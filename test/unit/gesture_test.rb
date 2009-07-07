@@ -1,8 +1,15 @@
 require 'test_helper'
 
 class GestureTest < ActiveSupport::TestCase
-  # Replace this with your real tests.
-  test "the truth" do
-    assert true
+
+  test "seeding?" do
+    
+    gesture_1 = Gesture.create :name => "throw"
+    assert gesture_1.seeding?
+    
+    gesture_2 = Gesture.create :name => "catch"
+    assert !gesture_2.seeding?
+    
   end
+
 end

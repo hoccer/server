@@ -1,7 +1,7 @@
 class Location < ActiveRecord::Base
   
   has_one   :gesture
-  has_many  :upload
+  has_many  :uploads
   
   def self.create_from coordinate_string
     
@@ -35,6 +35,23 @@ class Location < ActiveRecord::Base
   
   def serialized_coordinates
     "#{latitude};#{longitude};#{accuracy}".gsub(".", ",")
+  end
+  
+  def find_seeder
+    Gesture.find_by_name(
+      Gesture::GESTURES[gesture.name],
+      :joins => :location,
+      :conditions => ["locations.created_at > ? AND " \
+                      "locations.latitude between ? AND ? AND "\
+                      "locations.longitude between ? AND ?", 
+                        10.seconds.ago,
+                        latitude - 0.01, 
+                        latitude + 0.01,
+                        longitude - 0.01,
+                        longitude + 0.01
+                      ]
+    ).location
+    
   end
   
 end

@@ -3,7 +3,9 @@ require 'test_helper'
 class InteractionTest < ActionController::IntegrationTest
   fixtures :all
 
-  test "uploading a file" do
+  test "uploading and receiving a file" do
+    
+    # Upload 
     
     assert_difference ["Location.count", "Gesture.count"], +1 do
       post( 
@@ -19,17 +21,40 @@ class InteractionTest < ActionController::IntegrationTest
     expected =  '{"uri": "http://www.example.com/locations/52,1212;13,4242;42,5"}'
     assert_equal expected, @response.body
     
-    @upload = File.new(
+    # Fake uploading a File because else we'd have to fake a multipart form
+    
+    attachment = File.new(
       File.join(RAILS_ROOT, "test", "fixtures", "upload_test.jpg")
     )
     
-    post(
-      "/locations/52,1212;13,4242;42,5/uploads",
-      :upload => {:attachment => @upload}
-    )
+    upload    = Upload.create :attachment => attachment
+    location  = Location.last
+    location.uploads << upload
+    location.save
+    assert_not_nil Upload.last.attachment_file_name
     
     assert_response :success
+    
+    # Send receiving gesture
+    
+    assert_difference ["Location.count", "Gesture.count"], +1 do
+      post( 
+        "/locations/52,1222;13,4262;42,5/gesture",
+        :gesture => {:name => "catch"}
+      )
+    end
+    assert_response :success
+    expected =  '{"uri": "http://www.example.com/locations/52,1212;13,4242;42,5"}'
+    assert_equal expected, @response.body
+    
+    # Poll for receipt
+    
+    get "/locations/52,1212;13,4242;42,5"
+    assert_response :success
+    upload_path = upload.attachment.url.sub(/\?\d+/, "")
+    expected    = "{\"files\": [\"http://www.example.com#{upload_path}\"]}"
+    assert_equal expected, @response.body
   end
   
-  
+
 end

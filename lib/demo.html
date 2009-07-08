@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+  	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+  	<title>untitled</title>
+  	
+  </head>
+  
+  <body>
+    <h1>Geste senden auf Location 52,1212;13,4242;42,0</h1>
+    <p>
+      <form action="http://throwdata.artcom.de/locations/52,1212;13,4242;42,0/gesture" method="post">
+        <input type="text" name="gesture[name]" value="throw" id="gesture[name]" />
+        <input type="submit" value="Send" />
+      </form>
+    </p>
+    
+    <hr />
+    
+    <h1>File hochladen</h1>
+    <p>
+      <form action="http://throwdata.artcom.de/locations/52,1212;13,4242;42,0/uploads" method="post" enctype="multipart/form-data">
+        <input type="file" name="upload[attachment]" id="upload[attachment]" />
+        <input type="submit" />
+      </form>
+    </p>
+    
+    <hr />
+    
+    
+    <h1>Empfangsgeste senden auf 52,121<span style="color: red">1</span>;13,424<span style="color: red">1</span>;42,0</h1>
+    <p>
+      <form action="http://throwdata.artcom.de/locations/52,1211;13,4241;42,0/gesture" method="post">
+        <input type="text" name="gesture[name]" value="catch" id="gesture[name]" />
+        <input type="submit" value="Send" />
+      </form>
+    </p>
+    
+    <hr />
+    
+    <h1>Pollen auf der returnierten URL</h1>
+    <p>
+      <form action="http://throwdata.artcom.de/locations/52,1212;13,4242;42,0/" method="get">
+        <input type="submit" value="Send" />
+      </form>
+    </p>
+    
+  </body>
+</html>

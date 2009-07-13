@@ -1,2 +1,4 @@
 db/*.sqlit3
 log/*.log
+public/system/*
+.DS_Store

@@ -10,7 +10,8 @@ class UploadsControllerTest < ActionController::TestCase
     post( 
       :create,
       :upload => {:attachment => @upload},
-      :location_id => "52,5211;13,1199;23,42"
+      :location_id => "52,5211;13,1199;23,42",
+      :gesture_id => "1"
     )
     
   end

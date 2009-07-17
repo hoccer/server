@@ -1,7 +1,6 @@
 class Location < ActiveRecord::Base
   
-  has_one   :gesture
-  has_many  :uploads
+  has_many   :gestures
   
   def self.create_from coordinate_string
     
@@ -39,7 +38,7 @@ class Location < ActiveRecord::Base
   
   def find_seeder
     Gesture.find_by_name(
-      Gesture::GESTURES[gesture.name],
+      Gesture::GESTURES[gestures.name],
       :joins => :location,
       :conditions => ["locations.created_at > ? AND " \
                       "locations.latitude between ? AND ? AND "\

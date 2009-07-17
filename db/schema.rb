@@ -27,7 +27,7 @@ ActiveRecord::Schema.define(:version => 20090703092657) do
   end
 
   create_table "uploads", :force => true do |t|
-    t.integer  "location_id"
+    t.integer  "gesture_id"
     t.string   "attachment_file_name"
     t.string   "attachment_content_type"
     t.integer  "attachment_file_size"

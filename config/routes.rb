@@ -1,8 +1,9 @@
 ActionController::Routing::Routes.draw do |map|
 
   map.resources :locations do |location|
-    location.resource :gesture
-    location.resource :uploads
+	  location.resources :gestures do |gesture|
+		  gesture.resource :upload
+	  end
   end
 
   map.connect ':controller/:action/:id'

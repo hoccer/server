@@ -7,7 +7,12 @@ class GesturesController < ApplicationController
     location.gestures << gesture
     
     if gesture.seeding?
-      response = {:uri => location_gesture_url(:id => gesture.id, :location_id => location.serialized_coordinates )}
+      response = {
+        :uri => location_gesture_url(
+          :id   => gesture.id, 
+          :location_id  => location.serialized_coordinates
+        )
+      }
     else
       response = {:uri => location_url(:id => wait_for_seeder(location))}
     end

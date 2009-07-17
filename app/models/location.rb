@@ -7,6 +7,18 @@ class Location < ActiveRecord::Base
     parameters = parse_coordinates(coordinate_string)
     
     location = create(
+      :latitude  => parameters[:latitude], 
+      :longitude => parameters[:longitude], 
+      :accuracy  => parameters[:accuracy]
+    )
+    
+    location
+  end
+  
+  def self.new_from_string coordinate_string
+    parameters = parse_coordinates(coordinate_string)
+    
+    location = new(
       :latitude  => parameters[0], 
       :longitude => parameters[1], 
       :accuracy  => parameters[2]
@@ -23,34 +35,44 @@ class Location < ActiveRecord::Base
       :first, 
       :conditions => [
         "latitude = ? AND longitude = ? AND accuracy = ?",
-        parameters[0], parameters[1], parameters[2]
+        parameters[:latitude], parameters[:longitude], parameters[:accuracy]
       ]
     )
   end
   
   def self.parse_coordinates coordinate_string
-    coordinate_string.gsub(/,/, ".").split(";").map { |s| s.to_f }
+    coordinates = coordinate_string.gsub(/,/, ".").split(";").map { |s| s.to_f }
+    result = {
+      :latitude => coordinates[0], 
+      :longitude => coordinates[1], 
+      :accuracy => coordinates[2]
+    }
   end
   
   def serialized_coordinates
     "#{latitude};#{longitude};#{accuracy}".gsub(".", ",")
   end
   
-  def find_seeder
-    Gesture.find_by_name(
-      Gesture::GESTURES[gestures.name],
+  def public_url
+    host = "#{request.protocol}#{request.env["HTTP_HOST"]}"
+    "#{host}/locations/#{serialized_coordinates}"
+  end
+  
+  def self.find_gestures options
+    Gesture.find_all_by_name(
+      Gesture::GESTURES[options[:gesture]],
       :joins => :location,
       :conditions => ["locations.created_at > ? AND " \
                       "locations.latitude between ? AND ? AND "\
                       "locations.longitude between ? AND ?", 
                         10.seconds.ago,
-                        latitude - 0.01, 
-                        latitude + 0.01,
-                        longitude - 0.01,
-                        longitude + 0.01
+                        options[:latitude]  - 0.01, 
+                        options[:latitude]  + 0.01,
+                        options[:longitude] - 0.01,
+                        options[:longitude] + 0.01
                       ]
-    ).location
+    )
     
   end
-  
+
 end

@@ -1,8 +1,8 @@
 ActionController::Routing::Routes.draw do |map|
 
-  map.resources :locations do |location|
+  map.resources :locations, :member => {:search => :get} do |location|
 	  location.resources :gestures do |gesture|
-		  gesture.resource :upload
+		  gesture.resources :uploads
 	  end
   end
 

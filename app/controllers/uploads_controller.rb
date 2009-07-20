@@ -16,5 +16,19 @@ class UploadsController < ApplicationController
     upload.update_attributes( params[:upload] )
     render :nothing => true, :status => 200
   end
-  
+
+  def show
+    
+    upload = Upload.find_by_checksum params[:id]
+    
+    if upload.attachment.original_filename.nil? 
+      render :nothing => true, :status => 204
+    else
+      send_data(
+        :filename => upload.attachment.original_filename,
+        :type => upload.attachment.content_type,
+        :status => 200
+      )
+    end
+  end
 end

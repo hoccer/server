@@ -1,35 +1,29 @@
+require 'sha1'
+
+
 class GesturesController < ApplicationController
   
   def create
+    host = "#{request.protocol}#{request.env["HTTP_HOST"]}"
+    
     location = Location.create_from(params[:location_id])
-    
-    gesture =  Gesture.create(params[:gesture])
+    gesture =  Gesture.create!(params[:gesture])
     location.gestures << gesture
+        
+    sha = SHA1.new( 
+      location_gesture_url(
+        :id   => gesture.id, 
+        :location_id  => location.serialized_coordinates
+      )
+    ).to_s
     
-    if gesture.seeding?
-      response = {
-        :uri => location_gesture_url(
-          :id   => gesture.id, 
-          :location_id  => location.serialized_coordinates
-        )
-      }
-    else
-      response = {:uri => location_url(:id => wait_for_seeder(location))}
-    end
+    upload = Upload.create(:checksum => sha)
+    gesture.upload = upload
+    upload.save
+
+    response = {:uri => "#{host}/uploads/#{sha}"}
     
     render :json => response.to_json
   end
-  
-  def wait_for_seeder location
-    expiration_time = Time.now + 10.seconds
     
-    while Time.now < expiration_time
-      if seeder = location.find_seeder
-        return seeder.serialized_coordinates
-      end
-    end
-    
-    return nil
-  end
-  
 end

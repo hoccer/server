@@ -5,8 +5,7 @@ class Location < ActiveRecord::Base
   def self.create_from coordinate_string
     
     parameters = parse_coordinates(coordinate_string)
-    
-    location = create(
+    location = create!(
       :latitude  => parameters[:latitude], 
       :longitude => parameters[:longitude], 
       :accuracy  => parameters[:accuracy]

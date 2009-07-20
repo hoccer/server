@@ -11,4 +11,10 @@ class UploadsController < ApplicationController
     end
   end
   
+  def update
+    upload = Upload.find_by_checksum params[:id]
+    upload.update_attributes( params[:upload] )
+    render :nothing => true, :status => 200
+  end
+  
 end

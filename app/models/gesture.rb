@@ -1,7 +1,7 @@
 class Gesture < ActiveRecord::Base
   
   belongs_to :location
-  has_many :uploads
+  has_one :upload
   
   GESTURES = {
     "catch" => "throw"

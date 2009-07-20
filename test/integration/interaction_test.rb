@@ -5,23 +5,24 @@ class InteractionTest < ActionController::IntegrationTest
 
   test "uploading and receiving a file" do
     
-    # Upload 
+    # Send seeding gesture 
     
-    assert_difference ["Location.count", "Gesture.count"], +1 do
+    assert_difference ["Location.count", "Gesture.count", "Upload.count"], +1 do
       post( 
         "/locations/52,1212;13,4242;42,5/gestures",
-        :gesture => {:name => "throw"},
-        :filename => "upload_test.jpg"
+        :gesture => {:name => "throw"}
       )
     end
-
+    
     assert_response :success
     
     assert_equal "throw", Gesture.last.name
     assert_equal Gesture.last.location, Location.last
     
-    expected =  '{"uri": "http://www.example.com/locations/52,1212;13,4242;42,5/gestures/' + Gesture.last.id.to_s +  '"}'
+    expected =  "{\"uri\": \"http://www.example.com/uploads/#{Upload.last.checksum}\"}"
     assert_equal expected, @response.body
+    
+    assert_nil Upload.last.attachment_uploaded_at
     
     # Fake uploading a File because else we'd have to fake a multipart form
     
@@ -30,15 +31,13 @@ class InteractionTest < ActionController::IntegrationTest
     
     # Send receiving gesture
     
-    
     get( "/locations/52,1222;13,4262;42,5/search?gesture=catch" )
     
     assert_response :success
     
-    expected = "{\"http://www.example.com/locations/52,1212;13,4242;42,5/" \
-               "gestures/#{Gesture.last.id}\": {\"uploads\": "\
-               "[\"http://www.example.com#{Upload.last.attachment.url}\"]}}"
-    
+    expected = "{\"uploads\": "\
+               "[\"http://www.example.com/uploads/#{Upload.last.checksum}\"]}"
+        
     assert_equal expected, @response.body
   end
   
@@ -48,10 +47,9 @@ class InteractionTest < ActionController::IntegrationTest
       File.join(RAILS_ROOT, "test", "fixtures", "upload_test.jpg")
     )
     
-    upload    = Upload.create :attachment => attachment
     gesture  = Location.last.gestures.last
-    gesture.uploads << upload
-    gesture.save
+    gesture.upload.update_attributes(:attachment => attachment)
+    gesture.upload.save
   end
   
 

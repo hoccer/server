@@ -14,19 +14,10 @@ class LocationsController < ApplicationController
     options     = coordinats.merge(:gesture => params[:gesture])
     gestures    = Location.find_gestures(options)
     
-    response = gestures.inject({}) do |result, gesture|
-      key = location_gesture_url(
-        :location_id => gesture.location.serialized_coordinates, 
-        :id => gesture.id
-      )
-      
-      value = {:uploads => gesture.uploads.map {|u| host + u.attachment.url}}
-      
-      result[key] = value
-      result
-    end
     
-    
+    response    = {
+      :uploads => gestures.map {|g| "#{host}/uploads/#{g.upload.checksum}"}
+    }
     
     render :json => response
   end

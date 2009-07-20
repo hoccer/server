@@ -24,7 +24,7 @@ class UploadsController < ApplicationController
     if upload.attachment.original_filename.nil? 
       render :nothing => true, :status => 204
     else
-      send_data(
+      send_file(
         :filename => upload.attachment.original_filename,
         :type => upload.attachment.content_type,
         :status => 200

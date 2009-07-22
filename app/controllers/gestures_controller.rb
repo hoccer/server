@@ -14,7 +14,7 @@ class GesturesController < ApplicationController
       location_gesture_url(
         :id   => gesture.id, 
         :location_id  => location.serialized_coordinates
-      )
+      ) + Time.now.to_s
     ).to_s
     
     upload = Upload.create(:checksum => sha)

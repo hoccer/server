@@ -10,13 +10,13 @@ class InteractionTest < ActionController::IntegrationTest
     assert_difference ["Location.count", "Gesture.count", "Upload.count"], +1 do
       post( 
         "/locations/52,1212;13,4242;42,5/gestures",
-        :gesture => {:name => "throw"}
+        :gesture => {:name => "distribute"}
       )
     end
     
     assert_response :success
     
-    assert_equal "throw", Gesture.last.name
+    assert_equal "distribute", Gesture.last.name
     assert_equal Gesture.last.location, Location.last
     
     expected =  "{\"uri\": \"http://www.example.com/uploads/#{Upload.last.checksum}\"}"
@@ -31,7 +31,7 @@ class InteractionTest < ActionController::IntegrationTest
     
     # Send receiving gesture
     
-    get( "/locations/52,1222;13,4262;42,5/search?gesture=catch" )
+    get( "/locations/52,1222;13,4262;42,5/search?gesture=distribute" )
     
     assert_response :success
     
@@ -52,5 +52,4 @@ class InteractionTest < ActionController::IntegrationTest
     gesture.upload.save
   end
   
-
 end

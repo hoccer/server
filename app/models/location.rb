@@ -59,7 +59,7 @@ class Location < ActiveRecord::Base
   
   def self.find_gestures options
     Gesture.find_all_by_name(
-      Gesture::GESTURES[options[:gesture]],
+      options[:gesture],
       :joins => :location,
       :conditions => ["locations.created_at > ? AND " \
                       "locations.latitude between ? AND ? AND "\

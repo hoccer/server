@@ -42,6 +42,37 @@ class InteractionTest < ActionController::IntegrationTest
   end
   
   
+  test "downloading a passed upload which was already downloaded" do
+    
+    prepare_upload
+    
+    get upload_path(:id => "23232323")
+    assert_response 200
+    
+    get upload_path(:id => "23232323")
+    assert_response 403
+    
+  end
+  
+  def prepare_upload
+    location = Location.create(
+      :latitude => 13.44, :longitude => 52.12, :accuracy => 42.0
+    )
+    
+    gesture = location.gestures.create :name => "pass"
+
+    attachment = File.new(
+      File.join(RAILS_ROOT, "test", "fixtures", "upload_test.jpg")
+    )
+
+    upload = Upload.create(
+      :checksum => "23232323", :attachment => attachment
+    )
+    
+    gesture.upload = upload
+    upload.save
+  end
+
   def fake_upload_file
     attachment = File.new(
       File.join(RAILS_ROOT, "test", "fixtures", "upload_test.jpg")

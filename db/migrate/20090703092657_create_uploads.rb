@@ -7,6 +7,7 @@ class CreateUploads < ActiveRecord::Migration
       t.integer   :attachment_file_size
       t.datetime  :attachment_uploaded_at
       t.string    :checksum
+      t.integer   :download_counter,        :default => 0
 
       t.timestamps
     end

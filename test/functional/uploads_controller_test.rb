@@ -17,8 +17,21 @@ class UploadsControllerTest < ActionController::TestCase
   end
   
   test "fetching an upload without an attachment" do
-    Upload.create :checksum => "2323232323"
-    get :show, :id => "2323232323"
+    location = Location.create(
+      :latitude => 13.44, :longitude => 52.12, :accuracy => 42.0
+    )
+    
+    gesture = location.gestures.create :name => "throw"
+
+    upload = Upload.create(
+      :checksum => "23232323"
+    )
+    
+    gesture.upload = upload
+    upload.save
+    
+    
+    get :show, :id => "23232323"
     assert_response 204
   end
   
@@ -49,7 +62,6 @@ class UploadsControllerTest < ActionController::TestCase
     get :show, :id => "23232323"
     assert_response 200
   end
-  
   
   
 end

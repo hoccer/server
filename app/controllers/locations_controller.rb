@@ -12,8 +12,8 @@ class LocationsController < ApplicationController
     host        = "#{request.protocol}#{request.env["HTTP_HOST"]}"
     coordinats  = Location.parse_coordinates(params[:id])
     options     = coordinats.merge(:gesture => params[:gesture])
-    gestures    = Location.find_gestures(options)
     
+    gestures    = get_gestures(options)
     
     response    = {
       :uploads => gestures.map {|g| "#{host}/uploads/#{g.upload.checksum}"}
@@ -22,4 +22,13 @@ class LocationsController < ApplicationController
     render :json => response
   end
   
+  
+  def get_gestures options
+    unless gestures = Location.find_gestures(options)
+      sleep(1)
+      get_gestures(options)
+    else
+      return gestures
+    end
+  end
 end

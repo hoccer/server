@@ -5,7 +5,8 @@
       type="text/javascript"></script>
 
 <script src="javascripts/jquery-1-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="javascripts/ajaxupload.3.5.js" type="text/javascript" charset="utf-8"></script>
+<script src="javascripts/swfobject.js" type="text/javascript" charset="utf-8"></script>
+<script src="javascripts/jquery.uploadify.v2.0.1.min.js" type="text/javascript" charset="utf-8"></script>
       
       
       
@@ -74,27 +75,22 @@
             
       if ($("input[value=upload]").attr("checked")) {
         $.ajax({
-           type: "POST",
-           url: "/locations/"+lat+";"+lng+";100,0/gestures",
-           data: "name=distribute",
-           success: function(msg){
-             $("#upload_response").html(msg);
-             //new AjaxUpload('#upload', {action: 'upload.php'});
-            
-             path = msg.split("/")[4].replace(/\"\}/, "");
-            
-             new AjaxUpload('#upload', {
-               action: "/uploads/" + path,
-               name: "upload[attachment]",
-               data: {"_method" : "put"},
-               onSubmit: function() {
-                 // allow only 1 upload
-                 this.disable();
-               }
-             });
-             }
-            
-           });
+          type: "POST",
+          url: "/locations/"+lat+";"+lng+";100,0/gestures",
+          data: "name=distribute",
+          success: function(msg){
+            $("#upload_response").html(msg);
+            path = msg.split("/")[4].replace(/\"\}/, "");
+          
+            $('#upload_foo').uploadify({
+              'uploader':  '/uploadify.swf',
+              'cancelImg': '/images/rails.png',
+              'auto':      'true',
+              'scriptData': {'_method' : 'put'}, 
+              'script':    "/uploads/" + path
+            });
+          }
+        });
       }
       else {
         alert("http://localhost/locations/"+lat+";"+lng+";100,0");
@@ -114,6 +110,10 @@
   <div id="map_canvas" style="width: 600px; height: 450px"></div>
   
   <form action="#" method="get" accept-charset="utf-8">
+    <p>
+      <input type="radio" name="gesture_name" value="distribute" checked="checked"/> Distribute
+      <input type="radio" name="gesture_name" value="pass" /> Pass
+    </p>
     
     <p>
       <input type="radio" name="request_method" value="upload" checked="checked"/> Upload
@@ -121,14 +121,16 @@
     </p>
       <p>Latitude: <input type="text" name="lat" id="latbox" value="1" /></p>
       <p>Longitude: <input type="text" name="long" id="lonbox" value="2" /></p>
-    <input type="submit" id="submit" value="Submit">
+    <input type="submit" id="submit" value="Go">
   </form>
   
   <p id="upload_response">
     
   </p>
   
-  <div id="upload" style="background-color: silver; height: 50px; width: 50px"></div>
+  <div id="upload_foo">
+   
+  </div>
   
   <div id="results"></div>
 </body>

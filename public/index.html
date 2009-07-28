@@ -38,7 +38,7 @@
     if (GBrowserIsCompatible()) {
       mapContainer = document.getElementById("map_canvas");
       map = new GMap2(mapContainer);
-      map.setCenter(new GLatLng(52.50094, 13.34566), 17);
+      map.setCenter(new GLatLng(52.501077, 13.345116), 17);
       map.enableScrollWheelZoom();
     }
     
@@ -103,7 +103,7 @@
         $.ajax({
           type: "POST",
           url: "/locations/"+lat+";"+lng+";100,0/gestures",
-          data: "name=" + $('input[name=gesture_name]:checked').val(),
+          data: "gesture[name]=" + $('input[name=gesture_name]:checked').val(),
           success: function(msg){
             $("#upload_response").html(msg);
             path = msg.split("/")[4].replace(/\"\}/, "");

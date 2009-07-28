@@ -74,6 +74,9 @@
       lng = lng.toString().replace(/\./, ",");
             
       if ($("input[value=upload]").attr("checked")) {
+        
+        $("body").append("<div id='upload_foo'></div>");
+        
         $.ajax({
           type: "POST",
           url: "/locations/"+lat+";"+lng+";100,0/gestures",
@@ -87,7 +90,10 @@
               'cancelImg': '/images/rails.png',
               'auto':      'true',
               'scriptData': {'_method' : 'put'}, 
-              'script':    "/uploads/" + path
+              'script':    "/uploads/" + path,
+              onAllComplete : function() {
+                $("#upload_foo").remove();
+              }
             });
           }
         });
@@ -127,10 +133,6 @@
   <p id="upload_response">
     
   </p>
-  
-  <div id="upload_foo">
-   
-  </div>
   
   <div id="results"></div>
 </body>

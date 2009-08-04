@@ -14,6 +14,8 @@ class UploadsController < ApplicationController
   def update
     upload = Upload.find_by_checksum params[:id]
     upload.update_attributes( params[:upload] )
+    content_type = MIME::Types.type_for(upload.attachment.original_filename).to_s
+    upload.update_attributes :attachment_content_type => content_type
     render :nothing => true, :status => 200
   end
 

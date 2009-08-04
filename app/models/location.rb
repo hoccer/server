@@ -1,5 +1,7 @@
 class Location < ActiveRecord::Base
   
+  EARTH_RADIUS = 6378.1 # in Kilometers
+  
   has_many   :gestures
   
   def self.create_from coordinate_string
@@ -46,6 +48,22 @@ class Location < ActiveRecord::Base
       :longitude => coordinates[1], 
       :accuracy => coordinates[2]
     }
+  end
+  
+  def self.distance location_a, location_b
+    
+    distance_latitude   = (location_a.latitude - location_b.latitude).to_rad
+    distance_longitude  = (location_a.longitude - location_b.longitude).to_rad
+    
+    a = (Math.sin(distance_latitude/2) ** 2) + 
+        (Math.cos(location_a.latitude.to_rad) * 
+        Math.cos(location_b.latitude.to_rad)) * 
+        (Math.sin((distance_longitude/2) ** 2))
+        
+    c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+    
+    distance = EARTH_RADIUS * c
+    
   end
   
   def serialized_coordinates

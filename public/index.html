@@ -123,12 +123,15 @@
         });
       }
       else {
-        alert("http://localhost/locations/"+lat+";"+lng+";100,0");
-      
-      
+        $.ajax({
+          type: "GET",
+          dataType: "json",
+          url: "/locations/"+lat+";"+lng+";100,0/search?gesture="+$('input[name=gesture_name]:checked').val(),
+          success: function(msg) {
+            $("#downloads").append("<a href='"+msg.uploads[0]+"'>"+ msg.uploads[0]+"</a>");
+          }
+        });      
       }
-      
-      
       
       return false;
       
@@ -214,6 +217,10 @@
     </p>
     
     <div id="results"></div>
+    
+    <div id="downloads">
+      
+    </div>
   </div>
 </body>
 </html>

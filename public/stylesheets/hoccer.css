@@ -19,3 +19,8 @@ h1 {
   padding: 10px;
   border: 2px dashed #000000;
 }
+
+#uploader {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}

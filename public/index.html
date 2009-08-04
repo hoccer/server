@@ -10,7 +10,8 @@
     <script src="javascripts/jquery.uploadify.v2.0.1.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="javascripts/maps.js" type="text/javascript" charset="utf-8"></script>
     <script src="javascripts/hoccer.js" type="text/javascript" charset="utf-8"></script>
-    <link rel="stylesheet" href="/stylesheets/hoccer.css" type="text/css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="/stylesheets/hoccer.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="stylesheets/uploadify.css" type="text/css" media="screen" charset="utf-8" />
   </head>
   <body>
     
@@ -20,45 +21,30 @@
     <div id="wrapper">
       <div id="map_canvas" style="width: 600px; height: 450px"></div>
       
+      <div id="uploader">
+        <div id="upload_foo"></div>
+      </div>
+      
       <form action="#" method="get" accept-charset="utf-8">
-        <p>
           <table>
             <tr>
               <td>
                 <input type="radio" name="gesture_name" value="distribute" checked="checked"/> Distribute
-              </td>
-              <td>
                 <input type="radio" name="gesture_name" value="pass" /> Pass
               </td>
-            </tr>
-            <tr>
               <td>
-                <input type="radio" name="request_method" value="upload" checked="checked"/> Upload
-              </td>
-              <td>
-                <input type="radio" name="request_method" value="download" /> Download
-              </td>
-            </tr>
-            <tr>
-              <td>Latitude:</td>
-              <td><input type="text" name="lat" id="latbox" value="1" /></td>
-            </tr>
-            <tr>
-              <td>Longitude:</td>
-              <td><input type="text" name="long" id="lonbox" value="2" /</td>
-            </tr>
-            <tr>
-              <td colspan="2" style="text-align: right">
                 <input type="submit" id="submit" value="Go" />
               </td>
             </tr>
+            <tr>
+              <td><input type="hidden" name="lat" id="latbox" value="1" /></td>
+              <td><input type="hidden" name="long" id="lonbox" value="2" /></td>
+            </tr>
           </table>   
-        </p>
+        
       </form>
       
-      <p id="upload_response">
-        
-      </p>
+      
       
       <div id="results"></div>
       

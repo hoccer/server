@@ -9,7 +9,7 @@ class InteractionTest < ActionController::IntegrationTest
     
     assert_difference ["Location.count", "Gesture.count", "Upload.count"], +1 do
       post( 
-        "/locations/52,1212;13,4242;42,5/gestures",
+        "/locations/52,1212;13,4242;80/gestures",
         :gesture => {:name => "distribute"}
       )
     end
@@ -31,7 +31,7 @@ class InteractionTest < ActionController::IntegrationTest
     
     # Send receiving gesture
     
-    get( "/locations/52,1222;13,4262;42,5/search?gesture=distribute" )
+    get( "/locations/52,1222;13,4262;100/search?gesture=distribute" )
     
     assert_response :success
     

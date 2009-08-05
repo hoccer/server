@@ -1,6 +1,11 @@
 class Location < ActiveRecord::Base
   
-  EARTH_RADIUS = 6378.1 # in Kilometers
+  EARTH_RADIUS = 6378100 # in Meters
+  
+  # named scopes
+  
+  named_scope :recent, lambda { {:conditions => ["created_at > ?", (5.seconds.ago)]}}
+  
   
   has_many   :gestures
   
@@ -19,11 +24,7 @@ class Location < ActiveRecord::Base
   def self.new_from_string coordinate_string
     parameters = parse_coordinates(coordinate_string)
     
-    location = new(
-      :latitude  => parameters[0], 
-      :longitude => parameters[1], 
-      :accuracy  => parameters[2]
-    )
+    location = self.new parameters
     
     location
   end
@@ -75,20 +76,18 @@ class Location < ActiveRecord::Base
     "#{host}/locations/#{serialized_coordinates}"
   end
   
-  def self.find_gestures options
-    Gesture.find_all_by_name(
-      options[:gesture],
-      :joins => :location,
-      :conditions => ["locations.created_at > ? AND " \
-                      "locations.latitude between ? AND ? AND "\
-                      "locations.longitude between ? AND ?", 
-                        10.seconds.ago,
-                        options[:latitude]  - 0.01, 
-                        options[:latitude]  + 0.01,
-                        options[:longitude] - 0.01,
-                        options[:longitude] + 0.01
-                      ]
-    )
+  def self.find_gestures search_location, gesture_name
+    
+    locations = Location.recent(:include => :gestures).select do |location|
+
+      max_distance  = location.accuracy + search_location.accuracy
+      real_distance = Location.distance location, search_location
+      logger.info ">> max/real distance: #{max_distance} / #{real_distance}"
+      real_distance < max_distance && location.gestures[0].name == gesture_name
+      
+    end
+    
+    locations.map {|l| l.gestures[0]}
     
   end
 

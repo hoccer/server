@@ -10,15 +10,13 @@ class LocationsController < ApplicationController
   
   def search
     host        = "#{request.protocol}#{request.env["HTTP_HOST"]}"
-    coordinats  = Location.parse_coordinates(params[:id])
-    options     = coordinats.merge(:gesture => params[:gesture])
-    
-    gestures    = get_gestures(options)
+    location    = Location.new_from_string(params[:id])
+    gestures    = get_gestures(location, params[:gesture])
     counter     = 0
     
     while gestures.empty? && counter < 5
       sleep(1)
-      gestures = get_gestures(options)
+      gestures = get_gestures(location, params[:gesture])
       counter += 1
     end
     
@@ -30,7 +28,7 @@ class LocationsController < ApplicationController
   end
   
   
-  def get_gestures options
-    gestures = Location.find_gestures(options)
+  def get_gestures location, gesture
+    gestures = Location.find_gestures(location, gesture)
   end
 end

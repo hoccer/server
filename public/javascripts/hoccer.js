@@ -29,7 +29,7 @@ $(document).ready(function(){
       $.ajax({
         type: "GET",
         dataType: "json",
-        url: "/locations/"+lat+";"+lng+";100,0/search?gesture="+$('input[name=gesture_name]:checked').val(),
+        url: "/locations/"+lat+";"+lng+";80,0/search?gesture="+$('input[name=gesture_name]:checked').val(),
         success: function(msg) {
           $("#downloads").append("<a href='"+msg.uploads[0]+"'>"+ msg.uploads[0]+"</a>");
         }

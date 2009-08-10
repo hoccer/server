@@ -24,3 +24,22 @@ h1 {
   margin-top: 20px;
   margin-bottom: 20px;
 }
+
+iframe {
+  border: 1px solid #000000;
+}
+
+#response_message {
+  background-color: #ffffff;
+  border-top: 1px solid #000000;
+  border-left: 1px solid #000000;
+  border-right: 1px solid #000000;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+}
+
+#response_popup {
+  width: 800px;
+  text-align: center;
+}

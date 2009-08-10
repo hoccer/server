@@ -31,7 +31,28 @@ $(document).ready(function(){
         dataType: "json",
         url: "/locations/"+lat+";"+lng+";80,0/search?gesture="+$('input[name=gesture_name]:checked').val(),
         success: function(msg) {
-          $("#downloads").append("<a href='"+msg.uploads[0]+"'>"+ msg.uploads[0]+"</a>");
+          if (msg.uploads[0]) {
+            $.ajax({
+              type: "GET",
+              url: msg.uploads[0],
+              
+              complete : function(xhr, status_text) {
+                var tmp_regexp = /Content-Type\:\s([a-z\/]+)/
+                content_type = tmp_regexp.exec(xhr.getAllResponseHeaders())[1];
+                generic_type = content_type.split("/")[0];
+                
+                switch (generic_type) {
+                  case "image":
+                    popup.handle_image(msg.uploads[0]);
+                    break;
+                  case "text":
+                    popup.handle_text(xhr.responseText)
+                    break;
+                }
+                
+              } 
+            });
+          }
         }
       });      
     }
@@ -40,6 +61,28 @@ $(document).ready(function(){
     
   });
 });
+
+var popup = {
+  
+  handle_image : function(image_url) {
+    Shadowbox.open({
+      content:    image_url,
+      player:     "img"
+    });
+  },
+  
+  handle_text : function(text) {
+    if (text.match(/^http:\/\//)) {
+      Shadowbox.open({
+        content:    text,
+        title:      text,
+        player:     "iframe"
+      });
+    } else {
+      popup.handle_text(xhr.responseText);
+    }
+  }
+}
 
 var uploader = {
   initialize : function() {

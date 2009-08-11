@@ -73,7 +73,7 @@ var popup = {
   },
   
   handle_text : function(text) {
-    if (text.match(/^http:\/\//)) {
+    if (text.match(/^https?:\/\//)) {
       Shadowbox.open({
         content:    text,
         title:      text,

@@ -37,17 +37,18 @@ $(document).ready(function(){
               url: msg.uploads[0],
               
               complete : function(xhr, status_text) {
-                var tmp_regexp = /Content-Type\:\s([a-z\/]+)/
+                var tmp_regexp = /Content-Type\:\s([a-z\/-]+)/
                 content_type = tmp_regexp.exec(xhr.getAllResponseHeaders())[1];
                 generic_type = content_type.split("/")[0];
                 
-                switch (generic_type) {
-                  case "image":
-                    popup.handle_image(msg.uploads[0]);
-                    break;
-                  case "text":
-                    popup.handle_text(xhr.responseText)
-                    break;
+                if (content_type.match(/^image/)) {
+                  popup.handle_image(msg.uploads[0]);
+                } 
+                else if (content_type.match(/text\/x-vcard/)) {
+                  popup.handle_vcard(xhr.responseText, msg.uploads[0]);
+                }
+                else if (content_type.match(/^text/)) {
+                  popup.handle_text(xhr.responseText);
                 }
                 
               } 
@@ -81,6 +82,19 @@ var popup = {
     } else {
       popup.handle_text(xhr.responseText);
     }
+  },
+  
+  handle_vcard : function(vcard, url) {
+    
+    name = vcard.match(/FN\:(.+)/)[1];
+    
+    Shadowbox.open({
+      content:    "<table><tr><td id='vc_image'><a href='"+ url + "'>" + 
+                  "<img src='/images/vcard-icon.png' /></a></td>" + 
+                  "<td id='vc_text'>"+ name + "</td></tr></table>",
+      title:      "Contact",
+      player:     "html"
+    });
   }
 }
 

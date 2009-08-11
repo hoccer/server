@@ -43,3 +43,30 @@ iframe {
   width: 800px;
   text-align: center;
 }
+
+#sb-content table tr td#vc_image {
+  width: 128px;
+  height: 104px;
+  /*background-image: url(/images/vcard-icon.png);
+  background-position: center center;
+  background-repeat: no-repeat;*/
+  color: #ffffff;
+  vertical-align: middle;
+}
+
+#sb-content table tr td#vc_text {
+  font-family: Verdana, Helvetica, Arial, sans-serif;
+  font-size: 44px;
+  padding-left: 20px;
+}
+
+#sb-content table tr td#vc_image img {
+  vertical-align: middle;
+  padding-left: 20px;
+}
+
+#sb-content table {
+  background-color: #ffffff;
+  height: 100%;
+  width: 100%;
+}

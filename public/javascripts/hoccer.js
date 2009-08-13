@@ -1,67 +1,86 @@
 $(document).ready(function(){
   maps.initialize();
+  hoccer.initialize();
   uploader.initialize();
-  
-  /* Ajaxify the submit form */
-  $("#submit").click(function(){      
-    lat = $("#latbox").attr("value");
-    lng = $("#lonbox").attr("value");
-    
-    lat = lat.toString().replace(/\./, ",");
-    lng = lng.toString().replace(/\./, ",");
-          
-    if (0 < $("#upload_fooQueue").children().length) {
-      
-      var gesture_path = "/locations/"+lat+";"+lng+";100,0/gestures";
-      
-      $.ajax({
-        type: "POST",
-        url: gesture_path,
-        data: "gesture[name]=" + $('input[name=gesture_name]:checked').val(),
-        success: function(msg){
-          var upload_path = "/uploads/" + msg.split("/")[4].replace(/\"\}/, "");
-          $("#upload_foo").uploadifySettings('script', upload_path);
-          $("#upload_foo").uploadifyUpload(); 
-        }
-      });
-    }
-    else {
-      $.ajax({
-        type: "GET",
-        dataType: "json",
-        url: "/locations/"+lat+";"+lng+";80,0/search?gesture="+$('input[name=gesture_name]:checked').val(),
-        success: function(msg) {
-          if (msg.uploads[0]) {
-            $.ajax({
-              type: "GET",
-              url: msg.uploads[0],
-              
-              complete : function(xhr, status_text) {
-                var tmp_regexp = /Content-Type\:\s([a-z\/-]+)/
-                content_type = tmp_regexp.exec(xhr.getAllResponseHeaders())[1];
-                generic_type = content_type.split("/")[0];
-                
-                if (content_type.match(/^image/)) {
-                  popup.handle_image(msg.uploads[0]);
-                } 
-                else if (content_type.match(/text\/x-vcard/)) {
-                  popup.handle_vcard(xhr.responseText, msg.uploads[0]);
-                }
-                else if (content_type.match(/^text/)) {
-                  popup.handle_text(xhr.responseText);
-                }
-                
-              } 
-            });
-          }
-        }
-      });      
-    }
-    
-    return false;
-    
-  });
 });
+
+
+var hoccer = {
+  
+  initialize : function() {
+    // Ajaxify the submit form
+    $("#submit").click(function() {
+
+      // Get the coordinates from hidden input fields and replace dot with comma
+      lat = $("#latbox").attr("value");
+      lng = $("#lonbox").attr("value");
+
+      lat = lat.toString().replace(/\./, ",");
+      lng = lng.toString().replace(/\./, ",");
+
+
+      // If there is a file in the upload queue upload that file
+      if (0 < $("#upload_fooQueue").children().length) {
+
+        var gesture_path = "/locations/"+lat+";"+lng+";100,0/gestures";
+
+        $.ajax({
+          type: "POST",
+          url: gesture_path,
+          data: "gesture[name]=" + $('input[name=gesture_name]:checked').val(),
+          success: function(msg){
+            var upload_path = "/uploads/" + msg.split("/")[4].replace(/\"\}/, "");
+            $("#upload_foo").uploadifySettings('script', upload_path);
+            $("#upload_foo").uploadifyUpload(); 
+          }
+        });
+      }
+      // If there is nothing in the upload queue, search for files matching 
+      // time, gesture and location
+      else {
+        $.ajax({
+          type: "GET",
+          dataType: "json",
+          url: "/locations/"+lat+";"+lng+";80,0/search?gesture="+$('input[name=gesture_name]:checked').val(),
+          success: function(msg) {
+            if (msg.uploads[0]) {
+              hoccer.fetch_upload(msg.uploads[0]);
+            }
+          }
+        });      
+      }
+
+      // Disables regular click behavior
+      return false;
+
+    });
+  },
+  
+  
+  fetch_upload : function(upload_url) {
+    $.ajax({
+      type: "GET",
+      url: upload_url,
+      
+      complete : function(xhr, status_text) {
+        var tmp_regexp = /Content-Type\:\s([a-z\/-]+)/
+        content_type = tmp_regexp.exec(xhr.getAllResponseHeaders())[1];
+        generic_type = content_type.split("/")[0];
+        
+        if (content_type.match(/^image/)) {
+          popup.handle_image(upload_url);
+        } 
+        else if (content_type.match(/text\/x-vcard/)) {
+          popup.handle_vcard(xhr.responseText, upload_url);
+        }
+        else if (content_type.match(/^text/)) {
+          popup.handle_text(xhr.responseText);
+        }
+      }
+      
+    });
+  }
+}
 
 var popup = {
   

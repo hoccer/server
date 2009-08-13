@@ -10,13 +10,13 @@ class LocationsController < ApplicationController
   
   def search
     host        = "#{request.protocol}#{request.env["HTTP_HOST"]}"
-    location    = Location.new_from_string(params[:id])
-    gestures    = get_gestures(location, params[:gesture])
+    gesture     = Gesture.new_located_gesture(params[:gesture], params[:id])
+    gestures    = get_gestures(gesture)
     counter     = 0
     
     while gestures.empty? && counter < 5
       sleep(1)
-      gestures = get_gestures(location, params[:gesture])
+      gestures = get_gestures(gesture)
       counter += 1
     end
     
@@ -28,7 +28,7 @@ class LocationsController < ApplicationController
   end
   
   
-  def get_gestures location, gesture
-    gestures = Location.find_gestures(location, gesture)
+  def get_gestures gesture
+    gestures = Gesture.find_seeder(gesture)
   end
 end

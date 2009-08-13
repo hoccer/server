@@ -6,8 +6,7 @@ class InteractionTest < ActionController::IntegrationTest
   test "uploading and receiving a file" do
     
     # Send seeding gesture 
-    
-    assert_difference ["Location.count", "Gesture.count", "Upload.count"], +1 do
+    assert_difference ["Gesture.count", "Upload.count"], +1 do
       post( 
         "/locations/52,1212;13,4242;80/gestures",
         :gesture => {:name => "distribute"}
@@ -17,7 +16,6 @@ class InteractionTest < ActionController::IntegrationTest
     assert_response :success
     
     assert_equal "distribute", Gesture.last.name
-    assert_equal Gesture.last.location, Location.last
     
     expected =  "{\"uri\": \"http://www.example.com/uploads/#{Upload.last.checksum}\"}"
     assert_equal expected, @response.body
@@ -46,31 +44,25 @@ class InteractionTest < ActionController::IntegrationTest
     
     prepare_upload
     
-    get upload_path(:id => "23232323")
+    get upload_path(:id => Upload.last.checksum)
     assert_response 200
     
-    get upload_path(:id => "23232323")
+    get upload_path(:id => Upload.last.checksum)
     assert_response 403
     
   end
   
   def prepare_upload
-    location = Location.create(
-      :latitude => 13.44, :longitude => 52.12, :accuracy => 42.0
+    assert gesture = Gesture.create_located_gesture(
+      {:name => "pass"}, "13,44;52,12;42,0"
     )
-    
-    gesture = location.gestures.create :name => "pass"
 
     attachment = File.new(
       File.join(RAILS_ROOT, "test", "fixtures", "upload_test.jpg")
     )
 
-    upload = Upload.create(
-      :checksum => "23232323", :attachment => attachment
-    )
+    gesture.upload.update_attributes :attachment => attachment
     
-    gesture.upload = upload
-    upload.save
   end
 
   def fake_upload_file
@@ -78,7 +70,7 @@ class InteractionTest < ActionController::IntegrationTest
       File.join(RAILS_ROOT, "test", "fixtures", "upload_test.jpg")
     )
     
-    gesture  = Location.last.gestures.last
+    gesture  = Gesture.last
     gesture.upload.update_attributes(:attachment => attachment)
     gesture.upload.save
   end

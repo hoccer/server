@@ -10,7 +10,7 @@ class LocationsController < ApplicationController
   
   def search
     host        = "#{request.protocol}#{request.env["HTTP_HOST"]}"
-    gesture     = Gesture.new_located_gesture(params[:gesture], params[:id])
+    gesture     = Gesture.new_located_gesture({:name => params[:gesture]}, params[:id])
     gestures    = get_gestures(gesture)
     counter     = 0
     
@@ -29,6 +29,6 @@ class LocationsController < ApplicationController
   
   
   def get_gestures gesture
-    gestures = Gesture.find_seeder(gesture)
+    gestures = Gesture.find_in_range(gesture)
   end
 end

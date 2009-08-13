@@ -4,6 +4,8 @@ class Gesture < ActiveRecord::Base
   
   EARTH_RADIUS = 6367516 # in Meters
   
+  SEEDER_LIMITS = {"pass" => 1, "distribute" => 1}
+  
   # named scopes
   
   named_scope :recent, lambda { {:conditions => ["created_at > ?", (5.seconds.ago)]}}
@@ -25,16 +27,17 @@ class Gesture < ActiveRecord::Base
   end
 
   def self.create_located_gesture gesture, location_string
-    options = parse_coordinates(location_string).merge(gesture)
-    gesture = Gesture.create options
+    gesture = new_located_gesture( gesture, location_string )
+    gesture.save
+    gesture
   end
   
   def self.new_located_gesture gesture, location_string
-    options = parse_coordinates(location_string).merge(:name => gesture)
+    options = parse_coordinates(location_string).merge(gesture)
     gesture = Gesture.new options
   end
   
-  def self.find_seeder search_gesture
+  def self.find_in_range search_gesture
     
     gestures = Gesture.recent.select do |gesture|
       max_distance  = gesture.accuracy + search_gesture.accuracy
@@ -60,7 +63,11 @@ class Gesture < ActiveRecord::Base
     c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
     
     distance = EARTH_RADIUS * c
-    
+  
+  end
+  
+  def seed_limit
+    SEEDER_LIMITS[name]
   end
 
   private
@@ -72,6 +79,5 @@ class Gesture < ActiveRecord::Base
       self.upload = upload
       upload.save
     end
-    
-    
+ 
 end

@@ -1,6 +1,6 @@
 class Location < ActiveRecord::Base
   
-  EARTH_RADIUS = 6378100 # in Meters
+  EARTH_RADIUS = 6367516 # in Meters
   
   # named scopes
   

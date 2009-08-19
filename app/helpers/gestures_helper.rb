@@ -1,2 +1,0 @@
-module GesturesHelper
-end

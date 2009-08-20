@@ -89,6 +89,7 @@ class Peer < ActiveRecord::Base
         peer_group.peers << self
         update_expiration_time if self.first_seeder?
       else
+        PeerGroup
         peer_group = self.gesture.titlecase.constantize.create
         peer_group.peers << self
         update_expiration_time

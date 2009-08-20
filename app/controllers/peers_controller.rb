@@ -1,13 +1,12 @@
 class PeersController < ApplicationController
   
   def create
-    peer = Peer.create_from_params params
+    peer = Peer.create params[:peer]
     
     if peer
-      render :json => {
-        :peer_uri   => peer_url(:id => peer.uid),
-        :upload_uri => upload_url(:id => peer.upload.uid)
-      }.to_json
+      response = { :peer_uri => peer_url(:id => peer.uid) }  
+      response[:upload_uri] = upload_url(:id => peer.upload.uid) if peer.seeder
+      render :json => response.to_json
     else
       render :json => {:state => :error}, :status => 500
     end

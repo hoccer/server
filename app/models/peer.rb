@@ -21,7 +21,7 @@ class Peer < ActiveRecord::Base
       :gesture  => params[:gesture],
       :seeder   => (params[:role] == "seeder") 
     }
-    coordinates = Peer.parse_coordinates( params[:id] )
+    coordinates = Peer.parse_coordinates( params[:location] )
     create options.merge(coordinates)
   end
   

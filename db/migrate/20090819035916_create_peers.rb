@@ -6,7 +6,7 @@ class CreatePeers < ActiveRecord::Migration
       t.float :latitude
       t.float :longitude
       t.float :accuracy
-      t.boolean :seeder
+      t.boolean :seeder,        :default => false
       t.integer :peer_group_id
       t.timestamps
     end

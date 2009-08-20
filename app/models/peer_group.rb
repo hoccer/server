@@ -43,7 +43,7 @@ class PeerGroup < ActiveRecord::Base
         :state => :waiting,
         :expires => (expires_at-Time.now).to_i, 
         :resources => [],
-        :status_code => 204
+        :status_code => 202
       }
     elsif expired? && 0 <  number_of_seeders && 0 == number_of_peers
       {

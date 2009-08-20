@@ -1,5 +1,5 @@
 class PeersController < ApplicationController
-  
+  skip_before_filter :verify_authenticity_token 
   def create
     peer = Peer.create params[:peer]
     

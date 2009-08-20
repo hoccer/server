@@ -70,3 +70,7 @@ iframe {
   height: 100%;
   width: 100%;
 }
+
+#message {
+  height: 20px;
+}

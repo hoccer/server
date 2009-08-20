@@ -7,6 +7,8 @@ $(document).ready(function(){
 
 var hoccer = {
   
+  interval_id : 0,
+  
   initialize : function() {
     // Ajaxify the submit form
     $("#submit").click(function() {
@@ -15,40 +17,35 @@ var hoccer = {
       lat = $("#latbox").attr("value");
       lng = $("#lonbox").attr("value");
 
-      lat = lat.toString().replace(/\./, ",");
-      lng = lng.toString().replace(/\./, ",");
 
-
-      // If there is a file in the upload queue upload that file
+      var gesture_path = "/locations/"+lat+";"+lng+";100,0/gestures";
+        
+      var post_body = "peer[gesture]=" + $('input[name=gesture_name]:checked').val() +
+                      "&peer[latitude]=" + lat +
+                      "&peer[longitude]=" + lng +
+                      "&peer[accuracy]=" + 80.0
+                      
       if (0 < $("#upload_fooQueue").children().length) {
-
-        var gesture_path = "/locations/"+lat+";"+lng+";100,0/gestures";
-
-        $.ajax({
-          type: "POST",
-          url: gesture_path,
-          data: "gesture[name]=" + $('input[name=gesture_name]:checked').val(),
-          success: function(msg){
-            var upload_path = "/uploads/" + msg.split("/")[4].replace(/\"\}/, "");
+        post_body = post_body + "&peer[seeder]=1"
+      }
+      
+      
+      $.ajax({
+        type: "POST",
+        url: "/peers",
+        data: post_body,
+        dataType: "json",
+        success: function(msg){
+          if (msg.upload_uri) {
+            upload_path = msg.upload_uri.match(/(\/uploads\/.+)/)[1];
             $("#upload_foo").uploadifySettings('script', upload_path);
-            $("#upload_foo").uploadifyUpload(); 
+            $("#upload_foo").uploadifyUpload();
           }
-        });
-      }
-      // If there is nothing in the upload queue, search for files matching 
-      // time, gesture and location
-      else {
-        $.ajax({
-          type: "GET",
-          dataType: "json",
-          url: "/locations/"+lat+";"+lng+";80,0/search?gesture="+$('input[name=gesture_name]:checked').val(),
-          success: function(msg) {
-            if (msg.uploads[0]) {
-              hoccer.fetch_upload(msg.uploads[0]);
-            }
+          else {
+            hoccer.initialize_peer_query(msg.peer_uri);
           }
-        });      
-      }
+        }
+      });
 
       // Disables regular click behavior
       return false;
@@ -56,6 +53,30 @@ var hoccer = {
     });
   },
   
+  initialize_peer_query : function(url) {
+    var query_method = function() {hoccer.peer_query(url)}
+    hoccer.interval_id = setInterval(query_method, 1000);
+  },
+  
+  peer_query : function(url) {
+    $.ajax({
+      type: "GET",
+      url: url,
+      dataType: "json",
+      success : function(msg) {
+      },
+      complete : function(event, xhr, settings) {
+        $("#status").html(event.status);
+        if (event.status == 200) {
+          window.clearInterval(hoccer.interval_id);
+        }
+      },
+      error : function() {
+        alert("error");
+        window.clearInterval(hoccer.interval_id);
+      }
+    });
+  },
   
   fetch_upload : function(upload_url) {
     $.ajax({

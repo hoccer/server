@@ -71,6 +71,9 @@ class Peer < ActiveRecord::Base
     self.seeder && number_of_seeders_in_peer_group == 1
   end
   
+  def serialize_coordinates
+    "#{self.latitude};#{self.longitude};#{self.accuracy}"
+  end
   
   
   private
@@ -98,7 +101,7 @@ class Peer < ActiveRecord::Base
     
     def update_expiration_time
       self.peer_group.update_attributes(
-        :expires_at => self.created_at + 10.seconds
+        :expires_at => self.created_at + 5.seconds
       )
     end
     

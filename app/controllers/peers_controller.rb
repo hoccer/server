@@ -17,7 +17,12 @@ class PeersController < ApplicationController
   def show
     peer        = Peer.find_by_uid(params[:id])
     status      = peer.peer_group.status
+    
     log_peer_group_info(peer, status) unless status[:state] == :waiting
+    
+    # Rewrite Resource Links. There has to be a better way for that like
+    # returning the proper urls right from the model, somehow. Can be done
+    # later.
     status[:resources]  = status[:resources].map {|u| upload_url(:id => u)}
     render :json => status.to_json, :status => status[:status_code]
   end

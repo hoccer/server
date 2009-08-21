@@ -1,8 +1,13 @@
 class PeerGroup < ActiveRecord::Base
+  
+  # Associations
   has_many :peers
   
+  # Validations
   validate :no_collisions_present
 
+  # Instance Methods
+  
   def expired?
     expires_at < Time.now
   end
@@ -80,6 +85,7 @@ class PeerGroup < ActiveRecord::Base
 
 end
 
+# Single Table Inheritence Classes
 
 class Pass < PeerGroup
   def collisions?

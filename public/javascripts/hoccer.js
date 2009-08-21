@@ -103,7 +103,7 @@ var hoccer = {
         else if (content_type.match(/^text/)) {
           popup.handle_text(xhr.responseText);
         }
-      }2419
+      }
       
     });
   }
@@ -151,7 +151,8 @@ var uploader = {
       'cancelImg': '/images/cancel.png',
       'fileDataName': 'upload[attachment]',
       'scriptData': {'_method' : 'put'}, 
-      'script':    "/uploads/"
+      'script':    "/uploads/",
+      'onSelect': function(){}
     });
   }
 }

@@ -64,11 +64,17 @@ var hoccer = {
       url: url,
       dataType: "json",
       success : function(msg) {
+        if (0 < msg.resources.length) {
+          hoccer.fetch_upload(msg.resources[0]);
+        }
       },
       complete : function(event, xhr, settings) {
-        $("#status").html(event.status);
         if (event.status == 200) {
           window.clearInterval(hoccer.interval_id);
+          $("#status").empty();
+        }
+        if (event.status == 202 && (0 == $("#status img").length)) {
+          $("#status").append("<img src='/images/ajax-loader.gif' />" );
         }
       },
       error : function() {
@@ -97,7 +103,7 @@ var hoccer = {
         else if (content_type.match(/^text/)) {
           popup.handle_text(xhr.responseText);
         }
-      }
+      }2419
       
     });
   }
@@ -120,7 +126,7 @@ var popup = {
         player:     "iframe"
       });
     } else {
-      popup.handle_text(xhr.responseText);
+      alert("replace me with something good");
     }
   },
   

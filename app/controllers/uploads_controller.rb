@@ -15,11 +15,7 @@ class UploadsController < ApplicationController
     upload = Upload.find_by_uid params[:id]
     
     if !upload.attachment_ready?
-      render :nothing => true, :status => 204
-    end
-  
-    if upload.attachment_ready?
-      render :nothing => true, :status => 403
+      render :nothing => true, :status => 202
     end
   
     if upload.attachment_ready?

@@ -27,7 +27,7 @@ class UploadsControllerTest < ActionController::TestCase
     assert peer.upload
         
     get :show, :id => peer.upload.uid
-    assert_response 204
+    assert_response 202
   end
   
   test "fetching an upload with an attachment" do

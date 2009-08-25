@@ -9,7 +9,7 @@ to your hoccer-server/.git/config file.
        
 Then you can simply do a 
 
- $ git push hoccer.com
+ $ git push hoccer.com master
  
  to deploy your local version onto the server.
  

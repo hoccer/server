@@ -1,0 +1,19 @@
+= Deploying new versions of the server =
+
+To deploy a new version on www.hoccer.com you should have a remote ropsitory 
+to your hoccer-server/.git/config file.
+
+   [remote "hoccer.com"]
+       url = ssh://xadmin@throwdata.artcom.de/var/www/throwdata-server
+       fetch = +refs/heads/*:refs/remotes/server/*
+       
+Then you can simply do a 
+
+ $ git push hoccer.com
+ 
+ to deploy your local version onto the server.
+ 
+ 
+= Server Setup =
+
+The server has a post-commit hook ... (not jet)

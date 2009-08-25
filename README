@@ -16,4 +16,18 @@ Then you can simply do a
  
 = Server Setup =
 
-The server has a post-commit hook ... (not jet)
+The server has a post-receive hook (.git/hooks/post-receive) to update the
+server automaticly after :
+
+--------------8<-----------
+#!/bin/sh
+
+unset GIT_DIR
+PROJECT_DIR=`pwd`/../
+
+cd $PROJECT_DIR
+git reset --hard
+
+touch tmp/restart.txt
+-------------->8-----------
+

@@ -6,7 +6,7 @@ class PeersController < ApplicationController
     
     if peer
       response = { :peer_uri => peer_url(:id => peer.uid),
-                   :message => "Building group" }  
+                   :message => "Searching for partner" }  
       response[:upload_uri] = upload_url(:id => peer.upload.uid) if peer.seeder
       render :json => response.to_json
     else

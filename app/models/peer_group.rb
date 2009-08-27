@@ -47,6 +47,7 @@ class PeerGroup < ActiveRecord::Base
     elsif !expired?
       {
         :state => :waiting,
+        :message => (expires_at-Time.now).to_s,
         :expires => (expires_at-Time.now).to_i, 
         :resources => [],
         :status_code => 202
@@ -70,6 +71,7 @@ class PeerGroup < ActiveRecord::Base
     elsif expired? && 0 <  number_of_seeders && 0 <  number_of_peers
       {
         :state => :ready, 
+        :message => "Downloading the catched content",
         :expires => 0, 
         :resources => peers.map {|p| p.upload.uid if p.upload}.compact,
         :status_code => 200

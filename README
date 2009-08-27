@@ -28,6 +28,8 @@ PROJECT_DIR=`pwd`/../
 cd $PROJECT_DIR
 git reset --hard
 
+rake db:migrate
+
 touch tmp/restart.txt
 -------------->8-----------
 

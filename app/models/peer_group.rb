@@ -39,6 +39,7 @@ class PeerGroup < ActiveRecord::Base
     if collisions?
       {
         :state => :collision, 
+        :message => "Unfortunatly your hoc was intercepted. Try again."
         :expires => 0, 
         :resources => [], 
         :status_code => 409
@@ -53,6 +54,7 @@ class PeerGroup < ActiveRecord::Base
     elsif expired? && 0 <  number_of_seeders && 0 == number_of_peers
       {
         :state => :no_peers,
+        :message => "Nobody catched your content."
         :expires => 0,
         :resources => [],
         :status_code => 500
@@ -60,6 +62,7 @@ class PeerGroup < ActiveRecord::Base
     elsif expired? && 0 == number_of_seeders && 0 <  number_of_peers
       {
         :state => :no_seeders, 
+        :message => "Nothing was thrown to you."
         :expires => 0, 
         :resources => [],
         :status_code => 500

@@ -5,7 +5,8 @@ class PeersController < ApplicationController
     peer = Peer.create params[:peer]
     
     if peer
-      response = { :peer_uri => peer_url(:id => peer.uid) }  
+      response = { :peer_uri => peer_url(:id => peer.uid),
+                   :message => "Building group" }  
       response[:upload_uri] = upload_url(:id => peer.upload.uid) if peer.seeder
       render :json => response.to_json
     else

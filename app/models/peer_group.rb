@@ -60,7 +60,7 @@ class PeerGroup < ActiveRecord::Base
         :resources => [],
         :status_code => 500
       }
-    elsif expired? && 0 == number_of_seeders && 0 <  number_of_peers
+    elsif expired? && 0 == number_of_seeders && 0 < number_of_peers
       {
         :state => :no_seeders, 
         :message => "Nothing was thrown to you.",
@@ -68,7 +68,7 @@ class PeerGroup < ActiveRecord::Base
         :resources => [],
         :status_code => 500
       }
-    elsif expired? && 0 <  number_of_seeders && 0 <  number_of_peers
+    elsif expired? && 0 < number_of_seeders && 0 < number_of_peers
       {
         :state => :ready, 
         :message => "Downloading the catched content",

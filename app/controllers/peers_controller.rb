@@ -25,6 +25,7 @@ class PeersController < ApplicationController
     # returning the proper urls right from the model, somehow. Can be done
     # later.
     status[:resources]  = status[:resources].map {|u| upload_url(:id => u)}
+    status[:message] = "Uploading your content" if peer.seeder
     render :json => status.to_json, :status => status[:status_code]
   end
 

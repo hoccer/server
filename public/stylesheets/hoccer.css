@@ -22,13 +22,31 @@ h1 {
 
 #page {
   width: 800px;
-  height:400px;
   border-bottom: 1px solid black;
   margin: 0 auto;
+  padding: 0;
 }
 
 #welcome p {
   width: 500px;
+}
+
+.topic {
+  width: 250px;
+  float: left;
+  margin-right: 25px;
+  padding:0;
+}
+
+#last-topic {
+  margin-right: 0;
+}
+
+.topic img {
+  display: block;
+  width: 246px;
+  height:120px;
+  border: 2px solid blue;
 }
 
 #wrapper {

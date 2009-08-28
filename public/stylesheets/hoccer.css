@@ -6,29 +6,37 @@ body {
   
 }
 
-h1 {
-  margin: 0 auto;
-  padding-top:47px;
-  width: 800px;
-  text-align: left;
-  font-size: 24pt;
-  font-family: Verdana, Helvetica, Arial, sans-serif;
-  color: #08F9FF;
-}
-
-#logo {
-  float:left;
-  margin-left: -70px;
-  margin-top: 30px;
-  margin-right: 10px
-}
-
 #headline {
   width: 800px;
   margin: 0 auto;
-  height: 93px;
-  border-bottom: 1px solid red;
 }
+
+h1 {
+  margin: 57px auto 0;
+  width: 800px;
+  text-align: left;
+  font-size: 24pt;
+  font-family: Georgia, sans-serif;
+  color: #08F9FF;
+}
+
+.swap span {display: none}
+
+#logo {
+  position: relative;
+  float:left;
+  right: 67px;
+  bottom: 24px;
+ }
+
+#metanav {
+  height: 20px;
+  padding-top: 20px;
+}
+
+#metanav img { float: right; }
+#metanav a {  display: block; float: right; margin: 2px 6px;}
+#metanav a.last { margin-right: 0; }
 
 #page {
   width: 800px;
@@ -121,3 +129,27 @@ iframe {
 #message {
   height: 20px;
 }
+
+
+/** text replacement **/
+
+h1#hoccer { 
+  background: url(../images/hl_hoccer.gif) no-repeat; height: 36px;
+}
+
+a.swap { }
+a#contact {
+  background: url(../images/metanav_contact.gif) no-repeat; 
+  height: 7px; width:37px; }
+  
+a:hover#contact { background: url(../images/metanav_contact-mo.gif) no-repeat; }
+
+a#imprint { background: url(../images/metanav_imprint.gif) no-repeat; 
+  height: 7px; width:35px; }
+a:hover#imprint { background: url(../images/metanav_imprint-mo.gif) no-repeat; }
+
+h2#hl_welcome { background: url(../images/hl_welcome.gif) no-repeat; 
+  height: 18px; width:79px; }
+ 
+ 
+

@@ -5,7 +5,8 @@ class PeersController < ApplicationController
     peer = Peer.create params[:peer]
     
     if peer
-      response = { :peer_uri => peer_url(:id => peer.uid) }  
+      response = { :peer_uri => peer_url(:id => peer.uid),
+                   :message => "Searching for partner" }  
       response[:upload_uri] = upload_url(:id => peer.upload.uid) if peer.seeder
       render :json => response.to_json
     else
@@ -24,6 +25,7 @@ class PeersController < ApplicationController
     # returning the proper urls right from the model, somehow. Can be done
     # later.
     status[:resources]  = status[:resources].map {|u| upload_url(:id => u)}
+    status[:message] = "Uploading your content" if peer.seeder and status[:status_code] == 200
     render :json => status.to_json, :status => status[:status_code]
   end
 

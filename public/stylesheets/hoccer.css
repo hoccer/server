@@ -162,7 +162,7 @@ iframe {
 /** text replacement **/
 
 h1#hoccer { 
-  background: url(../images/hl_hoccer.gif) no-repeat; height: 36px;
+  background: url(../images/hl_hoccer.png) no-repeat; height: 36px;
 }
 
 a#contact {
@@ -175,16 +175,16 @@ a#imprint { background: url(../images/metanav_imprint.gif) no-repeat;
   height: 7px; width:35px; }
 a:hover#imprint { background: url(../images/metanav_imprint-mo.gif) no-repeat; }
 
-h2#hl_welcome { background: url(../images/hl_welcome.gif) no-repeat; 
+h2#hl_welcome { background: url(../images/hl_welcome.png) no-repeat; 
   height: 18px; width:79px; }
   
-h3#share { background: url(../images/hl_share.gif) no-repeat; 
+h3#share { background: url(../images/hl_share.png) no-repeat; 
   height: 18px; }
   
-h3#download { background: url(../images/hl_download.gif) no-repeat; 
+h3#download { background: url(../images/hl_download.png) no-repeat; 
   height: 18px; }
   
-h3#video { background: url(../images/hl_video.gif) no-repeat; 
+h3#video { background: url(../images/hl_video.png) no-repeat; 
   height: 18px; }
   
 a#artcom { background: url(../images/logo_artcom.gif) no-repeat; 

@@ -1,9 +1,6 @@
 body {
   margin: 0;
   padding: 0;
-  background: #fff url(../images/bg_gradient.gif) repeat-x;
-  color: #fff
-  
 }
 
 h1 {
@@ -11,23 +8,20 @@ h1 {
   padding-top:47px;
   width: 800px;
   text-align: left;
+<<<<<<< HEAD:public/stylesheets/hoccer.css
   font-size: 24pt;
+=======
+  font-size: 44pt;
+>>>>>>> c45b55be1f4b8ab26139f2c5a4408534f7dddf41:public/stylesheets/hoccer.css
   font-family: Verdana, Helvetica, Arial, sans-serif;
   color: #08F9FF;
 }
 
-#logo {
-  float:left;
-  margin-left: -70px;
-  margin-top: 30px;
-  margin-right: 10px
-}
-
 #headline {
-  width: 800px;
-  margin: 0 auto;
-  height: 93px;
-  border-bottom: 1px solid red;
+  width: 100%;
+  height: 80px;
+  border-bottom: 1px solid gray;
+  margin: 0;
 }
 
 #page {

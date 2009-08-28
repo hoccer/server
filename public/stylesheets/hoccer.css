@@ -2,12 +2,25 @@ body {
   margin: 0;
   padding: 0;
   background: #fff url(../images/bg_gradient.gif) repeat-x;
+  font-family: Georgia, sans-serif;
+  font-size: 10pt;
   color: #fff
-  
 }
 
+#people_layer {
+  background: url(../images/img_people.png) no-repeat 30px 320px;
+}
+
+#page {
+  width: 713px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+
+
 #headline {
-  width: 800px;
+  width: 713px;
   margin: 0 auto;
 }
 
@@ -16,7 +29,7 @@ h1 {
   width: 800px;
   text-align: left;
   font-size: 24pt;
-  font-family: Georgia, sans-serif;
+ 
   color: #08F9FF;
 }
 
@@ -31,26 +44,28 @@ h1 {
 
 #metanav {
   height: 20px;
-  padding-top: 20px;
+  padding-top: 10px;
 }
 
 #metanav img { float: right; }
 #metanav a {  display: block; float: right; margin: 2px 6px;}
 #metanav a.last { margin-right: 0; }
 
-#page {
-  width: 800px;
-  border-bottom: 1px solid black;
-  margin: 0 auto;
-  padding: 0;
-}
+
+
+#welcome { background: url(../images/img_worldmap_mobile.png) no-repeat;
+           background-position: right center;
+           height: 193px; 
+           margin-bottom: 30px; }
 
 #welcome p {
-  width: 500px;
+  width: 470px;
 }
 
 .topic {
-  width: 250px;
+  background: url(../images/line_dotted_teaser.gif) no-repeat top center;
+  width: 221px;
+  height: 279px;
   float: left;
   margin-right: 25px;
   padding:0;
@@ -61,11 +76,23 @@ h1 {
 }
 
 .topic img {
+  margin-top:16px;
   display: block;
-  width: 246px;
-  height:120px;
+  width: 217px;
+  height:100px;
   border: 2px solid blue;
 }
+
+#footer {height: 100px; }
+
+a#artcom {
+  display: block;
+  float: right;
+  margin-top: 8px;
+  }
+
+
+
 
 #wrapper {
   width: 600px;
@@ -137,7 +164,6 @@ h1#hoccer {
   background: url(../images/hl_hoccer.gif) no-repeat; height: 36px;
 }
 
-a.swap { }
 a#contact {
   background: url(../images/metanav_contact.gif) no-repeat; 
   height: 7px; width:37px; }
@@ -150,6 +176,18 @@ a:hover#imprint { background: url(../images/metanav_imprint-mo.gif) no-repeat; }
 
 h2#hl_welcome { background: url(../images/hl_welcome.gif) no-repeat; 
   height: 18px; width:79px; }
+  
+h3#share { background: url(../images/hl_share.gif) no-repeat; 
+  height: 18px; }
+  
+h3#download { background: url(../images/hl_download.gif) no-repeat; 
+  height: 18px; }
+  
+h3#video { background: url(../images/hl_video.gif) no-repeat; 
+  height: 18px; }
+  
+a#artcom { background: url(../images/logo_artcom.gif) no-repeat; 
+  height: 18px; width:155px; }
  
  
 

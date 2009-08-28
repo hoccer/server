@@ -20,12 +20,13 @@ body {
 
 
 #headline {
-  width: 713px;
   margin: 0 auto;
+  background: url(../images/line_header_gradient.png) no-repeat -10px bottom;
 }
 
 h1 {
-  margin: 57px auto 0;
+  margin: 55px auto 0;
+  padding-bottom: 3px;
   width: 800px;
   text-align: left;
   font-size: 24pt;

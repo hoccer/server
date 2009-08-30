@@ -4,7 +4,7 @@ class Peer < ActiveRecord::Base
   
   # Constants
   EARTH_RADIUS    = 6367516 # in Meters
-  PEERING_TIMEOUT = 5.seconds
+  PEERING_TIMEOUT = 10.seconds
   
   # Filters
   before_create :generate_uid

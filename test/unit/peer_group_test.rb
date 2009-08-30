@@ -7,7 +7,7 @@ class PeerGroupTest < ActiveSupport::TestCase
     sleep(1)
     peer_b = create_peer( 52.500927, 13.345738, 80.0, "distribute", false)
     
-    expected = (peer_a.created_at + 5.seconds)
+    expected = (peer_a.created_at + 10.seconds)
     assert expected.to_s == peer_b.peer_group.expires_at.to_s
   end
   
@@ -16,7 +16,7 @@ class PeerGroupTest < ActiveSupport::TestCase
     sleep(1)
     peer_b = create_peer( 52.500927, 13.345738, 80.0, "distribute", true)
       
-    expected = peer_b.created_at + 5.seconds
+    expected = peer_b.created_at + 10.seconds
     assert expected.to_s == peer_b.peer_group.expires_at.to_s
   end
   

@@ -8,3 +8,7 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 
 require 'tasks/rails'
+
+task :deploy do
+  system "git push ssh://xadmin@throwdata.artcom.de/var/www/throwdata-server master"
+end

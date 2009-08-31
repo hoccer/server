@@ -4,7 +4,7 @@ class Peer < ActiveRecord::Base
   
   # Constants
   EARTH_RADIUS    = 6367516 # in Meters
-  PEERING_TIMEOUT = 5.seconds
+  PEERING_TIMEOUT = 7.seconds
   
   # Filters
   before_create :generate_uid
@@ -25,7 +25,7 @@ class Peer < ActiveRecord::Base
   # Returns all peers in range of given peer that have the same gesture.
   def self.find_all_in_range_of search_peer
     peers = Peer.recent.select do |peer|
-      max_distance  = peer.accuracy + search_peer.accuracy
+      max_distance  = peer.radius + search_peer.radius
       real_distance = Peer.distance( peer, search_peer )
       logger.info ">> max/real distance: #{max_distance} / #{real_distance}"
       real_distance < max_distance && peer.gesture == search_peer.gesture
@@ -58,6 +58,11 @@ class Peer < ActiveRecord::Base
   
   def serialize_coordinates
     "#{self.latitude};#{self.longitude};#{self.accuracy}"
+  end
+  
+  def radius
+    return 100 if accuracy < 100
+    accuracy
   end
   
   # Checks if a given peer is the first seeder in its peer group

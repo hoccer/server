@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAArBdZ0DZSRXLy2C1ozFxLFRQzZPwNz97XU_hYl_IZSVQEp8Q4aRQC5RxRv6CmxTV5eRGLsKjXQH8p8g"
+          type="text/javascript"></script>
+    <script src="javascripts/jquery-1-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="javascripts/swfobject.js" type="text/javascript" charset="utf-8"></script>
+    <script src="javascripts/jquery.uploadify.v2.0.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="javascripts/maps.js" type="text/javascript" charset="utf-8"></script>
+    <script src="javascripts/hoccer.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="/shadowbox/shadowbox.js"></script>
+    <script type="text/javascript">
+      Shadowbox.init(
+        {players: ["html", "iframe", "img"]}
+      );
+    </script>
+    <link rel="stylesheet" href="/stylesheets/hoccer.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="stylesheets/uploadify.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="/shadowbox/shadowbox.css">
+  </head>
+  <body>
+    
+    <h1>
+      <img src="images/090728_hoccer_icon_01.png" width="48" height="48" alt="090728 Hoccer Icon 01" style="margin-right:10px" />hoccer
+    </h1>
+    <div id="wrapper">
+      <div id="map_canvas" style="width: 600px; height: 450px"></div>
+      <div id="status"></div>
+      <div id="uploader">
+        <div id="upload_foo"></div>
+      </div>
+      
+      <form action="#" method="get" accept-charset="utf-8">
+          <table>
+            <tr>
+              <td>
+                <input type="radio" name="gesture_name" value="distribute" checked="checked"/> Distribute
+                <input type="radio" name="gesture_name" value="pass" /> Pass
+              </td>
+              <td>
+                <input type="submit" id="submit" value="Go" />
+              </td>
+            </tr>
+            <tr>
+              <td><input type="hidden" name="lat" id="latbox" value="1" /></td>
+              <td><input type="hidden" name="long" id="lonbox" value="2" /></td>
+            </tr>
+          </table>
+      </form>
+  </body>
+</html>

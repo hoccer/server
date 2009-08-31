@@ -13,8 +13,10 @@ body {
 
 #page {
   width: 713px;
+  height:600px;
   margin: 0 auto;
   padding: 0;
+  clear: both;
 }
 
 

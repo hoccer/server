@@ -60,7 +60,7 @@ a {
 
 
 
-#welcome { background: url(../images/img_worldmap_mobile.png) no-repeat;
+#welcome { background: url(../images/img_worldmap.png) no-repeat;
            background-position: right center;
            height: 193px; 
            margin-bottom: 30px; }
@@ -78,6 +78,12 @@ a {
   padding:0;
 }
 
+#mobile_shot {
+	float: right;
+	padding-top:30px;
+	padding-right:60px;
+}
+
 #last-topic {
   margin-right: 0;
 }
@@ -87,7 +93,6 @@ a {
   display: block;
   width: 217px;
   height:100px;
-  border: 2px solid blue;
 }
 
 #footer {height: 100px; }
@@ -187,7 +192,7 @@ h2#hl_welcome { background: url(../images/hl_welcome.png) no-repeat;
 h3#share { background: url(../images/hl_share.png) no-repeat; 
   height: 18px; }
   
-h3#download { background: url(../images/hl_download.png) no-repeat; 
+h3#download { background: url(../images/hl_gethoccer.png) no-repeat; 
   height: 18px; }
   
 h3#video { background: url(../images/hl_video.png) no-repeat; 

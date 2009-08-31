@@ -34,6 +34,12 @@ h1 {
   color: #08F9FF;
 }
 
+a {
+   color: #fff;
+   text-decoration: underline;
+}
+
+
 .swap span {display: none}
 
 #logo {
@@ -91,7 +97,7 @@ a#artcom {
   float: right;
   margin-top: 8px;
   }
-
+  
 
 
 

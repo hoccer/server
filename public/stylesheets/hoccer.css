@@ -69,6 +69,11 @@ a {
   width: 470px;
 }
 
+#imprint p {
+	width: 750px;
+	font-size: 8pt;
+}
+
 .topic {
   background: url(../images/line_dotted_teaser.gif) no-repeat top center;
   width: 221px;

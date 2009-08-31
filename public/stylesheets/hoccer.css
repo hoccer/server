@@ -194,6 +194,9 @@ a:hover#imprint { background: url(../images/metanav_imprint-mo.gif) no-repeat; }
 h2#hl_welcome { background: url(../images/hl_welcome.png) no-repeat; 
   height: 18px; width:79px; }
   
+h2#imprint { background: url(../images/hl_imprint.png) no-repeat; 
+  height: 22px; }
+
 h3#share { background: url(../images/hl_share.png) no-repeat; 
   height: 18px; }
   

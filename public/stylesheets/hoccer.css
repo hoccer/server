@@ -17,6 +17,7 @@ body {
   margin: 0 auto;
   padding: 0;
   clear: both;
+  padding-bottom:100px;
 }
 
 
@@ -72,6 +73,11 @@ a {
 }
 
 #imprint p {
+	width: 750px;
+	font-size: 8pt;
+}
+
+#about p {
 	width: 750px;
 	font-size: 8pt;
 }

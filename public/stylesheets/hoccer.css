@@ -78,9 +78,17 @@ a {
 	font-size: 8pt;
 }
 
-#about p {
-	width: 750px;
-	font-size: 8pt;
+#about {
+	width: 400px;
+}
+
+#contact  {
+	width: 400px;
+}
+
+#contributors {
+	width: 240px;
+	float:right;
 }
 
 .topic {
@@ -117,8 +125,6 @@ a#artcom {
   margin-top: 8px;
   }
   
-
-
 
 #wrapper {
   width: 600px;
@@ -204,6 +210,15 @@ h2#hl_welcome { background: url(../images/hl_welcome.png) no-repeat;
   height: 18px; width:79px; }
   
 h2#imprint { background: url(../images/hl_imprint.png) no-repeat; 
+  height: 22px; }
+
+h2#about { background: url(../images/hl_about.png) no-repeat; 
+  height: 22px; }
+
+h2#contact { background: url(../images/hl_contact.png) no-repeat; 
+  height: 22px; }
+
+h2#contributors { background: url(../images/hl_contributors.png) no-repeat; 
   height: 22px; }
 
 h3#share { background: url(../images/hl_share.png) no-repeat; 

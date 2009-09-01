@@ -9,6 +9,12 @@ require 'rake/rdoctask'
 
 require 'tasks/rails'
 
-task :deploy do
-  system "git push ssh://xadmin@throwdata.artcom.de/var/www/throwdata-server master"
+task :publish_web do
+  system "git push ssh://xadmin@hoccer.com/var/www/throwdata-server master"
+end
+
+task :publish_service do
+  system "git push ssh://xadmin@hoccer.com/var/www/throwdata-server master"
+  system "ssh xadmin@hoccer.com -x "rake db:migrate"
+  system "ssh xadmin@hoccer.com -x "touch tmp/restart.txt"
 end

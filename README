@@ -1,14 +1,18 @@
 = Deploying new versions of the server =
 
-To deploy your local version onto www.hoccer.com you can simply type 
+To deploy your local version onto www.hoccer.com we have tow rake tasks
 
- $ rake deploy
+1. to publish a new webpage (no server restart) 
+ $ rake publish_web
+ 
+2. to update the webservice (restart apache needed) 
+ $ rake publish_service
  
  
 = Server Setup =
 
 The server has a post-receive hook (.git/hooks/post-receive) to update the
-server automaticly after :
+server automaticly after a push :
 
 --------------8<-----------
 #!/bin/sh
@@ -18,9 +22,5 @@ PROJECT_DIR=`pwd`/../
 
 cd $PROJECT_DIR
 git reset --hard
-
-rake db:migrate
-
-touch tmp/restart.txt
 -------------->8-----------
 

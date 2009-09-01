@@ -19,7 +19,7 @@ body {
 }
 
 #content {
- height:500px;
+ height:520px;
  clear:both;
 }
 
@@ -115,6 +115,7 @@ a {
   width: 217px;
   height:100px;
   border: 0px;
+  margin-bottom: 10px;
 }
 
 #footer {height: 100px; }
@@ -196,6 +197,16 @@ h1#hoccer {
   background: url(../images/hl_hoccer.png) no-repeat; height: 36px;
 }
 
+h2 {
+padding:0;
+  margin:0;
+  }
+
+h3 {
+padding:0;
+  margin:0;
+  }
+
 a#contact {
   background: url(../images/metanav_contact.gif) no-repeat; 
   height: 7px; width:37px; }
@@ -213,6 +224,10 @@ h2#imprint { background: url(../images/hl_imprint.png) no-repeat;
   height: 22px; 
     margin:0;
     padding:0;
+  }
+
+h2#hoc { background: url(../images/hl_share.png) no-repeat; 
+  height: 18px;
   }
 
 h2#about { background: url(../images/hl_about.png) no-repeat; 

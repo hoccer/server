@@ -3,7 +3,7 @@
 <head>
 <title>Hoccer Web-Client</title>
 <meta name="author" content="Rodja Trappe">
-<meta name="date" content="2009-09-01T16:59:26+0200">
+<meta name="date" content="2009-09-01T17:24:09+0200">
 <meta name="copyright" content="">
 <meta name="keywords" content="">
 <meta name="description" content="">
@@ -56,14 +56,35 @@
       You can use the Maps view to navigate to a location where you want to throw data to. 
     </p>
 
-    <div id="location">
-    
-    <div id="map_canvas" style="width: 400px; height: 400px"></div>
+    <div id="hoc_actions">
       <div id="status"></div>
-      <div id="uploader">
-        <div id="upload_foo"></div>
-      </div>
-    </div>    
+        <div id="uploader">
+          <div id="upload_foo"></div>
+        </div>        
+        <form action="#" method="get" accept-charset="utf-8">
+        <table>
+            <tr>
+              <td>
+                <input type="radio" name="gesture_name" value="distribute" checked="checked"/> Distribute
+                <input type="radio" name="gesture_name" value="pass" /> Pass
+              </td>
+              <td>
+                <input type="submit" id="submit" value="Go" />
+              </td>
+            </tr>
+            <tr>
+              <td><input type="hidden" name="lat" id="latbox" value="1" /></td>
+              <td><input type="hidden" name="long" id="lonbox" value="2" /></td>
+            </tr>
+          </table>
+      </form>    
+    </div> <!-- hoc actions -->
+
+    <div id="location">
+      <div id="map_canvas" style="width: 400px; height: 400px"></div>
+    </div> <!-- location -->
+        
+    
     
   </div> <!-- hoc --> 
   </div> <!-- content -->

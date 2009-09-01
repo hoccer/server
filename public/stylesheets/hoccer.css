@@ -96,6 +96,10 @@ a {
 	padding-right:60px;
 }
 
+#hoc_actions{
+  float:right;
+}
+
 .topic {
   background: url(../images/line_dotted_teaser.gif) no-repeat top center;
   width: 221px;

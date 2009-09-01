@@ -126,15 +126,6 @@ a#artcom {
   margin-top: 8px;
   }
   
-
-#wrapper {
-  width: 600px;
-  margin: 0 auto;
-  text-align: left;
-  padding: 10px;
-  border: 2px dashed #000000;
-}
-
 #uploader {
   margin-top: 20px;
   margin-bottom: 20px;
@@ -206,6 +197,10 @@ h3 {
 padding:0;
   margin:0;
   }
+  
+#map_canvas{
+  border: 3px solid lightgray;
+}
 
 a#contact {
   background: url(../images/metanav_contact.gif) no-repeat; 

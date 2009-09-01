@@ -15,6 +15,6 @@ end
 
 task :publish_service do
   system "git push ssh://xadmin@hoccer.com/var/www/throwdata-server master"
-  system "ssh xadmin@hoccer.com -x "rake db:migrate"
-  system "ssh xadmin@hoccer.com -x "touch tmp/restart.txt"
+  system "ssh xadmin@hoccer.com -x 'rake db:migrate'"
+  system "ssh xadmin@hoccer.com -x 'touch tmp/restart.txt'"
 end

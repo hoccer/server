@@ -210,7 +210,10 @@ h2#hl_welcome { background: url(../images/hl_welcome.png) no-repeat;
   height: 18px; width:79px; }
   
 h2#imprint { background: url(../images/hl_imprint.png) no-repeat; 
-  height: 22px; }
+  height: 22px; 
+    margin:0;
+    padding:0;
+  }
 
 h2#about { background: url(../images/hl_about.png) no-repeat; 
   height: 22px; }

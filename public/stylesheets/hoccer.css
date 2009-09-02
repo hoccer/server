@@ -154,8 +154,10 @@ a:hover {
 }
 
 #hoc_actions{
+  margin-top: 52px;
   float:right;
-  background-color:transparent;
+  background: url(../images/bg_box_share-receive.png) no-repeat top left;
+  /*background-color:transparent;*/
   width:316px;
   height:330px;
 }
@@ -263,8 +265,43 @@ iframe {
   height: 20px;
 }
 
+#location {
+  margin-top: 15px;
+}
+
+#hoc {
+ line-height: 1.2em;
+}
+
+#map_canvas {
+  margin-top: 15px;
+}
+
+.fileinput {
+  margin-top: 25px;
+  margin-bottom: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.inputlabel {
+ 	float:left;
+ 	margin-right: 20px;
+}
+
+.inputform {
+ 	float:right;
+}
+
+.distribution {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+
 
 /** text replacement **/
+
 
 h1#hoccer { 
   background: url(../images/hl_hoccer.png) no-repeat; height: 36px;
@@ -347,6 +384,8 @@ h3#video {
   
 a#artcom { background: url(../images/logo_artcom.gif) no-repeat; 
   height: 18px; width:155px; }
+  
+
  
  
 

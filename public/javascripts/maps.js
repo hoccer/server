@@ -4,8 +4,15 @@ var maps = {
     if (GBrowserIsCompatible()) {
       mapContainer = document.getElementById("map_canvas");
       map = new GMap2(mapContainer);
+      
       map.setCenter(new GLatLng(52.501077, 13.345116), 17);
       map.enableScrollWheelZoom();
+
+      if (navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(function(position){
+          map.setCenter(new GLatLng(position.coords.latitude, position.coords.longitude), 17);
+        });
+      }
     }
 
     maps.setup_screen();
@@ -62,8 +69,8 @@ var maps = {
     var radius_xy       = 300;
 
     var zoomed_radius_xy  = (radius_xy / scale_factor);
-    var overlay_x         = (600-zoomed_radius_xy)/2;
-    var overlay_y         = (450-zoomed_radius_xy)/2;
+    var overlay_x         = (340-zoomed_radius_xy)/2;
+    var overlay_y         = (340-zoomed_radius_xy)/2;
 
     logo = new GScreenOverlay('/images/radius.png',
             new GScreenPoint(overlay_x, overlay_y, 'pixels', 'pixels'),  // screenXY

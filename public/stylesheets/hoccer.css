@@ -8,6 +8,37 @@ body {
   color: #fff
 }
 
+h1 {
+  margin: 55px auto 0;
+  padding-bottom: 3px;
+  width: 800px;
+  text-align: left;
+  font-size: 24pt;
+ 
+  color: #08F9FF;
+}
+
+h2 {
+padding:0;
+  margin:0;
+  }
+
+h3 {
+padding:0;
+  margin:0;
+}
+
+a {
+   color: #fff;
+   text-decoration: none;
+}
+
+a:hover {
+   color: #fff;
+   text-decoration: none;
+}
+
+
 #people_layer {
   background: url(../images/img_people.png) no-repeat 30px 320px;
 }
@@ -30,25 +61,6 @@ body {
   background: url(../images/line_header_gradient.png) no-repeat -10px bottom;
 }
 
-h1 {
-  margin: 55px auto 0;
-  padding-bottom: 3px;
-  width: 800px;
-  text-align: left;
-  font-size: 24pt;
- 
-  color: #08F9FF;
-}
-
-a {
-   color: #fff;
-   text-decoration: none;
-}
-
-a:hover {
-   color: #fff;
-   text-decoration: none;
-}
 
 .swap span {display: none}
 
@@ -85,6 +97,10 @@ a:hover {
 	font-size: 8pt;
 }
 
+#imprint {
+	line-height: 1em;
+}
+
 #imprint a {
 	text-decoration: none;
 	border-bottom: 1px dotted white;
@@ -97,6 +113,7 @@ a:hover {
 
 #about {
 	width: 400px;
+	line-height: 1.2em;
 }
 
 #about a {
@@ -111,6 +128,7 @@ a:hover {
 
 #contact  {
 	width: 400px;
+	line-height: 1.2em;
 }
 
 #contact a {
@@ -124,6 +142,7 @@ a:hover {
 }
 
 #contributors {
+	line-height: 1.2em;
 	width: 240px;
 	float:right;
 }
@@ -251,16 +270,6 @@ h1#hoccer {
   background: url(../images/hl_hoccer.png) no-repeat; height: 36px;
 }
 
-h2 {
-padding:0;
-  margin:0;
-  }
-
-h3 {
-padding:0;
-  margin:0;
-  }
-  
 #map_canvas{
   border: 3px solid lightgray;
 }
@@ -290,16 +299,30 @@ h2#imprint { background: url(../images/hl_imprint.png) no-repeat;
 
 h2#hoc { background: url(../images/hl_share.png) no-repeat; 
   height: 18px;
+  margin-bottom: 20px;
   }
 
-h2#about { background: url(../images/hl_about.png) no-repeat; 
-  height: 22px; }
+h2#about { 
+	margin-bottom: 20px;
+	background: url(../images/hl_about.png) no-repeat; 
+  	height: 22px; 
+  	}
+  	
+ h2#imprint { 
+	margin-bottom: 20px;
+  	}
 
-h2#contact { background: url(../images/hl_contact.png) no-repeat; 
-  height: 22px; }
+h2#contact { 
+margin-bottom: 20px;
+background: url(../images/hl_contact.png) no-repeat; 
+  height: 22px; 
+  }
 
-h2#contributors { background: url(../images/hl_contributors.png) no-repeat; 
-  height: 22px; }
+h2#contributors { 
+margin-bottom: 20px;
+background: url(../images/hl_contributors.png) no-repeat; 
+  height: 22px; 
+  }
 
 h3#share { 
 	background: url(../images/hl_share.png) no-repeat; 

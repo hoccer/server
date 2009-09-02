@@ -70,11 +70,19 @@
 								<div class="inputlabel">
 									<img src="images/text_select-file-or-paste-text.png" /> 
 								</div>
+
 								<div class="inputforms">
+								<form action="#" method="get" accept-charset="utf-8">
 									<table height="71">
 										<tr>
-											
-											<td><a href="#"><img src="images/btn_browse.png" /></a></td>
+										<td>
+    										<input type="hidden" name="gesture_name" value="distribute"/>
+   											<input type="submit" id="submit" value="Go" />
+    										<input type="hidden" name="lat" id="latbox" value="1" />
+   									  <input type="hidden" name="long" id="lonbox" value="2" />
+
+											   <a href="#"><img src="images/btn_browse.png" /></a>
+											</td>
 										</tr>
 										<tr>
 											
@@ -82,7 +90,13 @@
 										</tr>
 									</table>
 										
-								</div>
+								</div> <!-- inputform -->
+      </form>
+      								
+								 <div id="status"></div>
+      <div id="uploader">
+        <div id="upload_foo"></div>
+      </div>
 							<img src="images/line_dotted_share-receive-box.png" /> 
 							</div>
 							

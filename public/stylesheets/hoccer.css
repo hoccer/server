@@ -43,7 +43,6 @@ h1 {
 
 a {
    color: #fff;
-   //text-decoration: underline;
    text-decoration: none;
 }
 
@@ -87,12 +86,42 @@ a:hover {
 	font-size: 8pt;
 }
 
+#imprint a {
+	text-decoration: none;
+	border-bottom: 1px dotted white;
+}
+
+#imprint a:hover {
+	text-decoration: none;
+	border-bottom: 1px solid white;
+}
+
 #about {
 	width: 400px;
 }
 
+#about a {
+	text-decoration: none;
+	border-bottom: 1px dotted white;
+}
+
+#about a:hover {
+	text-decoration: none;
+	border-bottom: 1px solid white;
+}
+
 #contact  {
 	width: 400px;
+}
+
+#contact a {
+	text-decoration: none;
+	border-bottom: 1px dotted white;
+}
+
+#contact a:hover {
+	text-decoration: none;
+	border-bottom: 1px solid white;
 }
 
 #contributors {

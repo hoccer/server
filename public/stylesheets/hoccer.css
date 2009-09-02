@@ -1,3 +1,5 @@
+/* general styles */
+
 body {
   margin: 0;
   padding: 0;
@@ -38,6 +40,7 @@ a:hover {
    text-decoration: none;
 }
 
+/* containers */
 
 #people_layer {
   background: url(../images/img_people.png) no-repeat 30px 320px;
@@ -61,7 +64,6 @@ a:hover {
   background: url(../images/line_header_gradient.png) no-repeat -10px bottom;
 }
 
-
 .swap span {display: none}
 
 #logo {
@@ -80,7 +82,19 @@ a:hover {
 #metanav a {  display: block; float: right; margin: 2px 6px;}
 #metanav a.last { margin-right: 0; }
 
+#footer {
+	height: 100px; 
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
 
+a#artcom {
+  display: block;
+  float: right;
+  margin-top: 8px;
+  }
+
+/* styles for specific pages */
 
 #welcome { background: url(../images/img_worldmap.png) no-repeat;
            background-position: right center;
@@ -198,18 +212,7 @@ a:hover {
 	border-bottom: 1px solid white;
 }
 
-#footer {
-	height: 100px; 
-	margin-top: 0px;
-	margin-bottom: 0px;
-}
 
-a#artcom {
-  display: block;
-  float: right;
-  margin-top: 8px;
-  }
-  
 #uploader {
   margin-top: 20px;
   margin-bottom: 20px;
@@ -304,8 +307,6 @@ input.text {
 	background-color: #e5ebee;
 	border: 1px solid white;
 }
-
-
 
 
 /** text replacement **/

@@ -2,8 +2,6 @@
 <html>
 	<head>
 		<title>Hoccer | Web-Client</title>
-		<meta name="author" content="Rodja Trappe">
-		<meta name="date" content="2009-09-02T10:46:52+0200">
 		<meta name="copyright" content="">
 		<meta name="keywords" content="">
 		<meta name="description" content="">
@@ -97,8 +95,12 @@
 						</div> <!-- hoc actions -->
 		
 						<div id="location">
-							
-							<div id="map_canvas" style="width: 380px; height: 380px"></div>
+							<form action="#" onsubmit="showAddress(this.address.value); return false">
+  	     <p>
+          <input type="text" size="20" name="address" value="" />
+          <input type="submit" value="Go!" />
+        </p>
+							<div id="map_canvas" style="width: 340px; height: 340px"></div>
 						
 						</div> <!-- location -->
 			

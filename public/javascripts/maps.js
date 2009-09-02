@@ -73,5 +73,37 @@ var maps = {
     map.addOverlay(logo);
 
   }
-  
+}
+
+// Create new geocoding object
+var geocoder = new GClientGeocoder();
+
+function showAddress(address) {
+		if (geocoder) {
+        geocoder.getLatLng(
+          address,
+          function(point) {
+            if (!point) {
+              alert("location '" + address + "' not found");
+            } else {
+              map.panTo(point);
+            }
+          }
+        );
+  }
+}
+
+function showAddress(address) {
+		if (geocoder) {
+        geocoder.getLatLng(
+          address,
+          function(point) {
+            if (!point) {
+              alert("location '" + address + "' not found");
+            } else {
+              map.panTo(point);
+            }
+          }
+        );
+  }
 }

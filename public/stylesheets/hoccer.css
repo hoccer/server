@@ -295,10 +295,16 @@ iframe {
 }
 
 .distribution {
-  margin-top: 40px;
+  margin-top: 20px;
   padding-left: 10px;
   padding-right: 10px;
 }
+
+input.text { 
+	background-color: #e5ebee;
+	border: 1px solid white;
+}
+
 
 
 

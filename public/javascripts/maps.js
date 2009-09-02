@@ -4,8 +4,15 @@ var maps = {
     if (GBrowserIsCompatible()) {
       mapContainer = document.getElementById("map_canvas");
       map = new GMap2(mapContainer);
+      
       map.setCenter(new GLatLng(52.501077, 13.345116), 17);
       map.enableScrollWheelZoom();
+
+      if (navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(function(position){
+          map.setCenter(new GLatLng(position.coords.latitude, position.coords.longitude), 17);
+        });
+      }
     }
 
     maps.setup_screen();

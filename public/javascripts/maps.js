@@ -62,8 +62,8 @@ var maps = {
     var radius_xy       = 300;
 
     var zoomed_radius_xy  = (radius_xy / scale_factor);
-    var overlay_x         = (600-zoomed_radius_xy)/2;
-    var overlay_y         = (450-zoomed_radius_xy)/2;
+    var overlay_x         = (340-zoomed_radius_xy)/2;
+    var overlay_y         = (340-zoomed_radius_xy)/2;
 
     logo = new GScreenOverlay('/images/radius.png',
             new GScreenPoint(overlay_x, overlay_y, 'pixels', 'pixels'),  // screenXY

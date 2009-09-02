@@ -73,5 +73,20 @@ var maps = {
     map.addOverlay(logo);
 
   }
-  
 }
+
+
+	function showAddress(address) {
+		if (geocoder) {
+        geocoder.getLatLng(
+          address,
+          function(point) {
+            if (!point) {
+              alert("location '" + address + "' not found");
+            } else {
+              map.panTo(point);
+            }
+          }
+        );
+      }
+    }

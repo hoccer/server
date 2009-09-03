@@ -11,52 +11,46 @@ var hoccer = {
   
   initialize : function() {
     $("#throw").click(function() {
-      alert("Your location: " + maps.getLongitude() + " " + maps.getLatitude());
-    });
-    
-    // Ajaxify the submit form
-    $("#submit").click(function() {
+      hoccer.post_gesture("distribute");
       
-      
-      // Get the coordinates from hidden input fields and replace dot with comma
-      lat = $("#latbox").attr("value");
-      lng = $("#lonbox").attr("value");
-
-
-      var gesture_path = "/locations/"+lat+";"+lng+";100,0/gestures";
-        
-      var post_body = "peer[gesture]=" + $('input[name=gesture_name]:checked').val() +
-                      "&peer[latitude]=" + lat +
-                      "&peer[longitude]=" + lng +
-                      "&peer[accuracy]=" + 80.0
-                      
-      if (0 < $("#upload_fooQueue").children().length) {
-        post_body = post_body + "&peer[seeder]=1"
-      }
-      
-      
-      $.ajax({
-        type: "POST",
-        url: "/peers",
-        data: post_body,
-        dataType: "json",
-        success: function(msg){
-          if (msg.upload_uri) {
-            upload_path = msg.upload_uri.match(/(\/uploads\/.+)/)[1];
-            $("#upload_foo").uploadifySettings('script', upload_path);
-            $("#upload_foo").uploadifyUpload();
-          }
-          else {
-            hoccer.initialize_peer_query(msg.peer_uri);
-          }
-        }
-      });
-
-      // Disables regular click behavior
       return false;
-
     });
   },
+  
+  post_gesture : function(gesture) {
+    lat = maps.getLatitude();
+    lng = maps.getLongitude();
+        
+    var post_body = "peer[gesture]=" + gesture +
+                    "&peer[latitude]=" + lat +
+                    "&peer[longitude]=" + lng +
+                    "&peer[accuracy]=" + 80.0
+
+    alert(post_body);
+
+                      
+    if (0 < $("#upload_fooQueue").children().length) {
+      post_body = post_body + "&peer[seeder]=1"
+    }
+      
+    $.ajax({
+      type: "POST",
+      url: "http://www.hoccer.com/peers",
+      data: post_body,
+      dataType: "json",
+      success: function(msg){
+        if (msg.upload_uri) {
+          upload_path = msg.upload_uri.match(/(\/uploads\/.+)/)[1];
+          $("#upload_foo").uploadifySettings('script', upload_path);
+          $("#upload_foo").uploadifyUpload();
+        }
+        else {
+          //hoccer.initialize_peer_query(msg.peer_uri);
+        }
+      }
+    });
+  },
+  
   
   initialize_peer_query : function(url) {
     var query_method = function() {hoccer.peer_query(url)}

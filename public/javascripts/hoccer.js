@@ -33,7 +33,7 @@ var hoccer = {
                     "&peer[longitude]=" + lng +
                     "&peer[accuracy]=" + 80.0
 
-    alert(post_body);
+    //alert(post_body);
 
                       
     if (0 < $("#upload_fooQueue").children().length) {

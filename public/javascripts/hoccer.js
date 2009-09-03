@@ -10,9 +10,14 @@ var hoccer = {
   interval_id : 0,
   
   initialize : function() {
+    $("#throw").click(function() {
+      alert("Your location: " + maps.getLongitude() + " " + maps.getLatitude());
+    });
+    
     // Ajaxify the submit form
     $("#submit").click(function() {
-
+      
+      
       // Get the coordinates from hidden input fields and replace dot with comma
       lat = $("#latbox").attr("value");
       lng = $("#lonbox").attr("value");

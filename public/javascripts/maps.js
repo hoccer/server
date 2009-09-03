@@ -25,7 +25,6 @@ var maps = {
 
     maps.setup_overlay();
 
-
     GEvent.addListener(map, 'click', function(overlay, point) {
 
       if (point) {
@@ -79,7 +78,18 @@ var maps = {
           );
     map.addOverlay(logo);
 
-  }
+  },
+  
+  getLongitude : function() {
+    return map.getCenter().lng();
+  },
+  
+  getLatitude : function() {
+    return map.getCenter().lat();
+  } 
+  
+  
+  
 }
 
 // Create new geocoding object

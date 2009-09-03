@@ -35,7 +35,7 @@ var hoccer = {
       
     $.ajax({
       type: "POST",
-      url: "http://www.hoccer.com/peers",
+      url: "/peers",
       data: post_body,
       dataType: "json",
       success: function(msg){

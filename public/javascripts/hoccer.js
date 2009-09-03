@@ -153,15 +153,16 @@ var popup = {
 var uploader = {
   initialize : function() {
     $('#upload_foo').uploadify({
-      'uploader':  '/uploadify.swf',
-      'cancelImg': '/images/cancel.png',
+      'uploader':  'uploadify.swf',
+      'cancelImg': 'images/cancel.png',
       'fileDataName': 'upload[attachment]',
       'scriptData': {'_method' : 'put'}, 
       'script':    "/uploads/",
       'onSelect': function(){},
       'width' : 72,
       'height' : 28,
-      'buttonImg': '/images/btn_browse.png' 
+      'buttonImg': 'images/btn_browse.png',
+      'wmode' : 'transparent'
     });
   }
 }

@@ -5,7 +5,7 @@ body {
   padding: 0;
   width: 1190px;
   background: #fff url(../images/bg_gradient.png) repeat-x;
-  font-family: Georgia, sans-serif;
+  font-family: Georgia, Utopia,Palatino,'Palatino Linotype',serif;
   font-size: 10pt;
   color: #fff
 }
@@ -324,6 +324,11 @@ input.btn {
 }
 
 .distribution {
+ 	margin-top: 10px;
+}
+
+.homebutton {
+ 	float:left;
  	margin-top: 10px;
 }
 

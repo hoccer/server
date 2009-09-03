@@ -19,10 +19,6 @@ var maps = {
   },
   
   setup_screen : function() {
-
-    document.getElementById("latbox").value=map.getCenter().lat();
-    document.getElementById("lonbox").value=map.getCenter().lng();
-
     maps.setup_overlay();
 
     GEvent.addListener(map, 'click', function(overlay, point) {

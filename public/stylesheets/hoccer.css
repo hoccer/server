@@ -308,6 +308,12 @@ input.text {
 	border: 1px solid white;
 }
 
+input.btn { 
+	background-color: #79949e;
+	border: 1px solid white;
+	color: white;
+}
+
 
 /** text replacement **/
 

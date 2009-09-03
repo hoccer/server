@@ -19,12 +19,7 @@ var maps = {
   },
   
   setup_screen : function() {
-
-    document.getElementById("latbox").value=map.getCenter().lat();
-    document.getElementById("lonbox").value=map.getCenter().lng();
-
     maps.setup_overlay();
-
 
     GEvent.addListener(map, 'click', function(overlay, point) {
 
@@ -79,7 +74,18 @@ var maps = {
           );
     map.addOverlay(logo);
 
-  }
+  },
+  
+  getLongitude : function() {
+    return map.getCenter().lng();
+  },
+  
+  getLatitude : function() {
+    return map.getCenter().lat();
+  } 
+  
+  
+  
 }
 
 // Create new geocoding object

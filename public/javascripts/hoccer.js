@@ -52,7 +52,7 @@ var hoccer = {
           $("#upload_foo").uploadifyUpload();
         }
         else {
-          //hoccer.initialize_peer_query(msg.peer_uri);
+            hoccer.initialize_peer_query(msg.peer_uri);
         }
       }
     });
@@ -158,7 +158,10 @@ var uploader = {
       'fileDataName': 'upload[attachment]',
       'scriptData': {'_method' : 'put'}, 
       'script':    "/uploads/",
-      'onSelect': function(){}
+      'onSelect': function(){},
+      'width' : 72,
+      'height' : 28,
+      'buttonImg': '/images/btn_browse.png' 
     });
   }
 }

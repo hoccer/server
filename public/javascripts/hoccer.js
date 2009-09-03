@@ -38,7 +38,10 @@ var hoccer = {
                       
     if (0 < $("#upload_fooQueue").children().length) {
       post_body = post_body + "&peer[seeder]=1"
+    } else {
+    	return;
     }
+    
       
     $.ajax({
       type: "POST",

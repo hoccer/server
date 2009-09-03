@@ -167,15 +167,6 @@ a#artcom {
 	padding-right:60px;
 }
 
-#hoc_actions{
-  margin-top: 52px;
-  float:right;
-  background: url(../images/bg_box_share-receive.png) no-repeat top left;
-  /*background-color:transparent;*/
-  width:316px;
-  height:330px;
-}
-
 .topic {
   background: url(../images/line_dotted_teaser.gif) no-repeat top center;
   width: 221px;
@@ -280,14 +271,14 @@ iframe {
 }
 
 .fileinput {
-  margin-top: 20px;
+  margin-top: 0px;
   margin-bottom: 20px;
   padding-left: 10px;
   padding-right: 10px;
 }
 
 .inputlabel {
- 	margin-top: 8px;
+ 	margin-top: 0px;
  	float:left;
  	margin-right: 20px;
 }
@@ -296,11 +287,6 @@ iframe {
  	float:right;
 }
 
-.distribution {
-  margin-top: 50px;
-  padding-left: 10px;
-  padding-right: 10px;
-}
 
 input.text { 
 	background-color: #e5ebee;
@@ -311,6 +297,34 @@ input.btn {
 	background-color: #79949e;
 	border: 1px solid white;
 	color: white;
+}
+
+/* share/receive */
+
+#hoc_actions{
+  margin-top: 18px;
+  float:right;
+  width:316px;
+  /*height:367px;*/
+}
+
+.hoc_actions_tab { 
+	height: 36px;
+	background: url(../images/receive_share_tabs.png) no-repeat;
+}
+
+.hoc_actions_box { 
+	margin-top: 0px;
+	margin-bottom: 0px;
+	background: url(../images/bg_box_share-receive.png) no-repeat;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 15px;
+	padding-bottom: 10px;
+}
+
+.distribution {
+ 	margin-top: 10px;
 }
 
 

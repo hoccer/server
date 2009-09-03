@@ -15,6 +15,13 @@ var hoccer = {
       
       return false;
     });
+    
+    $("#tap").click(function() {
+      hoccer.post_gesture("pass");
+      
+      return false;
+    });
+    
   },
   
   post_gesture : function(gesture) {

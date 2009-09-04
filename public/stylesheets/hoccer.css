@@ -193,12 +193,12 @@ a#artcom {
 	line-height: 1.2em;
 }
 
-.topic a {
+p a {
 	text-decoration: none;
 	border-bottom: 1px dotted white;
 }
 
-.topic a:hover {
+p a:hover {
 	text-decoration: none;
 	border-bottom: 1px solid white;
 }

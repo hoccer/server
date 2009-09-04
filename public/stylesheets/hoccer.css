@@ -60,8 +60,8 @@ a:hover {
 }
 
 #headline {
-  margin: 0 auto;
-  background: url(../images/line_header_gradient.png) no-repeat -10px bottom;
+  margin-top: 55px;
+  background: url(../images/line_header_gradient.png) no-repeat -5px bottom;
 }
 
 .swap span {display: none}
@@ -336,8 +336,9 @@ input.btn {
 /** text replacement **/
 
 
-h1#hoccer { 
-  background: url(../images/hl_hoccer.png) no-repeat; height: 36px;
+#hoccer { 
+  background: url(../images/hl_hoccer.png) no-repeat;
+  height: 39px;
 }
 
 #map_canvas{

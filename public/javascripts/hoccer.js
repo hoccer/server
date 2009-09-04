@@ -38,7 +38,10 @@ var hoccer = {
                       
     if (0 < $("#upload_fooQueue").children().length) {
       post_body = post_body + "&peer[seeder]=1"
+    } else {
+    	return;
     }
+    
       
     $.ajax({
       type: "POST",
@@ -84,7 +87,7 @@ var hoccer = {
         }
       },
       error : function() {
-        alert("error");
+        //alert("error");
         window.clearInterval(hoccer.interval_id);
       }
     });
@@ -132,7 +135,7 @@ var popup = {
         player:     "iframe"
       });
     } else {
-      alert("replace me with something good");
+      //alert("replace me with something good");
     }
   },
   

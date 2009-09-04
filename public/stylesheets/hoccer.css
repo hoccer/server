@@ -307,6 +307,12 @@ input.btn {
       width: 100px;
 }
 
+.tweet { 
+      float:right;
+      height: 36px;
+      width: 300px;
+}
+
 
 /* share/receive */
 

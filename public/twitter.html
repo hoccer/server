@@ -14,18 +14,13 @@
 		<script language="javascript" src="javascripts/jquery.tweet.js" type="text/javascript"></script>
 		<script type='text/javascript'>
 			$(document).ready(function(){
-			    $(".tweet").tweet({
-				username: "hoccer",
-				join_text: "auto",
-				avatar_size: 32,
-				count: 3,
-				auto_join_text_default: "we said,",
-				auto_join_text_ed: "we",
-				auto_join_text_ing: "we were",
-				auto_join_text_reply: "we replied to",
-				auto_join_text_url: "we were checking out",
-				loading_text: "loading tweets..."
-			    });
+			    $(".query").tweet({
+          avatar_size: 32,
+          count: 6,
+          query: "hoccer",
+          loading_text: "searching twitter..."
+        });
+
 			});
 		</script> 
 	</head>
@@ -47,7 +42,7 @@
 				<div id="content">  
 					<div id="welcome">
 						<h2 id="hl_welcome" class="swap"><span>Welcome</span></h2>
-						<div class="tweet"></div>  
+						<div class="query"></div>  
 					</div> <!-- welcome -->
 				</div> <!-- content -->  
 				<div id="footer">

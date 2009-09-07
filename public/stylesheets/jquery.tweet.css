@@ -1,4 +1,4 @@
-.tweet
+.query
 {
   float: left;
   font-family: Georgia, serif;
@@ -8,7 +8,7 @@
   width: 250px;
 }
   
-.tweet .tweet_list
+.query .tweet_list
 {
   -webkit-border-radius: .5em;
   list-style-type: none;
@@ -17,30 +17,30 @@
   background-color: #5a92a6;
 }
     
-.tweet .tweet_list li
+.query .tweet_list li
 {
   overflow: auto;
   padding: .5em;
 }
 
-.tweet .tweet_list li a
+.query .tweet_list li a
 {
   color: #FFFFFF;
   text-decoration: underline;
 }
     
-.tweet .tweet_list .tweet_even
+.query .tweet_list .tweet_even
 {
   background-color: #4b7a8b;
 }
 
-.tweet .tweet_list .tweet_avatar
+.query .tweet_list .tweet_avatar
 {
   padding-right: .5em;
   float: left;
 }
       
-.tweet .tweet_list .tweet_avatar img
+.query .tweet_list .tweet_avatar img
 {
   vertical-align: middle;
 }

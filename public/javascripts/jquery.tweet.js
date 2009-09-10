@@ -70,19 +70,19 @@
       var relative_to = (arguments.length > 1) ? arguments[1] : new Date();
       var delta = parseInt((relative_to.getTime() - parsed_date) / 1000);
       if(delta < 60) {
-      return 'less than a minute ago';
+      return 'less than a minute ago<br/>';
       } else if(delta < 120) {
-      return 'about a minute ago';
+      return 'about a minute ago<br/>';
       } else if(delta < (45*60)) {
-      return (parseInt(delta / 60)).toString() + ' minutes ago';
+      return (parseInt(delta / 60)).toString() + ' minutes ago<br/>';
       } else if(delta < (90*60)) {
-      return 'about an hour ago';
+      return 'about an hour ago<br/>';
       } else if(delta < (24*60*60)) {
-      return 'about ' + (parseInt(delta / 3600)).toString() + ' hours ago';
+      return 'about ' + (parseInt(delta / 3600)).toString() + ' hours ago<br/>';
       } else if(delta < (48*60*60)) {
-      return '1 day ago';
+      return '1 day ago<br/>';
       } else {
-      return (parseInt(delta / 86400)).toString() + ' days ago';
+      return (parseInt(delta / 86400)).toString() + ' days ago<br/>';
       }
     }
 

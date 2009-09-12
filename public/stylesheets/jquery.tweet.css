@@ -10,11 +10,11 @@
   
 .query .tweet_list
 {
-  -webkit-border-radius: .5em;
   list-style-type: none;
   margin: 0;
   padding: 0;
-  background-color: #5a92a6;
+  /**background-color: #5a92a6;**/
+  background-color: rgba(90, 146, 166, 0.1);
 }
     
 .query .tweet_list li
@@ -31,7 +31,8 @@
     
 .query .tweet_list .tweet_even
 {
-  background-color: #4b7a8b;
+  /**background-color: #4b7a8b;**/
+  background-color: rgba(75, 122, 139, 0.1);
 }
 
 .query .tweet_list .tweet_avatar

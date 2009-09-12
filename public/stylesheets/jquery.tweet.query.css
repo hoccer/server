@@ -15,6 +15,11 @@
   margin: 0;
   padding: 0;
   background-color: #5a92a6;
+  filter:alpha(opacity=50);
+  -moz-opacity:0.5;
+  -khtml-opacity: 0.5;
+  opacity: 0.5;
+
 }
     
 .tweet .tweet_list li

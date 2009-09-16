@@ -3,3 +3,4 @@ log/*.log
 public/system/*
 .DS_Store
 db/schema.rb
+doc/app/*

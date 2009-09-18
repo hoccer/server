@@ -8,10 +8,14 @@ $(document).ready(function(){
 
 hoccer_interface = {
   initialize : function() {
+    $("#receive_box").hide();
+    
     $("#hoccer_receive").bind("click", function(){
       if (/active/.exec($(this).attr("src"))) {
         $(this).attr("src", "/images/tab_receive-active.png");
         $("#hoccer_share").attr("src", "/images/tab_share-inactive.png");
+        $("#share_box").hide();
+        $("#receive_box").show();
       }
     });
     
@@ -19,6 +23,8 @@ hoccer_interface = {
       if (/active/.exec($(this).attr("src"))) {
         $(this).attr("src", "/images/tab_share-active.png");
         $("#hoccer_receive").attr("src", "/images/tab_receive-inactive.png");
+        $("#receive_box").hide();
+        $("#share_box").show();
       }
     });
   }

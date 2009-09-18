@@ -28,25 +28,28 @@ hoccer_interface = {
       }
     });
   }
-}
+};
 
 var hoccer = {
   
   interval_id : 0,
   
   initialize : function() {
-    $("#throw").click(function() {
+    $("#share_box img.throw").bind("click", function() {
       hoccer.post_gesture("distribute");
-      
-      return false;
     });
     
-    $("#tap").click(function() {
+    $("#share_box img.tap").bind("click", function() {
       hoccer.post_gesture("pass");
-      
-      return false;
     });
     
+    $("#receive_box img.throw").bind("click", function(){
+      hoccer.post_gesture("distribute");
+    });
+    
+    $("#receive_box img.tap").bind("click", function(){
+      hoccer.post_gesture("pass");
+    });
   },
   
   post_gesture : function(gesture) {
@@ -56,14 +59,14 @@ var hoccer = {
     var post_body = "peer[gesture]=" + gesture +
                     "&peer[latitude]=" + lat +
                     "&peer[longitude]=" + lng +
-                    "&peer[accuracy]=" + 80.0
+                    "&peer[accuracy]=" + 80.0;
                       
-    if (0 < $("#upload_fooQueue").children().length) {
-      post_body = post_body + "&peer[seeder]=1"
-    } else {
-    	return;
-    }
+    var queue_length = $("#upload_fooQueue").children().length;
+
     
+    if (0 < queue_length) {
+      post_body = post_body + "&peer[seeder]=1";
+    }
       
     $.ajax({
       type: "POST",
@@ -85,7 +88,7 @@ var hoccer = {
   
   
   initialize_peer_query : function(url) {
-    var query_method = function() {hoccer.peer_query(url)}
+    var query_method = function() {hoccer.peer_query(url);};
     hoccer.interval_id = setInterval(query_method, 1000);
   },
   
@@ -121,7 +124,7 @@ var hoccer = {
       url: upload_url,
       
       complete : function(xhr, status_text) {
-        var tmp_regexp = /Content-Type\:\s([a-z\/-]+)/
+        var tmp_regexp = /Content-Type\:\s([a-z\/-]+)/;
         content_type = tmp_regexp.exec(xhr.getAllResponseHeaders())[1];
         generic_type = content_type.split("/")[0];
         
@@ -138,7 +141,7 @@ var hoccer = {
       
     });
   }
-}
+};
 
 var popup = {
   
@@ -173,7 +176,7 @@ var popup = {
       player:     "html"
     });
   }
-}
+};
 
 var uploader = {
   initialize : function() {
@@ -190,4 +193,4 @@ var uploader = {
       'wmode' : 'transparent'
     });
   }
-}
+};

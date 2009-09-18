@@ -62,7 +62,14 @@ var hoccer = {
                     "&peer[accuracy]=" + 80.0;
                       
     var queue_length = $("#upload_fooQueue").children().length;
-
+    var widget_mode = function() {
+      if ($("#receive_box").css("display") == "none") {
+        return "share";
+      } 
+      else if ($("#share_box").css("display") == "none") {
+        return "receive"
+      }
+    };
     
     if (0 < queue_length) {
       post_body = post_body + "&peer[seeder]=1";
@@ -79,8 +86,8 @@ var hoccer = {
           $("#upload_foo").uploadifySettings('script', upload_path);
           $("#upload_foo").uploadifyUpload();
         }
-        else {
-            hoccer.initialize_peer_query(msg.peer_uri);
+        else if (widget_mode() == "receive") {
+          hoccer.initialize_peer_query(msg.peer_uri);
         }
       }
     });
@@ -103,6 +110,7 @@ var hoccer = {
         }
       },
       complete : function(event, xhr, settings) {
+        
         if (event.status == 200) {
           window.clearInterval(hoccer.interval_id);
           $("#status").empty();
@@ -113,6 +121,7 @@ var hoccer = {
       },
       error : function() {
         //alert("error");
+        $("#status").empty();
         window.clearInterval(hoccer.interval_id);
       }
     });

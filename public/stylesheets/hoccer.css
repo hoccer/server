@@ -83,9 +83,9 @@ a:hover {
 #metanav a.last { margin-right: 0; }
 
 #footer {
-	height: 100px; 
-	margin-top: 0px;
-	margin-bottom: 0px;
+  height: 100px; 
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 a#artcom {
@@ -107,64 +107,64 @@ a#artcom {
 }
 
 #imprint p {
-	width: 713px;
-	font-size: 8pt;
+  width: 713px;
+  font-size: 8pt;
 }
 
 #imprint {
-	line-height: 1em;
+  line-height: 1em;
 }
 
 #imprint a {
-	text-decoration: none;
-	border-bottom: 1px dotted white;
+  text-decoration: none;
+  border-bottom: 1px dotted white;
 }
 
 #imprint a:hover {
-	text-decoration: none;
-	border-bottom: 1px solid white;
+  text-decoration: none;
+  border-bottom: 1px solid white;
 }
 
 #about {
-	width: 400px;
-	line-height: 1.2em;
+  width: 400px;
+  line-height: 1.2em;
 }
 
 #about a {
-	text-decoration: none;
-	border-bottom: 1px dotted white;
+  text-decoration: none;
+  border-bottom: 1px dotted white;
 }
 
 #about a:hover {
-	text-decoration: none;
-	border-bottom: 1px solid white;
+  text-decoration: none;
+  border-bottom: 1px solid white;
 }
 
 #contact  {
-	width: 400px;
-	line-height: 1.2em;
+  width: 400px;
+  line-height: 1.2em;
 }
 
 #contact a {
-	text-decoration: none;
-	border-bottom: 1px dotted white;
+  text-decoration: none;
+  border-bottom: 1px dotted white;
 }
 
 #contact a:hover {
-	text-decoration: none;
-	border-bottom: 1px solid white;
+  text-decoration: none;
+  border-bottom: 1px solid white;
 }
 
 #contributors {
-	line-height: 1.2em;
-	width: 240px;
-	float:right;
+  line-height: 1.2em;
+  width: 240px;
+  float:right;
 }
 
 #mobile_shot {
-	float: right;
-	padding-top:30px;
-	padding-right:60px;
+  float: right;
+  padding-top:30px;
+  padding-right:60px;
 }
 
 .topic {
@@ -190,17 +190,17 @@ a#artcom {
 }
 
 .topic p {
-	line-height: 1.2em;
+  line-height: 1.2em;
 }
 
 p a {
-	text-decoration: none;
-	border-bottom: 1px dotted white;
+  text-decoration: none;
+  border-bottom: 1px dotted white;
 }
 
 p a:hover {
-	text-decoration: none;
-	border-bottom: 1px solid white;
+  text-decoration: none;
+  border-bottom: 1px solid white;
 }
 
 
@@ -278,25 +278,25 @@ iframe {
 }
 
 .inputlabel {
- 	margin-top: 0px;
- 	float:left;
- 	margin-right: 20px;
+  margin-top: 0px;
+  float:left;
+  margin-right: 20px;
 }
 
 .inputform {
- 	float:right;
+  float:right;
 }
 
 
 input.text { 
-	background-color: #e5ebee;
-	border: 1px solid white;
+  background-color: #e5ebee;
+  border: 1px solid white;
 }
 
 input.btn { 
-	background-color: #79949e;
-	border: 1px solid white;
-	color: white;
+  background-color: #79949e;
+  border: 1px solid white;
+  color: white;
 }
 
 .carousel { 
@@ -324,27 +324,26 @@ input.btn {
 }
 
 .hoc_actions_tab { 
-	height: 36px;
-	background: url(../images/receive_share_tabs.png) no-repeat;
+  height: 36px;
 }
 
 .hoc_actions_box { 
-	margin-top: 0px;
-	margin-bottom: 0px;
-	background: url(../images/bg_box_share-receive.png) no-repeat;
-	padding-left: 10px;
-	padding-right: 10px;
-	padding-top: 15px;
-	padding-bottom: 10px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  background: url(../images/bg_box_share-receive.png) no-repeat;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 15px;
+  padding-bottom: 10px;
 }
 
 .distribution {
- 	margin-top: 10px;
+  margin-top: 10px;
 }
 
 .homebutton {
- 	float:left;
- 	margin-top: 10px;
+  float:left;
+  margin-top: 10px;
 }
 
 
@@ -357,7 +356,7 @@ input.btn {
 }
 
 #map_canvas{
-  border: 3px solid lightgray;
+  border: 3px solid #f0f0f0;
 }
 
 a#contact {
@@ -371,16 +370,16 @@ a#imprint { background: url(../images/metanav_imprint.gif) no-repeat;
 a:hover#imprint { background: url(../images/metanav_imprint-mo.gif) no-repeat; }
 
 h2#hl_welcome { 
-	background: url(../images/hl_welcome.png) no-repeat; 
-	height: 18px; 
-	width:79px;
-	margin-bottom: 16px; 
+  background: url(../images/hl_welcome.png) no-repeat; 
+  height: 18px; 
+  width:79px;
+  margin-bottom: 16px; 
 }
 
 h2#hl_yvideo { 
-	background: url(../images/hl_yvideo.png) no-repeat; 
-	height: 18px; 
-	margin-bottom: 16px; 
+  background: url(../images/hl_yvideo.png) no-repeat; 
+  height: 18px; 
+  margin-bottom: 16px; 
 }
   
 h2#imprint { background: url(../images/hl_imprint.png) no-repeat; 
@@ -395,14 +394,14 @@ h2#hoc { background: url(../images/hl_share.png) no-repeat;
   }
 
 h2#about { 
-	margin-bottom: 20px;
-	background: url(../images/hl_about.png) no-repeat; 
-  	height: 22px; 
-  	}
-  	
+  margin-bottom: 20px;
+  background: url(../images/hl_about.png) no-repeat; 
+    height: 22px; 
+    }
+    
  h2#imprint { 
-	margin-bottom: 20px;
-  	}
+  margin-bottom: 20px;
+    }
 
 h2#contact { 
 margin-bottom: 20px;
@@ -417,24 +416,24 @@ background: url(../images/hl_contributors.png) no-repeat;
   }
 
 h3#share { 
-	background: url(../images/hl_share.png) no-repeat; 
-	height: 18px; 
-	margin-top: 15px;
-	margin-bottom: 15px;
+  background: url(../images/hl_share.png) no-repeat; 
+  height: 18px; 
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
   
 h3#download { 
-	background: url(../images/hl_gethoccer.png) no-repeat; 
-	height: 18px;
-	margin-top: 15px;
-	margin-bottom: 15px;
+  background: url(../images/hl_gethoccer.png) no-repeat; 
+  height: 18px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
   
 h3#video { 
-	background: url(../images/hl_video.png) no-repeat; 
-	height: 18px; 
-	margin-top: 15px;
-	margin-bottom: 15px;
+  background: url(../images/hl_video.png) no-repeat; 
+  height: 18px; 
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
   
 a#artcom { background: url(../images/logo_artcom.gif) no-repeat; 

@@ -1,9 +1,28 @@
 $(document).ready(function(){
   maps.initialize();
+  hoccer_interface.initialize();
   hoccer.initialize();
   uploader.initialize();
 });
 
+
+hoccer_interface = {
+  initialize : function() {
+    $("#hoccer_receive").bind("click", function(){
+      if (/active/.exec($(this).attr("src"))) {
+        $(this).attr("src", "/images/tab_receive-active.png");
+        $("#hoccer_share").attr("src", "/images/tab_share-inactive.png");
+      }
+    });
+    
+    $("#hoccer_share").bind("click", function(){
+      if (/active/.exec($(this).attr("src"))) {
+        $(this).attr("src", "/images/tab_share-active.png");
+        $("#hoccer_receive").attr("src", "/images/tab_receive-inactive.png");
+      }
+    });
+  }
+}
 
 var hoccer = {
   
@@ -32,9 +51,6 @@ var hoccer = {
                     "&peer[latitude]=" + lat +
                     "&peer[longitude]=" + lng +
                     "&peer[accuracy]=" + 80.0
-
-    //alert(post_body);
-
                       
     if (0 < $("#upload_fooQueue").children().length) {
       post_body = post_body + "&peer[seeder]=1"

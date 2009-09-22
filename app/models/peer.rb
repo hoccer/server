@@ -16,6 +16,7 @@ class Peer < ActiveRecord::Base
   
   # Named Scopes
   named_scope :recent, lambda { {:conditions => ["created_at > ?", (10.seconds.ago)]}}
+  named_scope :seeders, :conditions => {:seeder => true}
   
   # Validations
   validates_inclusion_of :gesture, :in => %w(pass distribute exchange)

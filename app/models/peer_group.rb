@@ -32,6 +32,11 @@ class PeerGroup < ActiveRecord::Base
     status[:state]
   end
   
+  def upload_content_types
+    seeder = peers.seeders.select {|s| s.upload && s.upload.attachment}
+    seeder.map{|s| s.upload.attachment.try(:content_type)}
+  end
+  
   def status
     
     # can you smell the state machine ?
@@ -78,6 +83,21 @@ class PeerGroup < ActiveRecord::Base
       }
     end
     
+  end
+  
+  def log_peer_group_info
+    status_hash = status
+    
+    logger.info ">>>>>" \
+      "log_format=0.1|" \
+      "timestamp=#{Time.now.to_s(:db)}|" \
+      "peer_group_id=#{id}|" \
+      "state=#{status_hash[:state]}|" \
+      "peers=#{number_of_peers}|" \
+      "seeders=#{number_of_seeders}|" \
+      "gesture=#{self.class.to_s}|" \
+      "locations=#{peers.map {|x| x.serialize_coordinates}.join('/')}|" \
+      "content_types=#{upload_content_types.join(';')}"
   end
   
   private

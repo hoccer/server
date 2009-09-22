@@ -88,16 +88,16 @@ class PeerGroup < ActiveRecord::Base
   def log_peer_group_info
     status_hash = status
     
-    logger.info ">>>>>" \
-      "log_format=0.1|" \
-      "timestamp=#{Time.now.to_s(:db)}|" \
-      "peer_group_id=#{id}|" \
-      "state=#{status_hash[:state]}|" \
-      "peers=#{number_of_peers}|" \
-      "seeders=#{number_of_seeders}|" \
-      "gesture=#{self.class.to_s}|" \
-      "locations=#{peers.map {|x| x.serialize_coordinates}.join('/')}|" \
-      "content_types=#{upload_content_types.join(';')}"
+    ">>>>>" \
+    "log_format=0.1|" \
+    "timestamp=#{Time.now.to_s(:db)}|" \
+    "peer_group_id=#{id}|" \
+    "state=#{status_hash[:state]}|" \
+    "peers=#{number_of_peers}|" \
+    "seeders=#{number_of_seeders}|" \
+    "gesture=#{self.class.to_s}|" \
+    "locations=#{peers.map {|x| x.serialize_coordinates}.join('/')}|" \
+    "content_types=#{upload_content_types.join(';')}"
   end
   
   private

@@ -19,7 +19,9 @@ class PeersController < ApplicationController
     peer        = Peer.find_by_uid(params[:id])
     status      = peer.peer_group.status
     
-    peer.peer_group.log_peer_group_info unless status[:state] == :waiting
+    unless status[:state] == :waiting
+      logger.info peer.peer_group.log_peer_group_info 
+    end
     
     # Rewrite Resource Links. There has to be a better way for that like
     # returning the proper urls right from the model, somehow. Can be done

@@ -32,23 +32,31 @@ hoccer_interface = {
 
 var hoccer = {
   
-  interval_id : 0,
+  interval_id : null,
   
   initialize : function() {
     $("#share_box img.throw").bind("click", function() {
-      hoccer.post_gesture("distribute");
+      if (hoccer.interval_id === null) {
+        hoccer.post_gesture("distribute");
+      }
     });
     
     $("#share_box img.tap").bind("click", function() {
-      hoccer.post_gesture("pass");
+      if (hoccer.interval_id === null) {
+        hoccer.post_gesture("pass");
+      }
     });
     
     $("#receive_box img.throw").bind("click", function(){
-      hoccer.post_gesture("distribute");
+      if (hoccer.interval_id === null) {
+        hoccer.post_gesture("distribute");
+      }
     });
     
     $("#receive_box img.tap").bind("click", function(){
-      hoccer.post_gesture("pass");
+      if (hoccer.interval_id === null) {
+        hoccer.post_gesture("pass");
+      }
     });
   },
   
@@ -113,6 +121,7 @@ var hoccer = {
         
         if (event.status == 200) {
           window.clearInterval(hoccer.interval_id);
+          hoccer.interval_id = null;
           $("#status").empty();
         }
         if (event.status == 202 && (0 == $("#status img").length)) {
@@ -120,9 +129,9 @@ var hoccer = {
         }
       },
       error : function() {
-        //alert("error");
-        $("#status").empty();
         window.clearInterval(hoccer.interval_id);
+        hoccer.interval_id = null;
+        $("#status").empty();
       }
     });
   },

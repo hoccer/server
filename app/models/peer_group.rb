@@ -90,7 +90,7 @@ class PeerGroup < ActiveRecord::Base
     
     ">>>>>" \
     "log_format=0.1|" \
-    "timestamp=#{Time.now.to_s(:db)}|" \
+    "timestamp=#{updated_at.to_s(:db)}|" \
     "peer_group_id=#{id}|" \
     "state=#{status_hash[:state]}|" \
     "peers=#{number_of_peers}|" \

@@ -20,7 +20,7 @@ class UploadsController < ApplicationController
   
     if upload.attachment_ready?
       send_file(
-        upload.attachment.path,
+        upload.attachment.path(:processed),
         :filename => upload.attachment.original_filename,
         :type => upload.attachment.content_type,
         :status => 200

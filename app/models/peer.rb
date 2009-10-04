@@ -49,10 +49,25 @@ class Peer < ActiveRecord::Base
         (Math.cos(peer_a.latitude.to_rad) * 
         Math.cos(peer_b.latitude.to_rad)) * 
         (Math.sin((distance_longitude/2) ** 2))
-        
-    c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
     
-    distance = EARTH_RADIUS * c
+    if a < 0 || a > 1
+      logger.warn(
+        "!!!!! #{a}; #{peer_a.latitude}; #{peer_a.longitude}" +
+        "#{peer_b.latitude}; #{peer_b.longitude}"
+      )
+    end
+    
+    begin
+      c = 2 * Math.atan2(
+        Math.sqrt(a),
+        Math.sqrt(1-a)
+      )
+      distance = EARTH_RADIUS * c
+    rescue
+      distance = 100
+    end
+    
+    distance
   end
   
   # Instance Methods

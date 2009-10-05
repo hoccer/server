@@ -46,9 +46,8 @@ class Peer < ActiveRecord::Base
     distance_longitude  = (peer_a.longitude - peer_b.longitude).to_rad
     
     a = (Math.sin(distance_latitude/2) ** 2) + 
-        (Math.cos(peer_a.latitude.to_rad) * 
-        Math.cos(peer_b.latitude.to_rad)) * 
-        (Math.sin((distance_longitude/2) ** 2))
+        (Math.cos(peer_a.latitude.to_rad) * Math.cos(peer_b.latitude.to_rad)) * 
+        (Math.sin(distance_longitude/2) ** 2)
     
     if a < 0 || a > 1
       logger.warn(
@@ -57,17 +56,12 @@ class Peer < ActiveRecord::Base
       )
     end
     
-    begin
-      c = 2 * Math.atan2(
-        Math.sqrt(a),
-        Math.sqrt(1-a)
-      )
-      distance = EARTH_RADIUS * c
-    rescue
-      distance = 100
-    end
+    c = 2 * Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1-a)
+    )
     
-    distance
+    distance = EARTH_RADIUS * c
   end
   
   # Instance Methods

@@ -130,6 +130,13 @@ var hoccer_client = {
   },
   
   share_validations : {
+    validate_that_no_query_is_running : function() {
+      if (hoccer_client.interval_id === null) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     
     validate_queue_is_not_empty : function() {
       if (!hoccer_client.files_in_queue()) {
@@ -142,7 +149,13 @@ var hoccer_client = {
   },
   
   receive_validations : {
-    
+    validate_that_no_query_is_running : function() {
+      if (hoccer_client.interval_id === null) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   },
   
   files_in_queue : function() {
@@ -203,7 +216,7 @@ var hoccer_client = {
       $("#upload_foo").uploadifySettings('script', upload_path);
       $("#upload_foo").uploadifyUpload();
     }
-    else if (hoccer_client.is_receiving()) {
+    else if (hoccer_client.is_receiving() && msg.peer_uri) {
       alert("i'm a receiver if i try");
     }
   }

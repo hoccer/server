@@ -325,6 +325,7 @@ input.btn {
 
 .hoc_actions_tab { 
   height: 36px;
+  position: relative;
 }
 
 .hoc_actions_box { 
@@ -335,6 +336,7 @@ input.btn {
   padding-right: 10px;
   padding-top: 15px;
   padding-bottom: 10px;
+  height: 280px;
 }
 
 .distribution {
@@ -388,7 +390,7 @@ h2#imprint { background: url(../images/hl_imprint.png) no-repeat;
     padding:0;
   }
 
-h2#hoc { background: url(../images/hl_share.png) no-repeat; 
+h2#hoc_head { background: url(../images/hl_share.png) no-repeat; 
   height: 18px;
   margin-bottom: 20px;
   }
@@ -437,9 +439,35 @@ h3#video {
 }
   
 a#artcom { background: url(../images/logo_artcom.gif) no-repeat; 
-  height: 18px; width:155px; }
-  
+  height: 18px; width:155px;
+}
 
- 
- 
+div#uploadify_queue div.uploadifyQueueItem {
+  font-size: 11px;
+  font-family: Helvetica;
+  width: 200px;
+  margin-top: 0px;
+  background-color: transparent;
+  border: none;
+  padding: 0px;
+  margin-left: 10px;
+  color: #638191;
+}
 
+div#share_box table td {
+  vertical-align: top;
+}
+
+div#receive_status {
+  height: 64px;
+}
+
+div#messages {
+  height: 20px;
+  width: 165px;
+  z-index: 0;
+  position: absolute;
+  font-family: Helvetica;
+  left: 150px;
+  top: 8px;
+}

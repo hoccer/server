@@ -73,6 +73,7 @@ var hoccer_client = {
       'scriptData'  : {'_method' : 'put'}, 
       'script'      : "/uploads/",
       'onSelect'    : function(){},
+      'onComplete'  : function() {$("#messages").text("Upload successful");},
       'width'       : 72,
       'height'      : 28,
       'buttonImg'   : 'images/btn_browse.png',
@@ -217,7 +218,96 @@ var hoccer_client = {
       $("#upload_foo").uploadifyUpload();
     }
     else if (hoccer_client.is_receiving() && msg.peer_uri) {
-      alert("i'm a receiver if i try");
+      hoccer_client.initialize_peer_query(msg.peer_uri);
+    }
+  },
+  
+  initialize_peer_query : function(url) {
+    var query_method = function() {hoccer_client.peer_query(url);};
+    hoccer_client.interval_id = setInterval(query_method, 1000);
+  },
+  
+  clear_peer_query : function() {
+    window.clearInterval(hoccer_client.interval_id);
+    hoccer_client.interval_id = null;
+  },
+  
+  peer_query : function(url) {
+    $.ajax({
+      type: "GET",
+      url: url,
+      dataType: "json",
+      success : function(msg) {
+        if (0 < msg.resources.length) {
+          hoccer_client.fetch_upload(msg.resources[0]);
+        }
+      },
+      complete : function(event, xhr, settings) {
+        
+        if (event.status == 200) {
+          $("#messages").text("Success");
+        }
+        if (event.status == 202 && (0 == $("#status img").length)) {
+          $("#messages").html("Looking for peers …");
+        }
+        if (event.status != 202) {
+          hoccer_client.clear_peer_query();
+          $("#messages").text(JSON.parse(event.responseText).message);
+        }
+      },
+      error : function() {
+      }
+    });
+  },
+  
+  fetch_upload : function(upload_url) {
+    $.ajax({
+      type: "GET",
+      url: upload_url,
+      
+      complete : function(xhr, status_text) {
+        var content_regexp = /Content-Type\:\s([a-z\/-]+)/;
+        content_type = content_regexp.exec(xhr.getAllResponseHeaders())[1];
+        
+        popup.handle_received_content({
+          "content_type" : content_type,
+          "data"         : xhr.responseText,
+          "upload_url"   : upload_url
+        });
+      }
+    });
+  }
+};
+
+var popup = {
+  handle_received_content : function(options) {
+    if (options.content_type.match(/^image/)) {
+      Shadowbox.open({
+        content:    options.upload_url,
+        player:     "img"
+      });
+    } 
+    else if (options.content_type.match(/text\/x-vcard/)) {
+      name = options.data.match(/FN\:(.+)/)[1];
+
+      Shadowbox.open({
+        content:    "<table><tr><td id='vc_image'><a href='"+ options.upload_url + "'>" + 
+                    "<img src='/images/vcard-icon.png' /></a></td>" + 
+                    "<td id='vc_text'>"+ name + "</td></tr></table>",
+        title:      "Contact",
+        player:     "html"
+      });
+    }
+    else if (options.content_type.match(/^text/)) {
+      if (text.match(/^https?:\/\//)) {
+        Shadowbox.open({
+          content:    text,
+          title:      text,
+          player:     "iframe"
+        });
+      } else {
+        //alert("replace me with something good");
+      }
     }
   }
 };

@@ -6,9 +6,11 @@ $(document).ready(function(){
 
 var hoccer_client = {
   
-  observer    : null,
-  mode        : "",
-  interval_id : null,
+  observer            : null,
+  mode                : "",
+  interval_id         : null,
+  upload_interval_id  : null,
+  upload_retry_count  : 0,
   
   initialize : function() {
     hoccer_client.initialize_share_and_receive_buttons();
@@ -239,7 +241,7 @@ var hoccer_client = {
       dataType: "json",
       success : function(msg) {
         if (0 < msg.resources.length) {
-          hoccer_client.fetch_upload(msg.resources[0]);
+          hoccer_client.initialize_upload_query(msg.resources[0]);
         }
       },
       complete : function(event, xhr, settings) {
@@ -260,22 +262,42 @@ var hoccer_client = {
     });
   },
   
+  initialize_upload_query : function(url) {
+    var query_method = function() {hoccer_client.fetch_upload(url);};
+    hoccer_client.upload_interval_id = setInterval(query_method, 1000);
+  },
+  
+  clear_upload_query : function() {
+    window.clearInterval(hoccer_client.upload_interval_id);
+    hoccer_client.upload_interval_id = null;
+    hoccer_client.upload_retry_count = 0;
+  },
+  
   fetch_upload : function(upload_url) {
+    if (9 < hoccer_client.upload_retry_count) { 
+      hoccer_client.clear_upload_query();
+    }
+    
     $.ajax({
       type: "GET",
       url: upload_url,
       
       complete : function(xhr, status_text) {
-        var content_regexp = /Content-Type\:\s([a-z\/-]+)/;
-        content_type = content_regexp.exec(xhr.getAllResponseHeaders())[1];
-        
-        popup.handle_received_content({
-          "content_type" : content_type,
-          "data"         : xhr.responseText,
-          "upload_url"   : upload_url
-        });
+        if (xhr.status == 200) {
+          var content_regexp = /Content-Type\:\s([a-z\/-]+)/;
+          content_type = content_regexp.exec(xhr.getAllResponseHeaders())[1];
+          
+          popup.handle_received_content({
+            "content_type" : content_type,
+            "data"         : xhr.responseText,
+            "upload_url"   : upload_url
+          });
+          hoccer_client.clear_upload_query();
+        }
       }
     });
+    
+    ++hoccer_client.upload_retry_count;
   }
 };
 

@@ -74,12 +74,13 @@ class PeerTest < ActiveSupport::TestCase
   end
   
   def create_peer lat, long, acc, gesture, seeder
-    Peer.create(
+    Peer.create!(
       :latitude   => lat,
       :longitude  => long,
       :accuracy   => acc,
       :gesture    => gesture,
-      :seeder     => seeder
+      :seeder     => seeder,
+      :bssids     => "00:1a:1e:30:3c:e0,00:1a:1e:30:3c:e1"
     )
   end
 end

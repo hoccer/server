@@ -21,6 +21,8 @@ class Peer < ActiveRecord::Base
   # Validations
   validates_inclusion_of :gesture, :in => %w(pass distribute exchange)
   
+  attr_accessor :bssids
+  
   # Class Methods
   
   # Returns all peers in range of given peer that have the same gesture.

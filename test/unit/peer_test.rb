@@ -2,6 +2,10 @@ require 'test_helper'
 
 class PeerTest < ActiveSupport::TestCase
   
+  test "peer has many bssids" do
+    assert_equal [], create_peer( 52.3, 42.1, 50.0, "pass", true ).access_points
+  end
+  
   test "uid is generated on freshly created peers" do
     assert_not_nil peer = create_peer( 52.13, 42.12, 50.0, "pass", true )
     assert_not_nil peer.uid
@@ -79,8 +83,7 @@ class PeerTest < ActiveSupport::TestCase
       :longitude  => long,
       :accuracy   => acc,
       :gesture    => gesture,
-      :seeder     => seeder,
-      :bssids     => "00:1a:1e:30:3c:e0,00:1a:1e:30:3c:e1"
+      :seeder     => seeder
     )
   end
 end

@@ -11,8 +11,9 @@ class Peer < ActiveRecord::Base
   after_create  :associate_with_peer_group, :initialize_upload
   
   # Associations
-  belongs_to  :peer_group
-  has_one     :upload
+  belongs_to                :peer_group
+  has_one                   :upload
+  has_and_belongs_to_many   :access_points
   
   # Named Scopes
   named_scope :recent, lambda { {:conditions => ["created_at > ?", (10.seconds.ago)]}}
@@ -21,7 +22,6 @@ class Peer < ActiveRecord::Base
   # Validations
   validates_inclusion_of :gesture, :in => %w(pass distribute exchange)
   
-  attr_accessor :bssids
   
   # Class Methods
   
@@ -67,6 +67,12 @@ class Peer < ActiveRecord::Base
   end
   
   # Instance Methods
+  
+  def bssids= bssids
+    bssids.each do |bssid|
+      access_points << AccessPoint.create!( :bssid => bssid )
+    end
+  end
   
   def serialize_coordinates
     "#{self.latitude};#{self.longitude};#{self.accuracy}"

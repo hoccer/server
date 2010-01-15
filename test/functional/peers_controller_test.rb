@@ -2,6 +2,18 @@ require 'test_helper'
 
 class PeersControllerTest < ActionController::TestCase
 
+  test "creating new seeder peergroup and access points" do
+    assert_difference "AccessPoint.count", +3 do
+      post :create, :peer => {
+        :latitude   => 13.44,
+        :longitude  => 52.12,
+        :accuracy   => 42.0,
+        :gesture    => "pass",
+        :seeder     => true,
+        :bssids     => ["deadbeef2342", "deadbeef2432", "deadbeef4223"]
+      }
+    end
+  end
 
   test "creating new seeder and peer group" do
     assert_difference ["Peer.count", "PeerGroup.count"], +1 do

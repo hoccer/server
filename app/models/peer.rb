@@ -15,6 +15,8 @@ class Peer < ActiveRecord::Base
   has_one                   :upload
   has_and_belongs_to_many   :access_points
   
+  accepts_nested_attributes_for :access_points
+  
   # Named Scopes
   named_scope :recent, lambda { {:conditions => ["created_at > ?", (10.seconds.ago)]}}
   named_scope :seeders, :conditions => {:seeder => true}
@@ -67,12 +69,6 @@ class Peer < ActiveRecord::Base
   end
   
   # Instance Methods
-  
-  def bssids= bssids
-    bssids.each do |bssid|
-      access_points << AccessPoint.create!( :bssid => bssid )
-    end
-  end
   
   def serialize_coordinates
     "#{self.latitude};#{self.longitude};#{self.accuracy}"

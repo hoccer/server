@@ -2,6 +2,37 @@ require 'test_helper'
 
 class PeerTest < ActiveSupport::TestCase
   
+  test "should not create access points if peer is invalid" do
+    assert_no_difference "AccessPoint.count" do
+      Peer.create(
+        :latitude   => 44.1,
+        :longitude  => 44.2,
+        :accuracy   => 23.0,
+        :access_points_attributes => [
+          { :bssid => "ffff" },
+          { :bssid => "eeee" },
+          { :bssid => "aaaa" }
+        ]
+      )
+    end
+  end
+  
+  test "should create 3 accesspoints for valid peer" do
+    assert_difference "AccessPoint.count", +3 do
+      peer = Peer.create(
+        :latitude   => 44.1,
+        :longitude  => 44.2,
+        :accuracy   => 23.0,
+        :gesture    => "pass",
+        :access_points_attributes => [
+          { :bssid => "ffff" },
+          { :bssid => "eeee" },
+          { :bssid => "aaaa" }
+        ]
+      )
+    end
+  end
+  
   test "peer has many bssids" do
     assert_equal [], create_peer( 52.3, 42.1, 50.0, "pass", true ).access_points
   end

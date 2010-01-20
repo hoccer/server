@@ -28,7 +28,8 @@ class PeerTest < ActiveSupport::TestCase
           { :bssid => "ffff" },
           { :bssid => "eeee" },
           { :bssid => "aaaa" }
-        ]
+        ],
+        :content_type => "image/jpeg"
       )
     end
   end

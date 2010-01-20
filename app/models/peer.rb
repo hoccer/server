@@ -24,7 +24,7 @@ class Peer < ActiveRecord::Base
   # Validations
   validates_inclusion_of :gesture, :in => %w(pass distribute exchange)
   
-  attr_accessor :content_type
+  attr_accessor :transfered_content_type
   
   # Class Methods
   

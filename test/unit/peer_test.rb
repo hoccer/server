@@ -29,7 +29,7 @@ class PeerTest < ActiveSupport::TestCase
           { :bssid => "eeee" },
           { :bssid => "aaaa" }
         ],
-        :content_type => "image/jpeg"
+        :transfered_content_type => "image/jpeg"
       )
     end
   end

@@ -10,7 +10,7 @@ class PeersControllerTest < ActionController::TestCase
         :accuracy   => 42.0,
         :gesture    => "pass",
         :seeder     => true,
-        :bssids     => ["aaaa", "bbbb", "cccc"]
+        :bssids     => ["aaaa", "bbbb", "cccc"],
       }
     end
   end
@@ -31,6 +31,26 @@ class PeersControllerTest < ActionController::TestCase
     assert_equal json_response["peer_uri"], peer_url(:id => Peer.first.uid)
     assert_equal json_response["upload_uri"], upload_url(:id => Upload.first.uid)
   end
+  
+  test "creating a new seeder and peer group with transfered content_type" do
+    assert_difference ["Peer.count", "PeerGroup.count"], +1 do
+      post :create, :peer => {
+        :latitude   => 13.44,
+        :longitude  => 52.12,
+        :accuracy   => 42.0,
+        :gesture    => "pass",
+        :seeder     => true,
+        :transfered_content_type => "image/*"
+      }
+    end
+    
+    assert_response :success
+    json_response = ActiveSupport::JSON.decode( @response.body )
+    assert_equal json_response["peer_uri"], peer_url(:id => Peer.first.uid)
+    assert_equal json_response["upload_uri"], upload_url(:id => Upload.first.uid)
+    
+  end
+  
   
   test "peers do not receive an upload url upon creation" do
     assert_difference ["Peer.count", "PeerGroup.count"], +1 do
@@ -80,4 +100,5 @@ class PeersControllerTest < ActionController::TestCase
       :seeder     => seeder
     )
   end
+  
 end

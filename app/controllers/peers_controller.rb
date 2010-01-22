@@ -12,7 +12,13 @@ class PeersController < ApplicationController
       response[:upload_uri] = upload_url(:id => peer.upload.uid) if peer.seeder
       render :json => response.to_json
     else
-      render :json => {:state => :error}, :status => 500
+      render(
+        :json => {
+          :state => :error, 
+          :message => "An error occurred. Please report to hoccer@artcom.de"
+        }, 
+        :status => 500
+      )
     end
       
   end

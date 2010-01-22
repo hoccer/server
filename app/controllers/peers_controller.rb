@@ -4,7 +4,9 @@ class PeersController < ApplicationController
   def create
     bssids_to_access_points
     
-    if peer = Peer.create( params[:peer] )
+    peer = Peer.new( params[:peer] )
+    
+    if peer.save
       response = { :peer_uri => peer_url(:id => peer.uid),
                    :message => "Searching for partner" }  
       response[:upload_uri] = upload_url(:id => peer.upload.uid) if peer.seeder
@@ -33,6 +35,8 @@ class PeersController < ApplicationController
   
   # Rewrites bssid array into nested attributes hash
   def bssids_to_access_points
+    return unless params[:peer]
+    
     bssids = params[:peer].delete(:bssids)
     
     unless bssids.nil? || bssids.empty?

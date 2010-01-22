@@ -30,7 +30,16 @@ class Peer < ActiveRecord::Base
   
   # Returns all peers in range of given peer that have the same gesture.
   def self.find_all_in_range_of search_peer
-    peers = Peer.recent.select do |peer|
+    access_points = AccessPoint.recent.all(
+      :conditions => {:bssid => search_peer.bssids}
+    ).uniq
+    
+    unless access_points.empty?
+      peers = access_points.map(&:peers).flatten.uniq
+      peers = nil if (peers - [search_peer]).empty?
+    end
+    
+    peers ||= Peer.recent.select do |peer|
       max_distance  = peer.radius + search_peer.radius
       real_distance = Peer.distance( peer, search_peer )
       logger.info ">> max/real distance: #{max_distance} / #{real_distance}"
@@ -87,6 +96,10 @@ class Peer < ActiveRecord::Base
     ).count
     
     self.seeder && number_of_seeders_in_peer_group == 1
+  end
+  
+  def bssids
+    access_points.map(&:bssid)
   end
   
   # Private Methods

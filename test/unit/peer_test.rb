@@ -34,6 +34,30 @@ class PeerTest < ActiveSupport::TestCase
     end
   end
   
+  test "find multiple peers based on similiar bssids" do
+    peer_1 = create_peer_with_bssids( 52.3, 42.1, 50.0, "pass", true, "aaa", "bbb", "ccc" )
+    peer_2 = create_peer_with_bssids( 52.2, 42.2, 50.0, "pass", false, "aaa", "bbb", "ccc" )
+    peer_3 = create_peer_with_bssids( 52.1, 42.1, 50.0, "pass", false, "aaa", "bbb", "ccc" )
+    
+    assert_equal 2, Peer.find_all_in_range_of(peer_1).size
+  end
+  
+  test "no peers found if to far away and different bssids" do
+    peer_1 = create_peer_with_bssids( 52.3, 42.1, 50.0, "pass", true, "aaa", "bbb", "ccc" )
+    peer_2 = create_peer_with_bssids( 52.2, 42.2, 50.0, "pass", false, "aba", "bcb", "cac" )
+    peer_3 = create_peer_with_bssids( 52.1, 42.1, 50.0, "pass", false, "aab", "bbc", "cca" )
+    
+    assert_equal 0, Peer.find_all_in_range_of(peer_1).size
+  end
+  
+  test "multiple peers found by location even if bssids differ" do
+    peer_1 = create_peer_with_bssids( 52.501077, 13.345116, 80.0, "distribute", true, "aaa", "bbb", "ccc" )
+    peer_2 = create_peer_with_bssids( 52.500927, 13.345738, 80.0, "distribute", false, "aba", "bcb", "cac" )
+    peer_3 = create_peer_with_bssids( 52.501616, 13.345785, 80.0, "distribute", false, "aab", "bbc", "cca" )
+    
+    assert_equal 2, Peer.find_all_in_range_of(peer_1).size
+  end
+  
   test "peer has many bssids" do
     assert_equal [], create_peer( 52.3, 42.1, 50.0, "pass", true ).access_points
   end
@@ -116,6 +140,21 @@ class PeerTest < ActiveSupport::TestCase
       :accuracy   => acc,
       :gesture    => gesture,
       :seeder     => seeder
+    )
+  end
+  
+  
+  def create_peer_with_bssids lat, long, acc, gesture, seeder, *bssids
+    
+    access_points = bssids.map {|bssid| {:bssid => bssid}}
+    
+    Peer.create!(
+      :latitude   => lat,
+      :longitude  => long,
+      :accuracy   => acc,
+      :gesture    => gesture,
+      :access_points_attributes => access_points,
+      :transfered_content_type => "image/jpeg"
     )
   end
 end

@@ -29,23 +29,26 @@ class Peer < ActiveRecord::Base
   # Class Methods
   
   # Returns all peers in range of given peer that have the same gesture.
+  # TODO Improve preformance via SQL magic
   def self.find_all_in_range_of search_peer
     access_points = AccessPoint.recent.all(
       :conditions => {:bssid => search_peer.bssids}
     ).uniq
     
     unless access_points.empty?
-      peers = access_points.map(&:peers).flatten.uniq
-      peers = nil if (peers - [search_peer]).empty?
+      peers_by_bssids = access_points.map(&:peers).flatten.uniq
     end
     
-    peers ||= Peer.recent.select do |peer|
+    peers_by_bssids ||= []
+    
+    peers_by_location = Peer.recent.select do |peer|
       max_distance  = peer.radius + search_peer.radius
       real_distance = Peer.distance( peer, search_peer )
       logger.info ">> max/real distance: #{max_distance} / #{real_distance}"
       real_distance < max_distance && peer.gesture == search_peer.gesture
     end
     
+    peers = peers_by_location | peers_by_bssids
     peers - [search_peer]
   end
   

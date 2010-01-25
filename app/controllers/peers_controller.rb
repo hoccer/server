@@ -41,9 +41,9 @@ class PeersController < ApplicationController
   
   # Rewrites bssid array into nested attributes hash
   def bssids_to_access_points
-    return unless params[:peer]
+    return unless params[:peer] && params[:peer][:bssids]
     
-    bssids = params[:peer].delete(:bssids)
+    bssids = params[:peer].delete(:bssids).split(",").flatten
     
     unless bssids.nil? || bssids.empty?
       access_points = { 

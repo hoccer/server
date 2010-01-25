@@ -35,14 +35,23 @@ class PeerTest < ActiveSupport::TestCase
   end
   
   test "find multiple peers based on similiar bssids" do
-    peer_1 = create_peer_with_bssids( 52.3, 42.1, 50.0, "pass", true, "aaa", "bbb", "ccc" )
-    peer_2 = create_peer_with_bssids( 52.2, 42.2, 50.0, "pass", false, "aaa", "bbb", "ccc" )
-    peer_3 = create_peer_with_bssids( 52.1, 42.1, 50.0, "pass", false, "aaa", "bbb", "ccc" )
+    peer_1 = create_peer_with_bssids( 52.3, 42.1, 50.0, "pass", true, "bbb", "ccc", "aaa" )
+    peer_2 = create_peer_with_bssids( 80.2, 20.2, 50.0, "pass", false, "aaa", "bzb", "czc" )
+    peer_3 = create_peer_with_bssids( 14.1, 66.1, 50.0, "pass", false, "aaa", "ccc", "bbb" )
+    
+    assert_equal 2, Peer.find_all_in_range_of(peer_1).size
+    assert_equal 3, PeerGroup.last.peers.count
+  end
+  
+  test "find multiple peers based on similiar real bssids" do
+    peer_1 = create_peer_with_bssids( 52.3, 42.1, 50.0, "pass", true,   "00:0f:b5:92:fa:45" )
+    peer_2 = create_peer_with_bssids( 80.2, 20.2, 50.0, "pass", false,  "00:22:3f:10:a8:bf", "00:0f:b5:92:fa:45" )
+    peer_3 = create_peer_with_bssids( 14.1, 66.1, 50.0, "pass", false,  "00:0f:b5:92:fa:45", "00:22:3f:11:5e:5e" )
     
     assert_equal 2, Peer.find_all_in_range_of(peer_1).size
   end
   
-  test "no peers found if to far away and different bssids" do
+  test "no peers found if too far away and different bssids" do
     peer_1 = create_peer_with_bssids( 52.3, 42.1, 50.0, "pass", true, "aaa", "bbb", "ccc" )
     peer_2 = create_peer_with_bssids( 52.2, 42.2, 50.0, "pass", false, "aba", "bcb", "cac" )
     peer_3 = create_peer_with_bssids( 52.1, 42.1, 50.0, "pass", false, "aab", "bbc", "cca" )

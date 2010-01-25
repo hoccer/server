@@ -15,7 +15,7 @@ class PeersControllerTest < ActionController::TestCase
         :accuracy   => 42.0,
         :gesture    => "pass",
         :seeder     => true,
-        :bssids     => ["aaaa", "bbbb", "cccc"],
+        :bssids     => ["a:a:a:a", "b:b:b:b", "c:c:c:c"],
       }
     end
   end

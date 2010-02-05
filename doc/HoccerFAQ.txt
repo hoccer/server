@@ -23,7 +23,7 @@ Technisch:
  A: On this site you can throw and catch files. You just have to locate your position on the map.
 
  F: Can I hocc if I haven't an GPS connection?
- A: At first Hoccer try to match the acces points. If both have a internet connection within the same accespoint you doesn't need a GPS Connection to throw and catch files. Second Android try to get a location from your acces point, but keep in mind this must not be very accurate.
+ A: At first Hoccer try to match the access points. If both have a internet connection within the same accespoint you doesn't need a GPS connection to hocc files. Second Android try to get a location from your access point, but keep in mind this must not be very accurate.
 
  F: Why do I have to synchronize all my contacts on Android 2.x ?
  A: 

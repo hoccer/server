@@ -71,7 +71,11 @@ a:hover {
   float:left;
   right: 67px;
   bottom: 24px;
- }
+ }  
+
+#long_line_question {white-space:nowrap; font-size:17px; font-style:normal; margin-bottom:7px;}
+
+#long_line_answer {white-space:nowrap; font-size:15px; margin-bottom:10px}
 
 #metanav {
   height: 20px;

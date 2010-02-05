@@ -73,9 +73,13 @@ a:hover {
   bottom: 24px;
  }  
 
-#long_line_question {white-space:nowrap; font-size:17px; font-style:normal; margin-bottom:7px;}
+#question {margin-bottom:5px; margin-top:3px}
 
 #long_line_answer {white-space:nowrap; font-size:15px; margin-bottom:10px}
+
+#faq p{
+  white-space:nowrap;
+}
 
 #metanav {
   height: 20px;
@@ -374,12 +378,21 @@ a:hover#contact { background: url(../images/metanav_contact-mo.gif) no-repeat; }
 a#imprint { background: url(../images/metanav_imprint.gif) no-repeat; 
   height: 7px; width:35px; }
 a:hover#imprint { background: url(../images/metanav_imprint-mo.gif) no-repeat; }
+a#faq { background: url(../images/metanav_faq.gif) no-repeat; 
+  height: 7px; width:35px; }
+a:hover#faq { background: url(../images/metanav_faq-mo.gif) no-repeat; }
 
 h2#hl_welcome { 
   background: url(../images/hl_welcome.png) no-repeat; 
   height: 18px; 
   width:79px;
   margin-bottom: 16px; 
+}
+
+h2#hl_faq { 
+  background: url(../images/hl_faq.png) no-repeat; 
+  height: 22px; 
+  width:220px;
 }
 
 h2#hl_yvideo { 

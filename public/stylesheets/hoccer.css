@@ -73,7 +73,9 @@ a:hover {
   bottom: 24px;
  }  
 
-#question {margin-bottom:5px; margin-top:3px}
+#question {margin-bottom:5px; 
+           margin-top:3px;
+           font-weight:bold;}
 
 #long_line_answer {white-space:nowrap; font-size:15px; margin-bottom:10px}
 

@@ -146,7 +146,7 @@ class Peer < ActiveRecord::Base
     # Create empty Upload placeholder object and associate it to the peer
     def initialize_upload
       if seeder
-        sha = SHA1.new(Time.now.to_s).to_s
+        sha = SHA1.new(Time.now.to_s + uid).to_s
         
         upload = Upload.create(:uid => sha)
         self.upload = upload

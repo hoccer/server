@@ -61,7 +61,7 @@
 
 = Deploying new versions of the server
 
-To deploy your local version onto www.hoccer.com we have tow rake tasks
+To deploy your local version onto www.hoccer.com we have two rake tasks
 
 1. to publish a new webpage (no server restart) 
  $ rake publish_web

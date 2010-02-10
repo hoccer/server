@@ -1,6 +1,11 @@
 require 'test_helper'
 
 class PeersControllerTest < ActionController::TestCase
+  
+  
+  test "posting without peer parameters" do
+    assert_nothing_raised { post :create }
+  end
 
   test "creating new seeder peergroup and access points" do
     assert_difference "AccessPoint.count", +3 do
@@ -10,7 +15,7 @@ class PeersControllerTest < ActionController::TestCase
         :accuracy   => 42.0,
         :gesture    => "pass",
         :seeder     => true,
-        :bssids     => ["aaaa", "bbbb", "cccc"],
+        :bssids     => ["a:a:a:a", "b:b:b:b", "c:c:c:c"],
       }
     end
   end

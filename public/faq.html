@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+	<head profile="http://gmpg.org/xfn/11">
+		<title>Hoccer | FAQ</title>
+		<meta name="author" content="Rodja Trappe"/>
+		<meta name="copyright" content=""/>
+		<meta name="description" content="Hoccer - an easy and intuitive way to exchange mobile data" />
+		<meta name="keywords" content="hoccer, android, iphone, mobile, share, data, throw, catch, receive, exchange" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="stylesheet" href="stylesheets/reset.css" type="text/css" media="screen"/>
+		<link rel="stylesheet" href="stylesheets/hoccer.css" type="text/css" media="screen"/>
+	</head>
+<body>
+
+	<div id="people_layer">
+		<div id="page">
+  
+  			<div id="headline">
+				<a href="index.html">  
+					<img id="logo" src="images/logo_hoccer.png" width="56" height="70" alt="Hoccer Logo"/>
+					<div id="hoccer"></div>
+				</a>
+			</div>
+
+  			<div id="metanav">
+				<a id="faq" class="swap last" href="faq.html"><span>FAQ</span></a>
+    			<img src="images/metanav_divider.gif" alt="divider" />
+				<a id="imprint" class="swap" href="imprint.html"><span>Imprint</span></a>
+    			<img src="images/metanav_divider.gif" alt="divider" /> 
+    			<a id="contact" class="swap" href="about.html"><span>Contact</span></a>
+  			</div>    
+
+  			<div id="content">
+	
+				<h2 id="hl_faq" class="swap"><span>FAQ</span></h2>
+	
+	  			<div style="overflow:auto; height:400px; width:730px; margin-top:25px">
+				   <div style="width:700px">
+				    			<p id="question">Why does Hoccer need access to my personal information like contacts and browser history?</p>						
+								<p>With Hoccer you can share your contacts or bookmarks. Thats why Hoccer needs access to it.</p> <br>
+									
+								<p id="question">What is the maximum range to hocc something?</p>
+								<p>We ensure you can hocc within 100 meter.</p> <br>
+								
+								<p id="question">Can I hocc files between Android and iPhone?</p>	
+								<p>Hoccer has been developed to work with both platforms.</p> <br>
+								
+								<p id="question">What happened to the tap gesture?</p>
+								<p>We removed this gesture from Hoccer. One-to-one hoccs will come back with a new gesture soon.</p><br>
+								
+								<p id="question">How can I hocc to one person only?</p>
+								<p>Currently you can't. Everyone who is in range and does a catch gesture in time will receive
+                           your data. However, we're going to (re-)implement one-to-one hoccs in a future release.</p> <br>
+								
+								<p id="question">I can not find Hoccer in the Android market. Where is it?</p>
+								<p>The market only shows applications compatible with your version of Android. That's Google's policy 
+								   and we try to support all Android version as soon as they get announced.</p> <br>
+								   
+								<p id="question">Will Hoccer be able to throw other files like .zip or .pdf?</p>
+								<p>Yes, it will. We are working on it and hope we can release this feature soon.</p><br>
+								
+								<p id="question">I can not see my caught contacts on Android 2.x. What's wrong?</p>
+								<p>The contacts API changed in 2.0 and we have not caught up yet. We are working on it.</p> <br>
+								
+								<p id="question">Why does Hoccer not work correctly on HTC Eris, Hero and Tattoo?</p>
+								<p>We fixed some bugs related to these devices. We hope Hoccer will work properly on them with the newest version.</p> <br>
+								
+								<p id="question">How does Hoccer transport the files from phone to phone?</p>
+								<p>Well, first of all, it does not use Bluetooth. Hoccer needs an internet connection. 
+								   If you throw a file it is tagged with your current location and send to a server. 
+								   When someone performs the catch gesture within a few seconds Hoccer contacts
+                           the server and asks for pending files at the receivers location. If both locations 
+                           are in range the file is sent to the receiver.</p> <br>
+								
+								<p id="question">How does Hoccer locate my position?</p>
+								<p>First Hoccer checks the wireless access points in range. If both peers are in 
+								   range of the same access point you don't need a GPS signal to hocc files. 
+								   If no common access point is found Hoccer tries to get a GPS 
+                           position. If GPS is not available the 'network location' is used as a fall back. 
+                           Please keep in mind that Hoccer requires a decent lock on your location 
+                           to function properly. Specially the fall back data might not be good enough. 
+                           However, it will work as long as all peers agree on the same (wrong) location.</p> <br>
+								
+								<p id="question">How can I hocc between my phone and my computer?</p>
+								<p>We implemented a <a href="hoc.html">Hoccer webclient</a>. Point the map to your current location and use the widget on 
+								   the right-hand side to hocc files.</p> <br>
+								
+								<p id="question">How can I hocc my files without using a gestures?</p>
+								<p>Not on the phone. But you can use our <a href="hoc.html">webclinent</a> to hocc files without a gesture.
+								     </p> <br>
+			     	</div>
+  				</div>
+  			</div> <!-- content -->  
+  
+  			<div id="footer">
+    			<div class="homebutton">
+						<a href="index.html"><img src="images/btn_home.png" alt="" /></a>
+				</div>
+    			<a class="swap" id="artcom" href="http://tech.artcom.de/en/home"><span>ART+COM Technologies</span></a>  
+  			</div>  
+  
+  
+		</div> <!-- page -->
+	</div> <!-- people_layer -->
+</body>
+</html>

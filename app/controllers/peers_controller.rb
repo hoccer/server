@@ -4,13 +4,21 @@ class PeersController < ApplicationController
   def create
     bssids_to_access_points
     
-    if peer = Peer.create( params[:peer] )
+    peer = Peer.new( params[:peer] )
+    
+    if peer.save
       response = { :peer_uri => peer_url(:id => peer.uid),
                    :message => "Searching for partner" }  
       response[:upload_uri] = upload_url(:id => peer.upload.uid) if peer.seeder
       render :json => response.to_json
     else
-      render :json => {:state => :error}, :status => 500
+      render(
+        :json => {
+          :state => :error, 
+          :message => "An error occurred. Please report to hoccer@artcom.de"
+        }, 
+        :status => 500
+      )
     end
       
   end
@@ -33,7 +41,9 @@ class PeersController < ApplicationController
   
   # Rewrites bssid array into nested attributes hash
   def bssids_to_access_points
-    bssids = params[:peer].delete(:bssids)
+    return unless params[:peer] && params[:peer][:bssids]
+    
+    bssids = params[:peer].delete(:bssids).split(",").flatten
     
     unless bssids.nil? || bssids.empty?
       access_points = { 

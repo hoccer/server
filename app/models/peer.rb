@@ -29,14 +29,26 @@ class Peer < ActiveRecord::Base
   # Class Methods
   
   # Returns all peers in range of given peer that have the same gesture.
+  # TODO Improve preformance via SQL magic
   def self.find_all_in_range_of search_peer
-    peers = Peer.recent.select do |peer|
+    access_points = AccessPoint.recent.all(
+      :conditions => {:bssid => search_peer.bssids}
+    ).uniq
+    
+    unless access_points.empty?
+      peers_by_bssids = access_points.map(&:peers).flatten.uniq
+    end
+    
+    peers_by_bssids ||= []
+    
+    peers_by_location = Peer.recent.select do |peer|
       max_distance  = peer.radius + search_peer.radius
       real_distance = Peer.distance( peer, search_peer )
       logger.info ">> max/real distance: #{max_distance} / #{real_distance}"
       real_distance < max_distance && peer.gesture == search_peer.gesture
     end
     
+    peers = peers_by_location | peers_by_bssids
     peers - [search_peer]
   end
   
@@ -89,6 +101,10 @@ class Peer < ActiveRecord::Base
     self.seeder && number_of_seeders_in_peer_group == 1
   end
   
+  def bssids
+    access_points.map(&:bssid)
+  end
+  
   # Private Methods
   
   private
@@ -130,7 +146,7 @@ class Peer < ActiveRecord::Base
     # Create empty Upload placeholder object and associate it to the peer
     def initialize_upload
       if seeder
-        sha = SHA1.new(Time.now.to_s).to_s
+        sha = SHA1.new(Time.now.to_s + uid).to_s
         
         upload = Upload.create(:uid => sha)
         self.upload = upload

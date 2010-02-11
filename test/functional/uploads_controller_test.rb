@@ -2,12 +2,11 @@ require 'test_helper'
 require 'digest/md5'
 
 class UploadsControllerTest < ActionController::TestCase
+  
   test "updating an upload" do
     Upload.create :uid => "23"
     
-    tmpfile = File.new(
-      File.join(RAILS_ROOT, "test", "fixtures", "upload_test.jpg")
-    )
+    tmpfile = File.new(Rails.root.join("test", "fixtures", "upload_test.jpg"))
     
     put( 
       :update,
@@ -17,7 +16,7 @@ class UploadsControllerTest < ActionController::TestCase
   end
   
   test "uploading a vcard with broken newlines" do
-    vcard_path = File.join(RAILS_ROOT, "test", "fixtures", "test.vcf")
+    vcard_path = Rails.root.join("test", "fixtures", "test.vcf")
     
     vcard_content = File.open(vcard_path) {|f| f.read}
     
@@ -27,9 +26,7 @@ class UploadsControllerTest < ActionController::TestCase
     
     upload = Upload.create( :uid => "23" )
     
-    tmpfile = File.new(
-      File.join(RAILS_ROOT, "test", "fixtures", "test.vcf")
-    )
+    tmpfile = File.new(Rails.root.join("test", "fixtures", "test.vcf"))
     
     put( 
       :update,
@@ -38,6 +35,9 @@ class UploadsControllerTest < ActionController::TestCase
     )
     
     upload.reload
+    
+    # TODO Find out why its not working
+    #processed_vcard_path = Rails.root.join("public", upload.attachment.url(:processed))
     
     processed_vcard_path = File.join(
       RAILS_ROOT, "public", upload.attachment.url(:processed)
@@ -55,7 +55,7 @@ class UploadsControllerTest < ActionController::TestCase
     Upload.create :uid => "23"
     
     tmpfile = File.new(
-      File.join(RAILS_ROOT, "test", "fixtures", "upload_test.jpg")
+      Rails.root.join("test", "fixtures", "upload_test.jpg")
     )
     
     digest_before_processing = Digest::MD5.hexdigest(tmpfile.read)
@@ -97,7 +97,7 @@ class UploadsControllerTest < ActionController::TestCase
     )
 
     attachment = File.new(
-      File.join(RAILS_ROOT, "test", "fixtures", "upload_test.jpg")
+      Rails.root.join("test", "fixtures", "upload_test.jpg")
     )
 
     put(
@@ -109,4 +109,47 @@ class UploadsControllerTest < ActionController::TestCase
     get :show, :id => peer.upload.uid
     assert_response 200
   end
+  
+  test "uploading a html file" do
+    assert peer = Peer.create(
+      :latitude   => 13.44,
+      :longitude  => 52.12,
+      :accuracy   => 42.0,
+      :gesture    => "pass",
+      :seeder     => true
+    )
+    
+    attachment = File.new(Rails.root.join("test", "fixtures", "test.html"))
+    
+    put(
+      :update,
+      :upload => {:attachment => attachment},
+      :id => Upload.last.uid
+    )
+    
+    get :show, :id => peer.upload.uid
+    assert_response 200
+  end
+  
+  test "uploading a zip file" do
+    assert peer = Peer.create(
+      :latitude   => 13.44,
+      :longitude  => 52.12,
+      :accuracy   => 42.0,
+      :gesture    => "pass",
+      :seeder     => true
+    )
+    
+    attachment = File.new(Rails.root.join("test", "fixtures", "test.zip"))
+    
+    put(
+      :update,
+      :upload => {:attachment => attachment},
+      :id => Upload.last.uid
+    )
+    
+    get :show, :id => peer.upload.uid
+    assert_response 200
+  end
+  
 end

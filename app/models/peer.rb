@@ -22,7 +22,7 @@ class Peer < ActiveRecord::Base
   named_scope :seeders, :conditions => {:seeder => true}
   
   # Validations
-  validates_inclusion_of :gesture, :in => %w(pass distribute exchange)
+  validates_inclusion_of :gesture, :in => %w(pass distribute exchange drop)
   
   attr_accessor :transfered_content_type
   

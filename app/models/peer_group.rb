@@ -129,3 +129,9 @@ class Exchange < PeerGroup
     
   end
 end
+
+class Drop < PeerGroup
+  def collisions?
+    false
+  end
+end

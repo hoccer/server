@@ -28,8 +28,7 @@ class PeerTest < ActiveSupport::TestCase
           { :bssid => "ffff" },
           { :bssid => "eeee" },
           { :bssid => "aaaa" }
-        ],
-        :transfered_content_type => "image/jpeg"
+        ]
       )
     end
   end
@@ -179,8 +178,7 @@ class PeerTest < ActiveSupport::TestCase
       :longitude  => long,
       :accuracy   => acc,
       :gesture    => gesture,
-      :access_points_attributes => access_points,
-      :transfered_content_type => "image/jpeg"
+      :access_points_attributes => access_points
     )
   end
 end

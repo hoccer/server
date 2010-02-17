@@ -44,8 +44,7 @@ class PeersControllerTest < ActionController::TestCase
         :longitude  => 52.12,
         :accuracy   => 42.0,
         :gesture    => "pass",
-        :seeder     => true,
-        :transfered_content_type => "image/*"
+        :seeder     => true
       }
     end
     

@@ -14,25 +14,9 @@ class UploadsControllerTest < ActionController::TestCase
       :upload => {:attachment => tmpfile}
     )
     
-    assert_equal "image/jpeg", Upload.find_by_uid(23).attachment.content_type
+    assert_equal "image/jpeg", Upload.find_by_uid("23").attachment.content_type
   end
   
-  test "updating an upload with transferred_content_type which takes precendence" do
-    Upload.create :uid => "23"
-    
-    tmpfile = File.new(Rails.root.join("test", "fixtures", "upload_test.jpg"))
-    
-    put( 
-      :update,
-      :id => 23,
-      :upload => {
-        :attachment => tmpfile, 
-        :transferred_content_type => "image/png"
-      }
-    )
-    
-    assert_equal "image/png", Upload.find_by_uid(23).attachment.content_type
-  end
   
   test "uploading a vcard with broken newlines" do
     vcard_path = Rails.root.join("test", "fixtures", "test.vcf")

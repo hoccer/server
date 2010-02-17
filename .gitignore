@@ -5,3 +5,5 @@ public/system/*
 db/schema.rb
 doc/app/*
 .gitkeep
+config/database.yml
+

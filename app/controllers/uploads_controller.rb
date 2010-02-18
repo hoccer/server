@@ -7,8 +7,8 @@ class UploadsController < ApplicationController
     
     upload.update_attributes( params[:upload] )
     
-    if upload.attachment.content_type.nil? || upload.attachment.content_type.blank?
-      content_type = MIME::Types.type_for(upload.attachment.original_filename).to_s
+    if upload.attachment.content_type.nil? || upload.attachment.content_type.blank? || upload.attachment.content_type =~ /^image\/\*$/
+      content_type = MIME::Types.type_for(upload.attachment.original_filename).to_s 
       upload.update_attributes :attachment_content_type => content_type
     end
     

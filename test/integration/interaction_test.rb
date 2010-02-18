@@ -52,7 +52,37 @@ class InteractionTest < ActionController::IntegrationTest
     assert_equal 200, PeerGroup.first.status[:status_code]
   end
   
-  test "uploading a file with broken mimetype" do
+  test "multipart content type prefered to uploading file extension" do
+    post peers_path, :peer => {
+      :latitude   => 20.44,
+      :longitude  => 30.12,
+      :accuracy   => 42.0,
+      :gesture    => "distribute",
+      :seeder     => true }
+    
+    assert_equal 200, status
+        
+    border = "ycKtoN8VURwvDC4sUzYC9Mo7l0IVUyDDVf"
+    multipart  = "--#{border}\r\n"
+    multipart << "Content-Disposition: form-data; name=\"upload[attachment]\" "
+    multipart << "filename=\"test.ogg\"\r\n"
+    multipart << "Content-Type: audio/mpeg\r\n"
+    multipart << "Content-Transfer-Encoding: binary\r\n\r\n"
+    multipart << "1234567890"
+    multipart << "\r\n--#{border}--\r\n"
+    
+    response_body = ActiveSupport::JSON.decode(@response.body)
+    
+    put( response_body["upload_uri"],
+      multipart,
+      { "Content-Type" => "multipart/form-data; boundary=#{border}" }
+    )
+
+    assert_response 200
+    assert_equal "audio/mpeg", Upload.last.attachment_content_type
+  end
+  
+  test "uploading an image file with broken mimetype" do
     post peers_path, :peer => {
       :latitude   => 20.44,
       :longitude  => 30.12,
@@ -81,7 +111,6 @@ class InteractionTest < ActionController::IntegrationTest
     assert_response 200
     assert_equal "image/jpeg", Upload.last.attachment_content_type
   end
-  
   
   
   

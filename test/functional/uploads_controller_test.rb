@@ -17,6 +17,22 @@ class UploadsControllerTest < ActionController::TestCase
     assert_equal "image/jpeg", Upload.find_by_uid("23").attachment.content_type
   end
   
+  test "sending an upload with legacy transfered_content_type which should be ignored" do
+    Upload.create :uid => "23"
+    
+    tmpfile = File.new(Rails.root.join("test", "fixtures", "upload_test.jpg"))
+    
+    put( 
+      :update,
+      :id => 23,
+      :upload => {
+        :attachment => tmpfile, 
+        :transfered_content_type => "image/png"
+      }
+    )
+    
+    assert_equal "image/jpeg", Upload.find_by_uid(23).attachment.content_type
+  end
   
   test "uploading a vcard with broken newlines" do
     vcard_path = Rails.root.join("test", "fixtures", "test.vcf")

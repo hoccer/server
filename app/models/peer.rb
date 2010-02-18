@@ -9,7 +9,7 @@ class Peer < ActiveRecord::Base
   # Filters
   before_create :generate_uid
   after_create  :associate_with_peer_group, :initialize_upload
-  
+   
   # Associations
   belongs_to                :peer_group
   has_one                   :upload
@@ -25,7 +25,6 @@ class Peer < ActiveRecord::Base
   validates_inclusion_of :gesture, :in => %w(pass distribute exchange drop)
   
   attr_accessor :transfered_content_type
-  
   # Class Methods
   
   # Returns all peers in range of given peer that have the same gesture.

@@ -31,7 +31,7 @@ class UploadsControllerTest < ActionController::TestCase
       }
     )
     
-    assert_equal "image/jpeg", Upload.find_by_uid(23).attachment.content_type
+    assert_equal "image/jpeg", Upload.find_by_uid("23").attachment.content_type
   end
   
   test "uploading a vcard with broken newlines" do

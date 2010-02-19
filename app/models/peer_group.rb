@@ -103,8 +103,8 @@ class PeerGroup < ActiveRecord::Base
   end
   
   def new_file_available
-    expires_at = Time.now + 7.seconds
-    save
+    self.expires_at = Time.now + 7.seconds
+    self.save
   end
   
   private

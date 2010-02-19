@@ -1,11 +1,41 @@
 require 'test_helper'
 
 class InteractionTest < ActionController::IntegrationTest
-  
+
+
+  test "uploading a file updates expires_at attribute and not the peer" do
+    post peers_path, :peer => {
+      :latitude   => 13.44,
+      :longitude  => 52.12,
+      :accuracy   => 42.0,
+      :gesture    => "distribute",
+      :seeder     => true
+    }
+
+    peer = Peer.last
+
+    sleep(1)
+
+    pre_upload_time = peer.peer_group.expires_at
+
+    tmpfile = fixture_file_upload("upload_test.jpg", "image/jpeg")
+
+    put(
+      upload_path(:id => peer.upload.uid),
+      :upload => {:attachment => tmpfile},
+      :html => {:multipart => true},
+      :referer => '/'
+    )
+
+    post_upload_time = peer.peer_group.reload.expires_at
+
+    assert pre_upload_time < post_upload_time
+  end
+
   test "pairing by bssids" do
-    
+
     assert_equal 0, PeerGroup.count
-    
+
     post peers_path, :peer => {
       :latitude   => 13.44,
       :longitude  => 52.12,
@@ -21,9 +51,9 @@ class InteractionTest < ActionController::IntegrationTest
         "00:0f:b5:92:fb:21"
       ],
     }
-    
+
     sleep(2)
-    
+
     post peers_path, :peer => {
       :latitude   => 20.44,
       :longitude  => 30.12,
@@ -43,15 +73,15 @@ class InteractionTest < ActionController::IntegrationTest
         "00:11:6b:24:d1:20"
       ],
     }
-    
+
     assert_equal 1, PeerGroup.count
     assert_equal 2, PeerGroup.first.peers.count
-    
+
     PeerGroup.first.expire!
-    
+
     assert_equal 200, PeerGroup.first.status[:status_code]
   end
-  
+
   test "multipart content type prefered to uploading file extension" do
     post peers_path, :peer => {
       :latitude   => 20.44,
@@ -59,9 +89,9 @@ class InteractionTest < ActionController::IntegrationTest
       :accuracy   => 42.0,
       :gesture    => "distribute",
       :seeder     => true }
-    
+
     assert_equal 200, status
-        
+
     border = "ycKtoN8VURwvDC4sUzYC9Mo7l0IVUyDDVf"
     multipart  = "--#{border}\r\n"
     multipart << "Content-Disposition: form-data; name=\"upload[attachment]\" "
@@ -70,9 +100,9 @@ class InteractionTest < ActionController::IntegrationTest
     multipart << "Content-Transfer-Encoding: binary\r\n\r\n"
     multipart << "1234567890"
     multipart << "\r\n--#{border}--\r\n"
-    
+
     response_body = ActiveSupport::JSON.decode(@response.body)
-    
+
     put( response_body["upload_uri"],
       multipart,
       { "Content-Type" => "multipart/form-data; boundary=#{border}" }
@@ -81,7 +111,7 @@ class InteractionTest < ActionController::IntegrationTest
     assert_response 200
     assert_equal "audio/mpeg", Upload.last.attachment_content_type
   end
-  
+
   test "uploading an image file with broken mimetype" do
     post peers_path, :peer => {
       :latitude   => 20.44,
@@ -89,9 +119,9 @@ class InteractionTest < ActionController::IntegrationTest
       :accuracy   => 42.0,
       :gesture    => "distribute",
       :seeder     => true }
-    
+
     assert_equal 200, status
-        
+
     border = "ycKtoN8VURwvDC4sUzYC9Mo7l0IVUyDDVf"
     multipart  = "--#{border}\r\n"
     multipart << "Content-Disposition: form-data; name=\"upload[attachment]\" "
@@ -100,9 +130,9 @@ class InteractionTest < ActionController::IntegrationTest
     multipart << "Content-Transfer-Encoding: binary\r\n\r\n"
     multipart << "1234567890"
     multipart << "\r\n--#{border}--\r\n"
-    
+
     response_body = ActiveSupport::JSON.decode(@response.body)
-    
+
     put( response_body["upload_uri"],
       multipart,
       { "Content-Type" => "multipart/form-data; boundary=#{border}" }
@@ -111,7 +141,5 @@ class InteractionTest < ActionController::IntegrationTest
     assert_response 200
     assert_equal "image/jpeg", Upload.last.attachment_content_type
   end
-  
-  
-  
+
 end

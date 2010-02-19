@@ -126,21 +126,21 @@ class Peer < ActiveRecord::Base
       if peer && !peer.peer_group.expired?
         peer_group = peer.peer_group
         peer_group.peers << self
-        update_expiration_time if self.first_seeder?
+        # update_expiration_time if self.first_seeder?
       else
         PeerGroup
         peer_group = self.gesture.titlecase.constantize.create
         peer_group.peers << self
-        update_expiration_time
+        # update_expiration_time
       end
     end
     
     # Set a new expiration time on the peers peer group
-    def update_expiration_time
-      self.peer_group.update_attributes(
-        :expires_at => self.created_at + PEERING_TIMEOUT
-      )
-    end
+    # def update_expiration_time
+    #   self.peer_group.update_attributes(
+    #     :expires_at => self.created_at + PEERING_TIMEOUT
+    #   )
+    # end
     
     # Create empty Upload placeholder object and associate it to the peer
     def initialize_upload

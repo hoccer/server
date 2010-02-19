@@ -6,9 +6,16 @@ class Upload < ActiveRecord::Base
   
   attr_accessor :transfered_content_type
   
+  after_update :peer_group_callback
+  
   
   def attachment_ready?
     !attachment.original_filename.nil?
   end
+  
+  private
+    def peer_group_callback
+      self.peer.peer_group.new_file_available if self.peer
+    end
 
 end

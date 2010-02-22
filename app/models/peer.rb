@@ -146,10 +146,7 @@ class Peer < ActiveRecord::Base
     def initialize_upload
       if seeder
         sha = SHA1.new(Time.now.to_s + uid).to_s
-        
-        upload = Upload.create(:uid => sha)
-        self.upload = upload
-        upload.save
+        upload = Upload.create(:uid => sha, :peer_id => id)
       end
     end
 end

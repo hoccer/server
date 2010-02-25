@@ -17,11 +17,11 @@ class PeerGroup < ActiveRecord::Base
   end
   
   def number_of_seeders
-    peers.find(:all, :conditions => {:seeder => true}).count
+    peers.find(:all, :conditions => {:seeder => true}).size
   end
   
   def number_of_peers
-    peers.find(:all, :conditions => {:seeder => false}).count
+    peers.find(:all, :conditions => {:seeder => false}).size
   end
   
   def collisions?

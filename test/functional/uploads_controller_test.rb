@@ -59,7 +59,7 @@ class UploadsControllerTest < ActionController::TestCase
     #processed_vcard_path = Rails.root.join("public", upload.attachment.url(:processed))
     
     processed_vcard_path = File.join(
-      RAILS_ROOT, "public", upload.attachment.url(:processed)
+      RAILS_ROOT, "public", upload.attachment.url(:processed).sub(/\?\d+$/, "")
     )
     
     assert File.exist?(processed_vcard_path)

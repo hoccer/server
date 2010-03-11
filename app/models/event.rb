@@ -6,6 +6,10 @@ class Event < ActiveRecord::Base
   
   before_save :calculate_postgis_point
   
+  has_many :access_point_sightings
+  
+  accepts_nested_attributes_for :access_point_sightings
+  
   # Class Methods
   
   def self.within_timeframe starting_at, ending_at
@@ -17,14 +21,37 @@ class Event < ActiveRecord::Base
     )
   end
   
+  def self.with_bssids bssids
+    scoped(
+      :joins => :access_point_sightings,
+      :conditions => ["access_point_sightings.bssid IN (?)", bssids.join(",")]
+    )
+  end
+  
   # Instance Methods
   
+  def bssids
+    access_point_sightings.all(:select => :bssid).map(&:bssid)
+  end
+  
   def nearby_events
-    Event.within_timeframe(
+    via_accesspoints, via_locations = [], []
+    
+    via_accesspoints = Event.within_timeframe(
       starting_at, ending_at
-    ).within_radius(
-      latitude, longitude, 100.0
-    ).scoped(:conditions => ["id != ?", self.id])
+    ).with_bssids(
+      bssids
+    ).scoped(:conditions => ["events.id != ?", self.id])
+    
+    if via_accesspoints.empty?
+      via_locations = Event.within_timeframe(
+        starting_at, ending_at
+      ).within_radius(
+        latitude, longitude, 100.0
+      ).scoped(:conditions => ["events.id != ?", self.id])
+    end
+    
+    via_accesspoints | via_locations
   end
   
   

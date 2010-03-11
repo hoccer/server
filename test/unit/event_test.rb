@@ -13,5 +13,52 @@ class EventTest < ActiveSupport::TestCase
     event.update_attributes( :longitude => 53.0, :latitude => 14.0 )
     assert before != event.reload.point
   end
-
+  
+  test "within_timeframe with two equal events" do
+    2.times { create_event_with_times( Time.now, (Time.now + 7.seconds) ) }
+    
+    event = Event.last
+    
+    assert_equal 1, event.within_timeframe.size
+    assert event != event.within_timeframe.first
+  end
+  
+  test "within_timeframe with overlapping events - first is first" do
+    create_event_with_times( Time.now, (Time.now + 7.seconds) )
+    create_event_with_times( (Time.now + 4.seconds), (Time.now + 11.seconds) )
+    
+    event = Event.last
+    
+    assert_equal 1, event.within_timeframe.size
+    assert event != event.within_timeframe.first
+  end
+  
+  test "within_timeframe with overlapping events - first is second" do
+    create_event_with_times( (Time.now + 4.seconds), (Time.now + 11.seconds) )
+    create_event_with_times( Time.now, (Time.now + 7.seconds) )
+    
+    event = Event.last
+    
+    assert_equal 1, event.within_timeframe.size
+    assert event != event.within_timeframe.first
+  end
+  
+  test "within_timeframe with non overlapping events - first is first" do
+    create_event_with_times( Time.now, (Time.now + 7.seconds) )
+    create_event_with_times( (Time.now + 23.seconds), (Time.now + 30.seconds) )
+    
+    event = Event.last
+    
+    assert_equal 0, event.within_timeframe.size
+  end
+  
+  
+  def create_event_with_times starting_at, ending_at
+    Event.create( 
+      :longitude    => 52.0, 
+      :latitude     => 13.0,
+      :starting_at  => starting_at,
+      :ending_at    => ending_at
+    )
+  end
 end

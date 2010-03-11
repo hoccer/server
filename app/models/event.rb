@@ -6,11 +6,31 @@ class Event < ActiveRecord::Base
   
   before_save :calculate_postgis_point
   
-  def calculate_postgis_point
-    self.point = connection.execute(
-      "SELECT #{GeoFoo::Core.as_point(latitude, longitude)}"
-    )[0]["st_geomfromtext"]
+  # Class Methods
+  
+  def self.within_timeframe starting_at, ending_at
+    scoped(
+      :conditions => [
+        "(events.starting_at, events.ending_at) OVERLAPS (timestamp ?, timestamp ?)",
+        starting_at, ending_at
+      ]
+    )
   end
+  
+  # Instance Methods
+  
+  def within_timeframe
+    Event.within_timeframe( starting_at, ending_at ) - [self]
+  end
+  
+  
+  private
+  
+    def calculate_postgis_point
+      self.point = connection.execute(
+        "SELECT #{GeoFoo::Core.as_point(latitude, longitude)}"
+      )[0]["st_geomfromtext"]
+    end
 end
 
 class Drop < Event

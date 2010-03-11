@@ -52,6 +52,15 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 0, event.within_timeframe.size
   end
   
+  test "within_timeframe with non overlapping events - first is second" do
+    create_event_with_times( (Time.now + 23.seconds), (Time.now + 30.seconds) )
+    create_event_with_times( Time.now, (Time.now + 7.seconds) )
+    
+    event = Event.last
+    
+    assert_equal 0, event.within_timeframe.size
+  end
+  
   
   def create_event_with_times starting_at, ending_at
     Event.create( 

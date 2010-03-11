@@ -19,8 +19,12 @@ class Event < ActiveRecord::Base
   
   # Instance Methods
   
-  def within_timeframe
-    Event.within_timeframe( starting_at, ending_at ) - [self]
+  def nearby_events
+    Event.within_timeframe(
+      starting_at, ending_at
+    ).within_radius(
+      latitude, longitude, 100.0
+    ) - [self]
   end
   
   

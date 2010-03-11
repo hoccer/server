@@ -24,7 +24,7 @@ class Event < ActiveRecord::Base
       starting_at, ending_at
     ).within_radius(
       latitude, longitude, 100.0
-    ) - [self]
+    ).scoped(:conditions => ["id != ?", self.id])
   end
   
   

@@ -2,11 +2,12 @@ class Event < ActiveRecord::Base
   
   add_geo_foo
   
-  validates_presence_of :latitude, :longitude
+  validates_presence_of   :latitude, :longitude
   
-  before_save :calculate_postgis_point
+  before_save             :calculate_postgis_point
   
-  has_many :access_point_sightings
+  has_many                :access_point_sightings
+  has_and_belongs_to_many :event_groups
   
   accepts_nested_attributes_for :access_point_sightings
   
@@ -28,10 +29,20 @@ class Event < ActiveRecord::Base
     )
   end
   
+  def self.with_type event_type
+    scoped(
+      :conditions => {:type => event_type}
+    )
+  end
+  
   # Instance Methods
   
   def bssids
     access_point_sightings.all(:select => :bssid).map(&:bssid)
+  end
+  
+  def linkable_type
+    nil
   end
   
   def nearby_events
@@ -41,6 +52,8 @@ class Event < ActiveRecord::Base
       starting_at, ending_at
     ).with_bssids(
       bssids
+    ).with_type(
+      linkable_type
     ).scoped(:conditions => ["events.id != ?", self.id])
     
     if via_accesspoints.empty?
@@ -48,6 +61,8 @@ class Event < ActiveRecord::Base
         starting_at, ending_at
       ).within_radius(
         latitude, longitude, 100.0
+      ).with_type(
+        linkable_type
       ).scoped(:conditions => ["events.id != ?", self.id])
     end
     
@@ -62,12 +77,37 @@ class Event < ActiveRecord::Base
         "SELECT #{GeoFoo::Core.as_point(latitude, longitude)}"
       )[0]["st_geomfromtext"]
     end
+    
 end
 
 class Drop < Event
   
+  after_create :create_event_group
+  
+  private
+  
+  def create_event_group
+    self.event_groups << Deposit.create
+  end
+  
 end
 
 class Pick < Event
+  
+  after_create :join_event_group
+  
+  def linkable_type
+    "Drop"
+  end
+  
+  private
+  
+  def join_event_group
+    events = nearby_events
+    
+    unless events.empty?
+      events.first.event_groups.first.events << self
+    end
+  end
   
 end

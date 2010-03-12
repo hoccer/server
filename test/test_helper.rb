@@ -35,4 +35,24 @@ class ActiveSupport::TestCase
   fixtures :all
 
   # Add more helper methods to be used by all tests here...
+  
+  def create_event_with_times starting_at, ending_at, base = Event
+    base.create( 
+      :longitude    => 52.0, 
+      :latitude     => 13.0,
+      :starting_at  => starting_at,
+      :ending_at    => ending_at
+    )
+  end
+  
+  def create_event_with_locations latitude, longitude, bssids = [], base = Event
+    base.create( 
+      :longitude    => latitude, 
+      :latitude     => longitude,
+      :starting_at  => Time.now,
+      :ending_at    => Time.now+7.seconds,
+      :access_point_sightings_attributes => bssids
+    )
+  end
+  
 end

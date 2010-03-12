@@ -82,42 +82,24 @@ class EventTest < ActiveSupport::TestCase
   
   test "event accepts nested access_point_sightings attributes" do
     assert_difference "AccessPointSighting.count", +1 do
-      create_event_with_locations( 52.0, 13.0, {:bssid => "ffff", :signal => 1.0})
+      create_event_with_locations( 52.0, 13.0, [{:bssid => "ffff", :signal => 1.0}])
     end
     assert_equal "ffff", AccessPointSighting.last.bssid
     assert (0.9..1.1).include? AccessPointSighting.last.signal
   end
   
   test "find nearby events with matching bssids" do
-    create_event_with_locations( 32.1, 10.5, {:bssid => "bbbb", :signal => 0.7})
-    create_event_with_locations( 10.0, 51.5, {:bssid => "bbbb", :signal => 0.7})
+    create_event_with_locations( 32.1, 10.5, [{:bssid => "bbbb", :signal => 0.7}])
+    create_event_with_locations( 10.0, 51.5, [{:bssid => "bbbb", :signal => 0.7}])
     
     assert_equal 1, Event.last.nearby_events.size
   end
   
   test "find nearby events with no matching bssids" do
-    create_event_with_locations( 32.1, 10.5, {:bssid => "bbbb", :signal => 0.7})
-    create_event_with_locations( 10.0, 51.5, {:bssid => "cccc", :signal => 0.7})
+    create_event_with_locations( 32.1, 10.5, [{:bssid => "bbbb", :signal => 0.7}])
+    create_event_with_locations( 10.0, 51.5, [{:bssid => "cccc", :signal => 0.7}])
     
     assert_equal 0, Event.last.nearby_events.size
   end
   
-  def create_event_with_times starting_at, ending_at
-    Event.create( 
-      :longitude    => 52.0, 
-      :latitude     => 13.0,
-      :starting_at  => starting_at,
-      :ending_at    => ending_at
-    )
-  end
-  
-  def create_event_with_locations latitude, longitude, *bssids
-    Event.create( 
-      :longitude    => latitude, 
-      :latitude     => longitude,
-      :starting_at  => Time.now,
-      :ending_at    => Time.now+7.seconds,
-      :access_point_sightings_attributes => bssids
-    )
-  end
 end

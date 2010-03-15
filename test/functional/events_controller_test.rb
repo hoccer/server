@@ -17,7 +17,7 @@ class EventsControllerTest < ActionController::TestCase
     end
     
     assert_response       303 #redirect see other
-    assert_redirected_to  event_path(Event.last)
+    assert_redirected_to  event_path(:id => Event.last.uuid)
   end
   
   test "create pick event" do
@@ -34,8 +34,7 @@ class EventsControllerTest < ActionController::TestCase
     end
     
     assert_response       303 #redirect see other
-    assert_redirected_to  event_path(Event.last)
+    assert_redirected_to  event_path(:id => Event.last.uuid)
   end
-  
   
 end

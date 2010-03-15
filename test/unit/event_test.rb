@@ -108,4 +108,10 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 0, Event.last.nearby_events.size
   end
   
+  test "creating an event auto creates an upload as well" do
+    assert_difference "Upload.count", +1 do
+      create_event_with_locations( 52.0, 13.0 )
+    end
+  end
+  
 end

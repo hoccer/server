@@ -6,9 +6,11 @@ class Event < ActiveRecord::Base
   
   before_create           :generate_uuid
   before_save             :calculate_postgis_point
+  after_create            :initialize_upload
   
   has_many                :access_point_sightings
   has_and_belongs_to_many :event_groups
+  has_one                 :upload
   
   accepts_nested_attributes_for :access_point_sightings
   
@@ -81,6 +83,9 @@ class Event < ActiveRecord::Base
       )[0]["st_geomfromtext"]
     end
     
+    def initialize_upload
+      upload = Upload.create :uuid => UUID.generate(:compact), :event_id => id
+    end
 end
 
 class Drop < Event

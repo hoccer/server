@@ -14,13 +14,21 @@ class EventsController < ApplicationController
     event = base.new params[:event]
     
     if event.save
-      redirect_to event_path(event), :status => 303
+      redirect_to event_path(event.uuid), :status => 303
     else
       render :nothing => true, :status => 404
     end
   end
 
   def show
+    
+    event     = Event.find_by_uuid( params[:id] )
+    response  = {
+      :upload_uri => upload_url( event.upload.uuid )
+    }
+    
+    render :json => response.to_json
+    
   end
   
   private
@@ -34,7 +42,7 @@ class EventsController < ApplicationController
       unless bssids.nil? || bssids.empty?
         access_points = {
           :access_point_sightings_attributes => bssids.map do |bssid|
-            {:bssid => bssid }
+            { :bssid => bssid }
           end
         }
       end

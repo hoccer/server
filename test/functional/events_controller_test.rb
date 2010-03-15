@@ -28,12 +28,14 @@ class EventsControllerTest < ActionController::TestCase
         :longitude          => 13.0,
         :location_accuracy  => 100.0,
         :starting_at        => Time.now,
-        :ending_at          => (Time.now + 7.seconds),
+        :ending_at          => 7.seconds.from_now,
         :access_point_sightings_attributes => [:bssid => "ffff", :bssid => "cccc"]
       }
     end
+    
+    assert_response       303 #redirect see other
+    assert_redirected_to  event_path(Event.last)
   end
   
   
-
 end

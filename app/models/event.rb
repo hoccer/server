@@ -4,6 +4,7 @@ class Event < ActiveRecord::Base
   
   validates_presence_of   :latitude, :longitude
   
+  before_create           :generate_uuid
   before_save             :calculate_postgis_point
   
   has_many                :access_point_sightings
@@ -69,6 +70,10 @@ class Event < ActiveRecord::Base
   
   
   private
+  
+    def generate_uuid
+      self.uuid = UUID.generate(:compact)
+    end
   
     def calculate_postgis_point
       self.point = connection.execute(

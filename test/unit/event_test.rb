@@ -1,6 +1,12 @@
 require 'test_helper'
 
 class EventTest < ActiveSupport::TestCase
+  
+  test "uuid added to new events" do
+    event = create_event_with_locations( 52.0, 13.0 )
+    assert_not_nil event.uuid
+    assert_equal 32, event.uuid.size
+  end
 
   test "Postgis Point is updated before create" do
     assert_not_nil event = Event.create( :longitude => 52.0, :latitude => 13.0 )

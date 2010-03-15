@@ -48,22 +48,20 @@ class Event < ActiveRecord::Base
   def nearby_events
     via_accesspoints, via_locations = [], []
     
-    via_accesspoints = Event.within_timeframe(
-      starting_at, ending_at
-    ).with_bssids(
-      bssids
-    ).with_type(
-      linkable_type
-    ).scoped(:conditions => ["events.id != ?", self.id])
+    via_accesspoints = ( Event.
+      within_timeframe( starting_at, ending_at ).
+      with_bssids( bssids ).
+      with_type( linkable_type ).
+      scoped(:conditions => ["events.id != ?", self.id])
+    )
     
     if via_accesspoints.empty?
-      via_locations = Event.within_timeframe(
-        starting_at, ending_at
-      ).within_radius(
-        latitude, longitude, 100.0
-      ).with_type(
-        linkable_type
-      ).scoped(:conditions => ["events.id != ?", self.id])
+      via_locations = ( Event.
+        within_timeframe( starting_at, ending_at ).
+        within_radius( latitude, longitude, 100.0 ).
+        with_type( linkable_type ).
+        scoped(:conditions => ["events.id != ?", self.id])
+      )
     end
     
     via_accesspoints | via_locations

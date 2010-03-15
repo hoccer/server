@@ -12,7 +12,7 @@ class EventsControllerTest < ActionController::TestCase
         :location_accuracy  => 100.0,
         :starting_at        => Time.now,
         :ending_at          => 7.seconds.from_now,
-        :access_point_sightings_attributes => [:bssid => "ffff", :bssid => "cccc"]
+        :bssids             => ["ffff", "cccc"]
       }
     end
     
@@ -29,7 +29,7 @@ class EventsControllerTest < ActionController::TestCase
         :location_accuracy  => 100.0,
         :starting_at        => Time.now,
         :ending_at          => 7.seconds.from_now,
-        :access_point_sightings_attributes => [:bssid => "ffff", :bssid => "cccc"]
+        :bssids             => ["ffff", "cccc"]
       }
     end
     

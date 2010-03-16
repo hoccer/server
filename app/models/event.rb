@@ -79,7 +79,7 @@ class Event < ActiveRecord::Base
   
     def calculate_postgis_point
       self.point = connection.execute(
-        "SELECT #{GeoFoo::Core.as_point(latitude, longitude)}"
+        "SELECT #{GeoFoo.as_point(latitude, longitude)}"
       )[0]["st_geomfromtext"]
     end
     

@@ -15,7 +15,7 @@ Rails::Initializer.run do |config|
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
 
   # Specify gems that this application depends on and have them installed with rake gems:install
-  config.gem "geo_foo", :requirement => '0.0.1'
+  config.gem "geo_foo", :requirement => '0.0.3'
   config.gem "uuid"
   config.gem "paperclip"
   # config.gem "bj"

@@ -7,8 +7,8 @@ class Event < ActiveRecord::Base
   before_create           :generate_uuid
   before_save             :calculate_postgis_point
   
+  belongs_to              :event_group
   has_many                :access_point_sightings
-  has_and_belongs_to_many :event_groups
   has_one                 :upload
   
   accepts_nested_attributes_for :access_point_sightings
@@ -69,6 +69,7 @@ class Event < ActiveRecord::Base
     via_accesspoints | via_locations
   end
   
+  #include ActionController::UrlWriter
   
   private
   
@@ -89,32 +90,37 @@ end
 
 class Drop < Event
   
-  after_create :create_event_group, :initialize_upload
+  after_create :initialize_upload
   
-  private
-  
-  def create_event_group
-    self.event_groups << Deposit.create
+  def status
+    {
+      :state        => "ready",
+      :message      => "like state but more verbose",
+      :expires      => (Time.now - created_at),
+      :upload_uri   => upload.uuid,
+      :peers        => nearby_events.size,
+      :status_code  => 200
+    }
   end
   
 end
 
 class Pick < Event
   
-  after_create :join_event_group
-  
   def linkable_type
     "Drop"
   end
   
-  private
-  
-  def join_event_group
-    events = nearby_events
-    
-    unless events.empty?
-      events.first.event_groups.first.events << self
-    end
+  def status
+    {
+      :uploads => nearby_events.map do |event| 
+        {
+          :uri          => event.upload.uuid,
+          :content_type => event.upload.attachment.content_type,
+          :filename     => event.upload.attachment.original_filename
+        }
+      end
+    }
   end
   
 end

@@ -2,12 +2,13 @@ class CreateEvents < ActiveRecord::Migration
   def self.up
     
     create_table :events do |t|
-      t.float      :longitude
-      t.float      :latitude
-      t.string     :type
-      t.datetime   :starting_at
-      t.datetime   :ending_at
-      t.string     :uuid
+      t.integer     :event_group_id
+      t.float       :longitude
+      t.float       :latitude
+      t.string      :type
+      t.datetime    :starting_at
+      t.datetime    :ending_at
+      t.string      :uuid
       t.timestamps
     end
     

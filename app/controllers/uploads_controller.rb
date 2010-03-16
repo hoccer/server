@@ -3,8 +3,7 @@ class UploadsController < ApplicationController
   skip_before_filter :verify_authenticity_token
 
   def update
-    upload = Upload.find_by_uid params[:id]
-
+    upload = Upload.find_by_uuid params[:id]
     upload.update_attributes( params[:upload] )
 
     # TODO make pretty

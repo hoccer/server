@@ -6,7 +6,6 @@ class Event < ActiveRecord::Base
   
   before_create           :generate_uuid
   before_save             :calculate_postgis_point
-  after_create            :initialize_upload
   
   has_many                :access_point_sightings
   has_and_belongs_to_many :event_groups
@@ -90,7 +89,7 @@ end
 
 class Drop < Event
   
-  after_create :create_event_group
+  after_create :create_event_group, :initialize_upload
   
   private
   

@@ -37,6 +37,16 @@ class Event < ActiveRecord::Base
     )
   end
   
+  def self.extract_uploads events
+    events.map do |event|
+      {
+        :uri          => event.upload.uuid,
+        :content_type => event.upload.attachment.content_type,
+        :filename     => event.upload.attachment.original_filename
+      }
+    end
+  end
+  
   # Instance Methods
   
   def bssids
@@ -69,8 +79,6 @@ class Event < ActiveRecord::Base
     via_accesspoints | via_locations
   end
   
-  #include ActionController::UrlWriter
-  
   private
   
     def generate_uuid
@@ -92,7 +100,11 @@ class Drop < Event
   
   after_create :initialize_upload
   
-  def status
+  def linkable_type
+    "Pick"
+  end
+  
+  def info
     {
       :state        => "ready",
       :message      => "like state but more verbose",
@@ -111,16 +123,24 @@ class Pick < Event
     "Drop"
   end
   
-  def status
-    {
-      :uploads => nearby_events.map do |event| 
-        {
-          :uri          => event.upload.uuid,
-          :content_type => event.upload.attachment.content_type,
-          :filename     => event.upload.attachment.original_filename
-        }
-      end
-    }
+  def info
+    linked_events = nearby_events
+    
+    if linked_events.empty?
+      {
+        :state        => "no_content",
+        :message      => "Nothing to pick up from this location",
+        :status_code  => 424
+      }
+    else
+      {
+        :state        => "ready",
+        :message      => "content available for download",
+        :uploads      => Event.extract_uploads( linked_events ),
+        :peers        => linked_events.size,
+        :status_code  => 200
+      }
+    end
   end
   
 end

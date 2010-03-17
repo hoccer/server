@@ -21,15 +21,24 @@ class EventsController < ApplicationController
   end
 
   def show
-    event = Event.find_by_uuid( params[:id] )
-    render :json => resolve_resources(event.status).to_json
+    event       = Event.find_by_uuid( params[:id] )
+    event_info  = resolve_resources(event.info)
+    render :json => event_info.to_json, :status => event_info[:status_code]
   end
   
   private
   
-    def resolve_resources status_hash
-      status_hash[:upload_uri] = upload_url(status_hash[:upload_uri])
-      status_hash
+    def resolve_resources info_hash
+      if info_hash[:upload_uri]
+        info_hash[:upload_uri] = upload_url(info_hash[:upload_uri])
+      end
+      
+      if uploads = info_hash[:uploads]
+        uploads.each { |upload| upload[:uri] = upload_url( upload[:uri] ) }
+        info_hash[:uploads] = uploads
+      end
+      
+      info_hash
     end
   
     # Rewrites bssid array into nested attributes hash

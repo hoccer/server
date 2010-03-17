@@ -1,0 +1,491 @@
+/* general styles */
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 1190px;
+  background: #fff url(../images/bg_gradient.png) repeat-x;
+  font-family: Georgia, Utopia,Palatino,'Palatino Linotype',serif;
+  font-size: 10pt;
+  color: #fff
+}
+
+h1 {
+  margin: 55px auto 0;
+  padding-bottom: 3px;
+  width: 800px;
+  text-align: left;
+  font-size: 24pt;
+ 
+  color: #08F9FF;
+}
+
+h2 {
+padding:0;
+  margin:0;
+  }
+
+h3 {
+padding:0;
+  margin:0;
+}
+
+a {
+   color: #fff;
+   text-decoration: none;
+}
+
+a:hover {
+   color: #fff;
+   text-decoration: none;
+}
+
+/* containers */
+
+#people_layer {
+  background: url(../images/img_people.png) no-repeat 30px 320px;
+}
+
+#page {
+  width: 713px;
+  margin: 0 auto;
+  padding: 0;
+  clear: both;
+}
+
+#content {
+ height:518px;
+ clear:both;
+ margin-bottom: 0px;
+}
+
+#headline {
+  margin-top: 55px;
+  background: url(../images/line_header_gradient.png) no-repeat -5px bottom;
+}
+
+.swap span {display: none}
+
+#logo {
+  position: relative;
+  float:left;
+  right: 67px;
+  bottom: 24px;
+ }  
+
+#question {margin-bottom:5px; 
+           margin-top:3px;
+           font-weight:bold;}
+
+
+#faq p{
+  white-space:nowrap;
+}
+
+#metanav {
+  height: 20px;
+  padding-top: 10px;
+}
+
+#metanav img { float: right; }
+#metanav a {  display: block; float: right; margin: 2px 6px;}
+#metanav a.last { margin-right: 0; }
+
+#footer {
+  height: 100px; 
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+a#artcom {
+  display: block;
+  float: right;
+  margin-top: 8px;
+  }
+
+/* styles for specific pages */
+
+#welcome { background: url(../images/img_worldmap.png) no-repeat;
+           background-position: right center;
+           height: 193px; 
+           margin-bottom: 30px; }
+
+#welcome p {
+  width: 470px;
+  line-height: 1.2em;
+}
+
+#imprint p {
+  width: 713px;
+  font-size: 8pt;
+}
+
+#imprint {
+  line-height: 1em;
+}
+
+#imprint a {
+  text-decoration: none;
+  border-bottom: 1px dotted white;
+}
+
+#imprint a:hover {
+  text-decoration: none;
+  border-bottom: 1px solid white;
+}
+
+#about {
+  width: 400px;
+  line-height: 1.2em;
+}
+
+#about a {
+  text-decoration: none;
+  border-bottom: 1px dotted white;
+}
+
+#about a:hover {
+  text-decoration: none;
+  border-bottom: 1px solid white;
+}
+
+#contact  {
+  width: 400px;
+  line-height: 1.2em;
+}
+
+#contact a {
+  text-decoration: none;
+  border-bottom: 1px dotted white;
+}
+
+#contact a:hover {
+  text-decoration: none;
+  border-bottom: 1px solid white;
+}
+
+#contributors {
+  line-height: 1.2em;
+  width: 240px;
+  float:right;
+}
+
+#mobile_shot {
+  float: right;
+  padding-top:30px;
+  padding-right:60px;
+}
+
+.topic {
+  background: url(../images/line_dotted_teaser.gif) no-repeat top center;
+  width: 221px;
+  height: 279px;
+  float: left;
+  margin-right: 25px;
+  padding:0;
+}
+
+#last-topic {
+  margin-right: 0;
+}
+
+.topic img {
+  margin-top:16px;
+  display: block;
+  width: 217px;
+  height:100px;
+  border: 0px;
+  margin-bottom: 10px;
+}
+
+.topic p {
+  line-height: 1.2em;
+}
+
+p a {
+  text-decoration: none;
+  border-bottom: 1px dotted white;
+}
+
+p a:hover {
+  text-decoration: none;
+  border-bottom: 1px solid white;
+}
+
+
+#uploader {
+ 
+}
+
+iframe {
+  border: 1px solid #000000;
+}
+
+#response_message {
+  background-color: #ffffff;
+  border-top: 1px solid #000000;
+  border-left: 1px solid #000000;
+  border-right: 1px solid #000000;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+}
+
+#response_popup {
+  width: 800px;
+  text-align: center;
+}
+
+#sb-content table tr td#vc_image {
+  width: 128px;
+  height: 104px;
+  /*background-image: url(/images/vcard-icon.png);
+  background-position: center center;
+  background-repeat: no-repeat;*/
+  color: #ffffff;
+  vertical-align: middle;
+}
+
+#sb-content table tr td#vc_text {
+  font-family: Verdana, Helvetica, Arial, sans-serif;
+  font-size: 44px;
+  padding-left: 20px;
+}
+
+#sb-content table tr td#vc_image img {
+  vertical-align: middle;
+  padding-left: 20px;
+}
+
+#sb-content table {
+  background-color: #ffffff;
+  height: 100%;
+  width: 100%;
+}
+
+#message {
+  height: 20px;
+}
+
+#location {
+  margin-top: 15px;
+}
+
+#hoc {
+ line-height: 1.2em;
+}
+
+#map_canvas {
+  margin-top: 15px;
+}
+
+.fileinput {
+  margin-top: 0px;
+  margin-bottom: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.inputlabel {
+  margin-top: 0px;
+  float:left;
+  margin-right: 20px;
+}
+
+.inputform {
+  float:right;
+}
+
+
+input.text { 
+  background-color: #e5ebee;
+  border: 1px solid white;
+}
+
+input.btn { 
+  background-color: #79949e;
+  border: 1px solid white;
+  color: white;
+}
+
+.carousel { 
+      float:right;
+      margin-top: 20px;
+      margin-right:60px;
+      height: 183px;
+      width: 100px;
+}
+
+.tweet { 
+      float:right;
+      height: 36px;
+      width: 300px;
+}
+
+
+/* share/receive */
+
+#hoc_actions{
+  margin-top: 18px;
+  float:right;
+  width:316px;
+  /*height:367px;*/
+}
+
+.hoc_actions_tab { 
+  height: 36px;
+  position: relative;
+}
+
+.hoc_actions_box { 
+  margin-top: 0px;
+  margin-bottom: 0px;
+  background: url(../images/bg_box_share-receive.png) no-repeat;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 15px;
+  padding-bottom: 10px;
+  height: 280px;
+}
+
+.distribution {
+  margin-top: 10px;
+}
+
+.homebutton {
+  float:left;
+  margin-top: 10px;
+}
+
+
+/** text replacement **/
+
+
+#hoccer { 
+  background: url(../images/hl_hoccer.png) no-repeat;
+  height: 39px;
+}
+
+#map_canvas{
+  border: 3px solid #f0f0f0;
+}
+
+a#contact {
+  background: url(../images/metanav_contact.gif) no-repeat; 
+  height: 7px; width:37px; }
+  
+a:hover#contact { background: url(../images/metanav_contact-mo.gif) no-repeat; }
+
+a#imprint { background: url(../images/metanav_imprint.gif) no-repeat; 
+  height: 7px; width:35px; }
+a:hover#imprint { background: url(../images/metanav_imprint-mo.gif) no-repeat; }
+a#faq { background: url(../images/metanav_faq.gif) no-repeat; 
+  height: 7px; width:35px; }
+a:hover#faq { background: url(../images/metanav_faq-mo.gif) no-repeat; }
+
+h2#hl_welcome { 
+  background: url(../images/hl_welcome.png) no-repeat; 
+  height: 18px; 
+  width:79px;
+  margin-bottom: 16px; 
+}
+
+h2#hl_faq { 
+  background: url(../images/hl_faq.png) no-repeat; 
+  height: 22px; 
+  width:220px;
+}
+
+h2#hl_yvideo { 
+  background: url(../images/hl_yvideo.png) no-repeat; 
+  height: 18px; 
+  margin-bottom: 16px; 
+}
+  
+h2#imprint { background: url(../images/hl_imprint.png) no-repeat; 
+  height: 22px; 
+    margin:0;
+    padding:0;
+  }
+
+h2#hoc_head { background: url(../images/hl_share.png) no-repeat; 
+  height: 18px;
+  margin-bottom: 20px;
+  }
+
+h2#about { 
+  margin-bottom: 20px;
+  background: url(../images/hl_about.png) no-repeat; 
+    height: 22px; 
+    }
+    
+ h2#imprint { 
+  margin-bottom: 20px;
+    }
+
+h2#contact { 
+margin-bottom: 20px;
+background: url(../images/hl_contact.png) no-repeat; 
+  height: 22px; 
+  }
+
+h2#contributors { 
+margin-bottom: 20px;
+background: url(../images/hl_contributors.png) no-repeat; 
+  height: 22px; 
+  }
+
+h3#share { 
+  background: url(../images/hl_share.png) no-repeat; 
+  height: 18px; 
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+  
+h3#download { 
+  background: url(../images/hl_gethoccer.png) no-repeat; 
+  height: 18px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+  
+h3#video { 
+  background: url(../images/hl_video.png) no-repeat; 
+  height: 18px; 
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+  
+a#artcom { background: url(../images/logo_artcom.gif) no-repeat; 
+  height: 18px; width:155px;
+}
+
+div#uploadify_queue div.uploadifyQueueItem {
+  font-size: 11px;
+  font-family: Helvetica;
+  width: 200px;
+  margin-top: 0px;
+  background-color: transparent;
+  border: none;
+  padding: 0px;
+  margin-left: 10px;
+  color: #638191;
+}
+
+div#share_box table td {
+  vertical-align: top;
+}
+
+div#receive_status {
+  height: 64px;
+}
+
+div#messages {
+  height: 20px;
+  width: 165px;
+  z-index: 0;
+  position: absolute;
+  font-family: Helvetica;
+  left: 150px;
+  top: 8px;
+}

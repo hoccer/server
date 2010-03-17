@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+	<head profile="http://gmpg.org/xfn/11">
+		<title>Hoccer | Share your data using intuitive gestures</title>
+		<meta name="author" content="Rodja Trappe"/>
+		<meta name="copyright" content=""/>
+		<meta name="description" content="Hoccer - an easy and intuitive way to exchange mobile data" />
+		<meta name="keywords" content="hoccer, android, iphone, mobile , share, data, throw , catch, receive, exchange" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="stylesheet" href="stylesheets/reset.css" type="text/css" media="screen"/>
+		<link rel="stylesheet" href="stylesheets/hoccer.css" type="text/css" media="screen"/>
+		<link href="stylesheets/jquery.tweet.css" media="all" rel="stylesheet" type="text/css"/>  
+		<script language="javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js" type="text/javascript"></script>
+		<script language="javascript" src="javascripts/jquery.tweet.js" type="text/javascript"></script>
+		<script type='text/javascript'>
+		$(document).ready(function(){
+			$(".query").tweet({
+			avatar_size: 32,
+			count: 6,
+			query: "hoccer",
+			loading_text: "searching twitter..."
+			});
+		});
+		</script> 
+	</head>
+	<body>
+		<div id="people_layer">
+			<div id="page">
+				<div id="headline">
+					<a href="index.html">  
+						<img id="logo" src="images/logo_hoccer.png" width="56" height="70" alt="Hoccer Logo"/>
+						<div id="hoccer"></div>
+					</a>
+					
+				</div>
+				<div id="metanav">
+					<a id="imprint" class="swap last" href="imprint.html"><span>Imprint</span></a>
+					<img src="images/metanav_divider.gif" alt="divider" /> 
+					<a id="contact" class="swap" href="about.html"><span>Contact</span></a>
+				</div>    
+				<div id="content">  
+					<div id="welcome">
+						<h2 id="hl_welcome" class="swap"><span>Welcome</span></h2>
+						<div class="query"></div>  
+					</div> <!-- welcome -->
+				</div> <!-- content -->  
+				<div id="footer">
+					<a class="swap" id="artcom" href="http://tech.artcom.de/en/home"><span>ART+COM Technologies</span></a>  
+				</div>  
+			</div> <!-- page -->
+		</div> <!-- people_layer -->
+	</body>
+</html>

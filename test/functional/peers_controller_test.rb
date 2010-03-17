@@ -2,7 +2,6 @@ require 'test_helper'
 
 class PeersControllerTest < ActionController::TestCase
   
-  
   test "posting without peer parameters" do
     assert_nothing_raised { post :create }
   end

@@ -11,15 +11,6 @@ class PeerGroupTest < ActiveSupport::TestCase
     assert expected.to_s == peer_b.peer_group.expires_at.to_s
   end
   
-  test "first seeder sets expiration time with first peer != seeder" do
-    peer_a = create_peer( 52.501077, 13.345116, 80.0, "distribute", false)
-    sleep(1)
-    peer_b = create_peer( 52.500927, 13.345738, 80.0, "distribute", true)
-      
-    expected = peer_b.created_at + 7.seconds
-    assert expected.to_s == peer_b.peer_group.expires_at.to_s
-  end
-  
   test "expired?" do
     peer_group = PeerGroup.create( :expires_at => (Time.now + 10.seconds) )
     assert !peer_group.expired?
@@ -58,6 +49,7 @@ class PeerGroupTest < ActiveSupport::TestCase
     assert !PeerGroup.first.valid?
   end
   
+  
   test "invalid peer group for pass with two peers" do
     create_peer( 52.501077, 13.345116, 80.0, "pass", false)
     create_peer( 52.501077, 13.345116, 80.0, "pass", false)
@@ -86,7 +78,7 @@ class PeerGroupTest < ActiveSupport::TestCase
   test "current_state :ready" do
     create_peer( 52.501077, 13.345116, 80.0, "distribute", true)
     create_peer( 52.500927, 13.345738, 80.0, "distribute", false)
-    PeerGroup.first.update_attributes(:expires_at => Time.now)
+    PeerGroup.first.update_attributes(:expires_at => 10.seconds.ago)
     assert_equal :ready, PeerGroup.first.current_state
   end
   

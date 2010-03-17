@@ -1,5 +1,7 @@
 class PeerGroup < ActiveRecord::Base
   
+  before_create :set_initial_exiration_date
+  
   # Associations
   has_many :peers
   
@@ -100,11 +102,22 @@ class PeerGroup < ActiveRecord::Base
     "content_types=#{upload_content_types.join(';')}"
   end
   
+  def new_file_available
+    self.expires_at = Time.now + 7.seconds
+    self.save
+  end
+  
   private
   
     def no_collisions_present
       if collisions?
         errors.add("Collision occured") 
+      end
+    end
+    
+    def set_initial_exiration_date
+      if self.expires_at.blank? || self.expires_at.nil?
+        self.expires_at = (Time.now + 7.seconds)
       end
     end
 

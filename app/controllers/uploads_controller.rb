@@ -6,9 +6,9 @@ class UploadsController < ApplicationController
     upload = Upload.find_by_uuid params[:id]
     upload.update_attributes( params[:upload] )
 
-    # TODO make pretty
-    if upload.attachment.content_type.nil? || upload.attachment.content_type.blank? || upload.attachment.content_type =~ /^\w+\/\*$/
-      content_type = MIME::Types.type_for(upload.attachment.original_filename).to_s
+    content_type = MIME::Types.type_for(upload.attachment.original_filename).to_s
+    
+    unless content_type.blank? || content_type == upload.attachment.content_type
       upload.update_attributes :attachment_content_type => content_type
     end
 

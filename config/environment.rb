@@ -18,6 +18,7 @@ Rails::Initializer.run do |config|
   config.gem "geo_foo", :requirement => '0.0.3'
   config.gem "uuid"
   config.gem "paperclip"
+  config.gem "mime-types", :lib => "mime/types"
   # config.gem "bj"
   # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
   # config.gem "sqlite3-ruby", :lib => "sqlite3"

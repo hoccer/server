@@ -54,7 +54,6 @@ class DropPickTest < ActionController::IntegrationTest
     follow_redirect!
     
     pick_event    = Pick.last
-    puts pick_event.info.to_json.inspect
   end
   
 end

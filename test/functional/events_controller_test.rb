@@ -81,7 +81,6 @@ class EventsControllerTest < ActionController::TestCase
     assert_equal 1, json_response["uploads"].size
     assert_equal 1, json_response["peers"]
     assert_equal 200, json_response["status_code"]
-    
   end
   
 end

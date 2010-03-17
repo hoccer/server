@@ -88,7 +88,8 @@ class InteractionTest < ActionController::IntegrationTest
       :longitude  => 30.12,
       :accuracy   => 42.0,
       :gesture    => "distribute",
-      :seeder     => true }
+      :seeder     => true
+    }
     
     assert_equal 200, status
         
@@ -110,6 +111,22 @@ class InteractionTest < ActionController::IntegrationTest
 
     assert_response 200
     assert_equal "image/jpeg", Upload.last.attachment_content_type
+    
+    post peers_path, :peer => {
+      :latitude   => 20.44,
+      :longitude  => 30.12,
+      :accuracy   => 42.0,
+      :gesture    => "distribute",
+      :seeder     => false,
+    }
+    
+    PeerGroup.last.expire!
+    
+    response_body = ActiveSupport::JSON.decode(@response.body)
+    
+    get peer_path( :id => Peer.last.uid )
+    assert_response :success
+    
   end
   
   

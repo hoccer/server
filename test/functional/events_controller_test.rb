@@ -149,12 +149,12 @@ class EventsControllerTest < ActionController::TestCase
   
     assert_response :success
     json_response = ActiveSupport::JSON.decode( @response.body )
-    assert_equal json_response["peer_uri"], event_url(Event.first.uuid)
+    assert_equal event_url(Event.first.uuid), json_response["peer_uri"]
     assert_nil json_response["upload_uri"]
   end
   
   test "creating peer without seeder param defaults to seeder=false" do
-    assert_difference "LegacyCatch.count", +1 do
+    assert_difference "LegacyReceive.count", +1 do
       post :create, :peer => {
         :latitude   => 13.44,
         :longitude  => 52.12,
@@ -164,9 +164,21 @@ class EventsControllerTest < ActionController::TestCase
     end
   end
   
-  test "querying a peer" do
+  # TODO remove Legacy
+  test "querying a throw peer" do
     throw_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, LegacyThrow)
     catch_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, LegacyCatch)
+    
+    assert catch_event.expired?, "Event Group is not expired"
+    get :show, :id => catch_event.uuid
+    
+    json_response = ActiveSupport::JSON.decode( @response.body )
+    assert_equal [upload_url(:id => Upload.first.uuid)], json_response["resources"]
+  end
+  
+  test "querying a pass peer" do
+    throw_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, LegacyPass)
+    catch_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, LegacyReceive)
     
     assert catch_event.expired?, "Event Group is not expired"
     get :show, :id => catch_event.uuid

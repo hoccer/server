@@ -1,12 +1,14 @@
 class EventsController < ApplicationController
   
+  include LegacyEvents # TODO remove Legacy
+  
   skip_before_filter :verify_authenticity_token
   
   def index
   end
 
   def create
-    legacy_client = convert_legacy_params
+    legacy_client = convert_legacy_params # TODO remove Legacy
     convert_bssid_params
     
     event_type  = params[:event].delete(:type)
@@ -15,7 +17,7 @@ class EventsController < ApplicationController
     @event = base.new params[:event]
 
     if @event.save
-      if legacy_client
+      if legacy_client # TODO remove Legacy
         render :json => legacy_response.to_json, :status => 200
       else
         redirect_to event_path(@event.uuid), :status => 303
@@ -26,19 +28,23 @@ class EventsController < ApplicationController
   end
 
   def show
-    @event       = Event.find_by_uuid( params[:id] )
+    @event = Event.find_by_uuid( params[:id] )
     
-    # TODO remove Legacy
-    event_info = legacy_info if @event.is_a? LegacyThrow
-    event_info = legacy_info if @event.is_a? LegacyCatch
-    
-    event_info ||= resolve_resources(@event.info)
-    render :json => event_info.to_json, :status => event_info[:status_code]
+    if @event
+      # TODO remove Legacy
+      event_info = legacy_info if @event.respond_to?(:legacy?)
+      
+      event_info ||= resolve_resources(@event.info)
+      render :json => event_info.to_json, :status => event_info[:status_code]
+    else
+      render :nothing => true, :status => 404
+    end
   end
   
   private
   
     def resolve_resources info_hash
+      
       if info_hash[:upload_uri]
         info_hash[:upload_uri] = upload_url(info_hash[:upload_uri])
       end
@@ -66,49 +72,6 @@ class EventsController < ApplicationController
       end
       
       params[:event].merge!(access_points) if access_points
-    end
-    
-    # TODO Make nice legacy module
-    
-    def legacy_info
-      info = @event.info
-      info[:resources] = info[:resources].map {|upload| upload_url(upload)}
-      info
-    end
-    
-    def convert_legacy_params
-      
-      if legacy_params = params.delete(:peer)
-        
-        seeder_param = legacy_params[:seeder]
-        
-        if (seeder_param).is_a? String
-          if (seeder_param == "0" || seeder_param == "false")
-            seeder = false
-          else
-            seeder = true
-          end
-        else
-          seeder = seeder_param
-        end
-      
-        params[:event] = {
-          :latitude           => legacy_params[:latitude],
-          :longitude          => legacy_params[:longitude],
-          :location_accuracy  => legacy_params[:accuracy],
-          :type               => (seeder ? "legacy_throw" : "legacy_catch"),
-          :bssids             => (legacy_params[:bssids] || [])
-        }
-      end
-    end
-    
-    def legacy_response
-      response = { :peer_uri => event_url(@event.uuid) }
-      if @event.is_a?(LegacyThrow)
-        response.merge!( :upload_uri => upload_url(@event.upload.uuid) )
-      end
-      
-      response
     end
 
 end

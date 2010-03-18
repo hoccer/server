@@ -239,7 +239,7 @@ module LegacyDistribute
     elsif !expired?
       {
         :state => :waiting,
-        :message => "waiting",
+        :message => expires.to_s,
         :expires => expires,
         :resources => [],
         :status_code => 202

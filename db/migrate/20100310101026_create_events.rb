@@ -13,8 +13,8 @@ class CreateEvents < ActiveRecord::Migration
     end
     
     table_name = "events"
-    self.connection.execute "SELECT AddGeometryColumn('#{table_name}', 'point', #{GeoFoo::SRID}, 'POINT', 2)"
-    self.connection.execute "CREATE INDEX #{table_name}_point_index ON #{table_name} USING GIST (point)"
+    execute "SELECT AddGeometryColumn('#{table_name}', 'point', #{GeoFoo::SRID}, 'POINT', 2)"
+    execute "CREATE INDEX #{table_name}_point_index ON #{table_name} USING GIST (point)"
   end
 
   def self.down

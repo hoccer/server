@@ -265,7 +265,7 @@ module LegacyDistribute
         :state => :ready,
         :message => "Downloading content",
         :expires => 0,
-        :resources => linked_events.first.upload.uuid,
+        :resources => ((upload = linked_events.first.upload) ? upload.uuid : []),
         :status_code => 200
       }
     end

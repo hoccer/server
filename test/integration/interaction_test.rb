@@ -3,8 +3,9 @@ require 'test_helper'
 class InteractionTest < ActionController::IntegrationTest
   
   test "pairing by bssids" do
+    EventGroup.delete_all
     
-    assert_equal 0, PeerGroup.count
+    assert_equal 0, EventGroup.count
     
     post peers_path, :peer => {
       :latitude   => 13.44,
@@ -43,13 +44,11 @@ class InteractionTest < ActionController::IntegrationTest
         "00:11:6b:24:d1:20"
       ],
     }
-    
-    assert_equal 1, PeerGroup.count
-    assert_equal 2, PeerGroup.first.peers.count
-    
-    PeerGroup.first.expire!
-    
-    assert_equal 200, PeerGroup.first.status[:status_code]
+
+    assert_equal 1, EventGroup.count
+    assert_equal 2, EventGroup.first.events.count
+        
+    assert_response :success
   end
   
   test "multipart content type prefered to uploading file extension" do
@@ -120,11 +119,11 @@ class InteractionTest < ActionController::IntegrationTest
       :seeder     => false,
     }
     
-    PeerGroup.last.expire!
+    expire EventGroup.last
     
     response_body = ActiveSupport::JSON.decode(@response.body)
     
-    get peer_path( :id => Peer.last.uid )
+    get peer_path( Event.last.uuid )
     assert_response :success
     
   end

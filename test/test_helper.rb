@@ -55,4 +55,13 @@ class ActiveSupport::TestCase
     )
   end
   
+  def expire event_group
+    event_group.events.each do |event|
+      event.update_attributes(
+        :starting_at  => event.starting_at - 7.seconds,
+        :ending_at    => event.ending_at - 7.seconds
+      )
+    end
+  end
+  
 end

@@ -27,7 +27,7 @@ class Event < ActiveRecord::Base
   def self.with_bssids bssids
     scoped(
       :joins => :access_point_sightings,
-      :conditions => ["access_point_sightings.bssid IN (?)", bssids.join(",")]
+      :conditions => ["access_point_sightings.bssid IN (?)", bssids]
     )
   end
 

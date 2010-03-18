@@ -77,12 +77,13 @@ class EventsController < ApplicationController
     end
     
     def convert_legacy_params
+      
       if legacy_params = params.delete(:peer)
         params[:event] = {
           :latitude           => legacy_params[:latitude],
           :longitude          => legacy_params[:longitude],
           :location_accuracy  => legacy_params[:accuracy],
-          :type               => (legacy_params[:seeder] ? "legacy_throw" : "legacy_catch"),
+          :type               => ((legacy_params[:seeder].to_s == "true") ? "legacy_throw" : "legacy_catch"),
           :bssids             => (legacy_params[:bssids] || [])
         }
       end

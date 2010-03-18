@@ -83,4 +83,96 @@ class EventsControllerTest < ActionController::TestCase
     assert_equal 200, json_response["status_code"]
   end
   
+  test "info response for lonesome throw event" do
+    throw_event = create_event_with_times(Time.now, 7.seconds.from_now, Throw)
+    
+    get :show, :id => throw_event.uuid
+    
+    json_response = ActiveSupport::JSON.decode( @response.body )
+    
+    assert_response 202
+    assert_equal "waiting", json_response["state"]
+    assert_equal "waiting for other participants", json_response["message"]
+    assert 0 < json_response["expires"], "Event already expired"
+    assert_not_nil json_response["upload_uri"]
+    assert_equal 0, json_response["peers"]
+    assert_equal 202, json_response["status_code"]
+  end
+  
+  #############################
+  #############################
+  ##### W A R N I N G ! #######
+  ###### Legacy Tests  ########
+  #############################
+  #############################
+
+  test "creating new seeder peergroup and access points" do
+    assert_difference "AccessPointSighting.count", +3 do
+      post :create, :peer => {
+        :latitude   => 13.44,
+        :longitude  => 52.12,
+        :accuracy   => 42.0,
+        :gesture    => "pass",
+        :seeder     => true,
+        :bssids     => ["a:a:a:a", "b:b:b:b", "c:c:c:c"],
+      }
+    end
+  end
+  
+  test "creating new seeder and peer group" do
+    assert_difference ["Event.count", "EventGroup.count", "Upload.count"], +1 do
+      post :create, :peer => {
+        :latitude   => 13.44,
+        :longitude  => 52.12,
+        :accuracy   => 42.0,
+        :gesture    => "pass",
+        :seeder     => true
+      }
+    end
+    
+    assert_response :success
+    json_response = ActiveSupport::JSON.decode( @response.body )
+    assert_equal json_response["peer_uri"], event_url(Event.last.uuid)
+    assert_equal json_response["upload_uri"], upload_url(Upload.last.uuid)
+  end
+  
+  test "peers do not receive an upload url upon creation" do
+    assert_difference ["Event.count", "EventGroup.count"], +1 do
+      post :create, :peer => {
+        :latitude   => 13.44,
+        :longitude  => 52.12,
+        :accuracy   => 42.0,
+        :gesture    => "pass",
+        :seeder     => false
+      }
+    end
+  
+    assert_response :success
+    json_response = ActiveSupport::JSON.decode( @response.body )
+    assert_equal json_response["peer_uri"], event_url(Event.first.uuid)
+    assert_nil json_response["upload_uri"]
+  end
+  
+  test "creating peer without seeder param defaults to seeder=false" do
+    assert_difference "LegacyCatch.count", +1 do
+      post :create, :peer => {
+        :latitude   => 13.44,
+        :longitude  => 52.12,
+        :accuracy   => 42.0,
+        :gesture    => "pass"
+      }
+    end
+  end
+  
+  test "querying a peer" do
+    throw_event = create_event_with_times(7.seconds.ago, Time.now, LegacyThrow)
+    catch_event = create_event_with_times(7.seconds.ago, Time.now, LegacyCatch)
+    
+    get :show, :id => catch_event.uuid
+    
+    json_response = ActiveSupport::JSON.decode( @response.body )
+    assert_equal json_response["resources"], [upload_url(:id => Upload.first.uuid)]
+  end
+  
+  
 end

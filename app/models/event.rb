@@ -4,7 +4,7 @@ class Event < ActiveRecord::Base
   
   validates_presence_of   :latitude, :longitude
   
-  before_create           :generate_uuid
+  before_create           :generate_uuid, :verify_lifetime
   before_save             :calculate_postgis_point
   
   belongs_to              :event_group
@@ -94,6 +94,22 @@ class Event < ActiveRecord::Base
     def initialize_upload
       upload = Upload.create :uuid => UUID.generate(:compact), :event_id => id
     end
+    
+    def verify_lifetime
+      self.starting_at ||= Time.now
+      self.ending_at   ||= 7.seconds.from_now
+    end
+    
+    def associate_with_event_group
+      linked_events = nearby_events
+
+      if linked_events.empty?
+        event_group = EventGroup.create
+        event_group.events << self
+      else
+        linked_events.first.event_group.events << self
+      end
+    end
 end
 
 class Drop < Event
@@ -141,6 +157,96 @@ class Pick < Event
         :status_code  => 200
       }
     end
+  end
+  
+end
+
+class Throw < Event
+  
+  after_create :initialize_upload, :associate_with_event_group
+  
+  def linkable_type
+    "Catch"
+  end
+  
+  def info
+    linked_events = nearby_events
+    
+    {
+      :state        => "waiting",
+      :message      => "waiting for other participants",
+      :expires      => ( ending_at - Time.now ),
+      :peers        => linked_events.size,
+      :upload_uri   => upload.uuid,
+      :status_code  => 202
+    }
+  end
+  
+end
+
+class Catch < Event
+  
+  after_create :associate_with_event_group
+  
+  def linkable_type
+    "Throw"
+  end
+  
+  def info
+    linked_events = event_group.events.with_type( linkable_type )
+    
+    {
+      :state        => "ready",
+      :message      => "content available for download",
+      :uploads      => Event.extract_uploads(linked_events),
+      :peers        => linked_events.size,
+      :status_code  => 202
+    }
+  end
+  
+end
+
+class LegacyThrow < Event
+  
+  after_create :initialize_upload, :associate_with_event_group
+  
+  def linkable_type
+    "LegacyCatch"
+  end
+  
+  def info
+    linked_events = nearby_events
+    
+    {
+      :state        => "waiting",
+      :message      => "waiting for other participants",
+      :expires      => ( ending_at - Time.now ),
+      :peers        => linked_events.size,
+      :upload_uri   => upload.uuid,
+      :status_code  => 202
+    }
+  end
+  
+end
+
+class LegacyCatch < Event
+  
+  after_create :associate_with_event_group
+  
+  def linkable_type
+    "LegacyThrow"
+  end
+  
+  def info
+    linked_events = event_group.events.with_type( linkable_type )
+    
+    {
+      :state        => "ready",
+      :message      => "content available for download",
+      :uploads      => linked_events.first.upload.uuid,
+      :peers        => linked_events.size,
+      :status_code  => 202
+    }
   end
   
 end

@@ -1,6 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
   
   map.resources :events
+  map.resources :peers, :controller => :events
   map.resources :pieces
   map.resources :uploads
   

@@ -165,13 +165,14 @@ class EventsControllerTest < ActionController::TestCase
   end
   
   test "querying a peer" do
-    throw_event = create_event_with_times(7.seconds.ago, Time.now, LegacyThrow)
-    catch_event = create_event_with_times(7.seconds.ago, Time.now, LegacyCatch)
+    throw_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, LegacyThrow)
+    catch_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, LegacyCatch)
     
+    assert catch_event.expired?, "Event Group is not expired"
     get :show, :id => catch_event.uuid
     
     json_response = ActiveSupport::JSON.decode( @response.body )
-    assert_equal json_response["resources"], [upload_url(:id => Upload.first.uuid)]
+    assert_equal [upload_url(:id => Upload.first.uuid)], json_response["resources"]
   end
   
   

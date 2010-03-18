@@ -72,8 +72,7 @@ class EventsController < ApplicationController
     
     def legacy_info
       info = @event.info
-      uploads = info.delete(:uploads)
-      info[:resources] = uploads.map {|upload| upload_url(upload)}
+      info[:resources] = info[:resources].map {|upload| upload_url(upload)}
       info
     end
     

@@ -48,7 +48,11 @@ module LegacyEvents
   end
   
   def legacy_response
-    response = { :peer_uri => event_url(@event.uuid) }
+    response = {
+      :peer_uri => event_url(@event.uuid),
+      :message  => "Searching for partner"
+    }
+    
     if @event.is_a?(LegacyThrow) || @event.is_a?(LegacyPass)
       response.merge!( :upload_uri => upload_url(@event.upload.uuid) )
     end

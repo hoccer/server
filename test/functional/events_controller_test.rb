@@ -162,6 +162,8 @@ class EventsControllerTest < ActionController::TestCase
         :gesture    => "pass"
       }
     end
+    
+    assert_equal Event.last.class, LegacyReceive
   end
   
   # TODO remove Legacy

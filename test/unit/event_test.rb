@@ -2,6 +2,35 @@ require 'test_helper'
 
 class EventTest < ActiveSupport::TestCase
   
+  test "should not create access points if peer is invalid" do
+    assert_no_difference "AccessPointSighting.count" do
+      Event.create(
+        :latitude   => 44.1,
+        :location_accuracy   => 23.0,
+        :access_point_sightings_attributes => [
+          { :bssid => "ffff" },
+          { :bssid => "eeee" },
+          { :bssid => "aaaa" }
+        ]
+      )
+    end
+  end
+  
+  test "should create 3 accesspoints for valid peer" do
+    assert_difference "AccessPointSighting.count", +3 do
+      Event.create(
+        :latitude   => 44.1,
+        :longitude  => 23.0,
+        :location_accuracy   => 23.0,
+        :access_point_sightings_attributes => [
+          { :bssid => "ffff" },
+          { :bssid => "eeee" },
+          { :bssid => "aaaa" }
+        ]
+      )
+    end
+  end
+  
   test "uuid added to new events" do
     event = create_event_with_locations( 52.0, 13.0 )
     assert_not_nil event.uuid
@@ -106,6 +135,182 @@ class EventTest < ActiveSupport::TestCase
     create_event_with_locations( 10.0, 51.5, [{:bssid => "cccc", :signal => 0.7}])
     
     assert_equal 0, Event.last.nearby_events.size
+  end
+  
+  test "find nearby events with multiple matching bssids" do
+    create_event_with_locations(
+      32.1,
+      10.5, 
+      [{:bssid => "oooo", :signal => 0.7},
+       {:bssid => "cccc", :signal => 0.7},
+       {:bssid => "hhhh", :signal => 0.7}]
+    )
+    create_event_with_locations(
+      10.0,
+      51.5,
+      [{:bssid => "bbbb", :signal => 0.7},
+       {:bssid => "cccc", :signal => 0.7},
+       {:bssid => "xxxx", :signal => 0.7}]
+    )
+    
+    assert_equal 1, Event.last.nearby_events.size
+  end
+  
+  test "find nearby events with no multiple matching bssids" do
+    create_event_with_locations(
+      32.1,
+      10.5, 
+      [{:bssid => "oooo", :signal => 0.7},
+       {:bssid => "cccc", :signal => 0.7},
+       {:bssid => "hhhh", :signal => 0.7}]
+    )
+    create_event_with_locations(
+      10.0,
+      51.5,
+      [{:bssid => "bbbb", :signal => 0.7},
+       {:bssid => "iiii", :signal => 0.7},
+       {:bssid => "xxxx", :signal => 0.7}]
+    )
+    assert_equal 0, Event.last.nearby_events.size
+  end
+  
+  test "no peers found if too far away and different bssids" do
+    event_a = create_event_with_locations(
+      32.1,
+      10.5, 
+      [{:bssid => "aaa1", :signal => 0.7},
+       {:bssid => "aaa2", :signal => 0.7},
+       {:bssid => "aaa3", :signal => 0.7}]
+    )
+    
+    event_b = create_event_with_locations(
+      3.1,
+      1.5, 
+      [{:bssid => "bbb1", :signal => 0.7},
+       {:bssid => "bbb2", :signal => 0.7},
+       {:bssid => "bbb3", :signal => 0.7}]
+    )
+    
+    event_c = create_event_with_locations(
+      44.1,
+      44.5, 
+      [{:bssid => "ccc1", :signal => 0.7},
+       {:bssid => "ccc2", :signal => 0.7},
+       {:bssid => "ccc3", :signal => 0.7}]
+    )
+    
+    assert_equal 0, event_a.nearby_events.count
+    assert_equal 0, event_b.nearby_events.count
+    assert_equal 0, event_c.nearby_events.count
+  end
+  
+  test "multiple peers found by location even if bssids differ" do
+    event_a = create_event_with_locations(
+      32.1,
+      10.5, 
+      [{:bssid => "aaa1", :signal => 0.7},
+       {:bssid => "aaa2", :signal => 0.7},
+       {:bssid => "aaa3", :signal => 0.7}]
+    )
+    
+    event_b = create_event_with_locations(
+      32.1,
+      10.5, 
+      [{:bssid => "bbb1", :signal => 0.7},
+       {:bssid => "bbb2", :signal => 0.7},
+       {:bssid => "bbb3", :signal => 0.7}]
+    )
+    
+    event_c = create_event_with_locations(
+      32.1,
+      10.5, 
+      [{:bssid => "ccc1", :signal => 0.7},
+       {:bssid => "ccc2", :signal => 0.7},
+       {:bssid => "ccc3", :signal => 0.7}]
+    )
+    assert_equal 2, event_a.nearby_events.count
+  end
+  
+  test "find peers in range or bssids" do
+    Event.delete_all
+    
+    event_a = create_event_with_locations(
+      32.1,
+      10.5, 
+      [{:bssid => "aaa1", :signal => 0.7},
+       {:bssid => "aaa2", :signal => 0.7},
+       {:bssid => "aaa3", :signal => 0.7}]
+    )
+    
+    event_b = create_event_with_locations(
+      32.1,
+      10.5, 
+      [{:bssid => "bbb1", :signal => 0.7},
+       {:bssid => "bbb2", :signal => 0.7},
+       {:bssid => "bbb3", :signal => 0.7}]
+    )
+    
+    event_c = create_event_with_locations(
+      44.1,
+      44.5, 
+      [{:bssid => "ccc1", :signal => 0.7},
+       {:bssid => "aaa2", :signal => 0.7},
+       {:bssid => "ccc3", :signal => 0.7}]
+    )  
+    
+    assert_equal 2, event_a.nearby_events.count
+  end
+  
+  test "another falsification" do
+    event_a = create_event_with_locations(
+      52.501077,
+      13.345116,
+      [{:bssid => "aaa1", :signal => 0.7},
+       {:bssid => "aaa2", :signal => 0.7},
+       {:bssid => "aaa3", :signal => 0.7}]
+    )
+    
+    event_b = create_event_with_locations(
+      52.500927,
+      13.345738,
+      [{:bssid => "bbb1", :signal => 0.7},
+       {:bssid => "bbb2", :signal => 0.7},
+       {:bssid => "bbb3", :signal => 0.7}]
+    )
+    
+    event_c = create_event_with_locations(
+      20.501616,
+      20.345785,
+      [{:bssid => "aaa1", :signal => 0.7},
+       {:bssid => "ccc2", :signal => 0.7},
+       {:bssid => "ccc3", :signal => 0.7}]
+    )
+    
+    event_d = create_event_with_locations(
+      20.501616,
+      20.345785,
+      [{:bssid => "ccc1", :signal => 0.7},
+       {:bssid => "ccc2", :signal => 0.7},
+       {:bssid => "ccc3", :signal => 0.7}]
+    )
+    
+    assert_equal 2, event_a.nearby_events.count
+  end
+  
+  test "first (Legacy)Throw on location creates new peer group" do
+    assert_difference "EventGroup.count", +1 do
+      create_event_with_locations(44.1, 44.5, [], LegacyThrow)
+    end
+    assert_not_nil Event.last.event_group
+  end
+  
+  test "following peers join exisiting peer group instead of creating one" do
+    event = create_event_with_locations(44.1, 44.5, [], LegacyThrow)
+    assert_no_difference "EventGroup.count" do
+      create_event_with_locations(44.1, 44.5, [], LegacyCatch)
+    end
+    
+    assert_not_nil event.event_group
   end
   
   test "creating a drop event auto creates an upload as well" do

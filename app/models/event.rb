@@ -83,14 +83,12 @@ class Event < ActiveRecord::Base
       scoped(:conditions => ["events.id != ?", self.id])
     )
 
-    if via_accesspoints.empty?
-      via_locations = ( Event .
-        within_timeframe( starting_at, ending_at ) .
-        within_radius( latitude, longitude, 100.0 ) .
-        with_type( linkable_type ) .
-        scoped(:conditions => ["events.id != ?", self.id])
-      )
-    end
+    via_locations = ( Event .
+      within_timeframe( starting_at, ending_at ) .
+      within_radius( latitude, longitude, 100.0 ) .
+      with_type( linkable_type ) .
+      scoped(:conditions => ["events.id != ?", self.id])
+    )
 
     via_accesspoints | via_locations
   end

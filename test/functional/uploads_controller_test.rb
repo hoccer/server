@@ -92,28 +92,15 @@ class UploadsControllerTest < ActionController::TestCase
   end
   
   test "fetching an upload without an attachment" do
-    assert peer = Peer.create(
-      :latitude   => 13.44,
-      :longitude  => 52.12,
-      :accuracy   => 42.0,
-      :gesture    => "pass",
-      :seeder     => true
-    )
-    
-    assert peer.upload
+    assert event = create_event_with_times( Time.now, 7.seconds.from_now, LegacyPass)
+    assert event.upload
         
-    get :show, :id => peer.upload.uuid
+    get :show, :id => event.upload.uuid
     assert_response 202
   end
   
   test "fetching an upload with an attachment" do
-    assert peer = Peer.create(
-      :latitude   => 13.44,
-      :longitude  => 52.12,
-      :accuracy   => 42.0,
-      :gesture    => "pass",
-      :seeder     => true
-    )
+    assert event = create_event_with_times( Time.now, 7.seconds.from_now, LegacyPass)
 
     attachment = File.new(
       Rails.root.join("test", "fixtures", "upload_test.jpg")
@@ -125,18 +112,12 @@ class UploadsControllerTest < ActionController::TestCase
       :id => Upload.last.uuid
     )
     
-    get :show, :id => peer.upload.uuid
+    get :show, :id => event.upload.uuid
     assert_response 200
   end
   
   test "uploading a html file" do
-    assert peer = Peer.create(
-      :latitude   => 13.44,
-      :longitude  => 52.12,
-      :accuracy   => 42.0,
-      :gesture    => "pass",
-      :seeder     => true
-    )
+    assert event = create_event_with_times( Time.now, 7.seconds.from_now, LegacyPass)
     
     attachment = File.new(Rails.root.join("test", "fixtures", "test.html"))
     
@@ -146,18 +127,12 @@ class UploadsControllerTest < ActionController::TestCase
       :id => Upload.last.uuid
     )
     
-    get :show, :id => peer.upload.uuid
+    get :show, :id => event.upload.uuid
     assert_response 200
   end
   
   test "uploading a zip file" do
-    assert peer = Peer.create(
-      :latitude   => 13.44,
-      :longitude  => 52.12,
-      :accuracy   => 42.0,
-      :gesture    => "pass",
-      :seeder     => true
-    )
+    assert event = create_event_with_times( Time.now, 7.seconds.from_now, LegacyPass)
     
     attachment = File.new(Rails.root.join("test", "fixtures", "test.zip"))
     
@@ -167,7 +142,7 @@ class UploadsControllerTest < ActionController::TestCase
       :id => Upload.last.uuid
     )
     
-    get :show, :id => peer.upload.uuid
+    get :show, :id => event.upload.uuid
     assert_response 200
   end
   

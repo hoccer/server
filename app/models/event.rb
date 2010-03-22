@@ -31,10 +31,12 @@ class Event < ActiveRecord::Base
     )
   end
 
-  def self.with_type event_type
-    scoped(
-      :conditions => {:type => event_type}
-    )
+  def self.with_type *event_types
+    if event_types.length == 1
+      scoped( :conditions => { :type => event_types[0] })
+    else
+      scoped( :conditions => ["type IN (?)", event_types] )
+    end
   end
 
   def self.extract_uploads events
@@ -73,26 +75,39 @@ class Event < ActiveRecord::Base
     nil
   end
 
-  def nearby_events
-    via_accesspoints, via_locations = [], []
-
+  def nearby_events custom_options = {}
+    options = {
+      :starting_at  => starting_at,
+      :ending_at    => ending_at,
+      :longitude    => longitude,
+      :latitude     => latitude,
+      :bssids       => bssids,
+      :types        => linkable_type
+    }
+    
+    options.merge! custom_options
+    
     unless bssids.empty?
-      via_accesspoints = ( Event .
-        within_timeframe( starting_at, ending_at ) .
-        with_bssids( bssids ) .
-        with_type( linkable_type ) .
-        scoped(:conditions => ["events.id != ?", self.id])
-      )
+      via_accesspoints( options ) | via_locations( options )
+    else
+      via_locations( options )
     end
-
-    via_locations = ( Event .
-      within_timeframe( starting_at, ending_at ) .
-      within_radius( latitude, longitude, 100.0 ) .
-      with_type( linkable_type ) .
+  end
+  
+  def via_accesspoints options
+    Event .
+      within_timeframe( options[:starting_at], options[:ending_at] ) .
+      with_bssids( options[:bssids] ) .
+      with_type( options[:types] ) .
       scoped(:conditions => ["events.id != ?", self.id])
-    )
-
-    via_accesspoints | via_locations
+  end
+  
+  def via_locations options
+    Event .
+      within_timeframe( options[:starting_at], options[:ending_at] ) .
+      within_radius( options[:latitude], options[:longitude], 100.0 ) .
+      with_type( options[:types] ) .
+      scoped(:conditions => ["events.id != ?", self.id])
   end
 
   private

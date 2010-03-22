@@ -154,7 +154,7 @@ class EventsControllerTest < ActionController::TestCase
   end
   
   test "creating peer without seeder param defaults to seeder=false" do
-    assert_difference "LegacyReceive.count", +1 do
+    assert_difference "SweepIn.count", +1 do
       post :create, :peer => {
         :latitude   => 13.44,
         :longitude  => 52.12,
@@ -163,30 +163,30 @@ class EventsControllerTest < ActionController::TestCase
       }
     end
     
-    assert_equal Event.last.class, LegacyReceive
+    assert_equal Event.last.class, SweepIn
   end
   
   # TODO remove Legacy
   test "querying a throw peer" do
-    throw_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, LegacyThrow)
-    catch_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, LegacyCatch)
+    throw_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, Throw)
+    catch_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, Catch)
     
     assert catch_event.expired?, "Event Group is not expired"
     get :show, :id => catch_event.uuid
     
     json_response = ActiveSupport::JSON.decode( @response.body )
-    assert_equal [upload_url(:id => Upload.first.uuid)], json_response["resources"]
+    assert_equal upload_url(:id => Upload.first.uuid), json_response["uploads"][0]["uri"]
   end
   
   test "querying a pass peer" do
-    throw_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, LegacyPass)
-    catch_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, LegacyReceive)
+    throw_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, SweepOut)
+    catch_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, SweepIn)
     
     assert catch_event.expired?, "Event Group is not expired"
     get :show, :id => catch_event.uuid
     
     json_response = ActiveSupport::JSON.decode( @response.body )
-    assert_equal [upload_url(:id => Upload.first.uuid)], json_response["resources"]
+    assert_equal upload_url(:id => Upload.first.uuid), json_response["uploads"][0]["uri"]
   end
   
   

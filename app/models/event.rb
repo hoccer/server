@@ -4,7 +4,7 @@ class Event < ActiveRecord::Base
 
   validates_presence_of   :latitude, :longitude
 
-  before_create           :generate_uuid, :verify_lifetime
+  before_create           :generate_uuid, :verify_lifetime, :set_api_version
   before_save             :calculate_postgis_point
 
   belongs_to              :event_group
@@ -12,6 +12,8 @@ class Event < ActiveRecord::Base
   has_one                 :upload
 
   accepts_nested_attributes_for :access_point_sightings
+  
+  attr_protected          :api_version
 
   # Class Methods
 
@@ -124,6 +126,10 @@ class Event < ActiveRecord::Base
 
     def initialize_upload
       upload = Upload.create :uuid => UUID.generate(:compact), :event_id => id
+    end
+    
+    def set_api_version
+      self.api_version ||= 2
     end
 
     def verify_lifetime

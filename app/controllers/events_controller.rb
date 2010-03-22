@@ -11,6 +11,8 @@ class EventsController < ApplicationController
     legacy_client = convert_legacy_params # TODO remove Legacy
     convert_bssid_params
     
+    params[:event].merge! :user_agent => request.user_agent
+    
     event_type  = params[:event].delete(:type)
     base        = Event.const_get(event_type.camelize)
     
@@ -18,6 +20,7 @@ class EventsController < ApplicationController
 
     if @event.save
       if legacy_client # TODO remove Legacy
+        @event.update_attribute(:api_version, 1)
         render :json => legacy_response.to_json, :status => 200
       else
         redirect_to event_path(@event.uuid), :status => 303

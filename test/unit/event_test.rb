@@ -297,6 +297,13 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 2, event_a.nearby_events.count
   end
   
+  test "first event in distribute sets lifetime" do
+    catch_event = create_event_with_locations(44.1, 44.5, [], Catch)
+    throw_event = create_event_with_locations(44.1, 44.5, [], Throw)
+    
+    assert_equal catch_event.ending_at, catch_event.latest_in_group
+  end
+  
   test "first (Legacy)Throw on location creates new peer group" do
     assert_difference "EventGroup.count", +1 do
       create_event_with_locations(44.1, 44.5, [], LegacyThrow)

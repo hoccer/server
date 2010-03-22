@@ -1,41 +1,23 @@
 module Legacy
   
   module Distribute
-    def collisions?
-      1 < event_group.events.with_type( "LegacyThrow" ).count
+    def seeder
+      "LegacyThrow"
     end
 
-    def number_of_peers
-      Event.with_type( "LegacyCatch" ) .
-      all(:conditions => {:event_group_id => event_group_id}) .
-      count
-    end
-
-    def number_of_seeders
-      Event.with_type( "LegacyThrow" ) .
-      all(:conditions => {:event_group_id => event_group_id}) .
-      count
+    def peer
+      "LegacyCatch"
     end
   end
   
   module Share
-    def collisions?
-      (1 < event_group.events.with_type( "LegacyPass" ).count) ||
-      (1 < event_group.events.with_type( "LegacyReceive" ).count)
-    end
-
-    def number_of_peers
-      Event.with_type( "LegacyReceive" ) .
-      all(:conditions => {:event_group_id => event_group_id}) .
-      count
-    end
-
-    def number_of_seeders
-      Event.with_type( "LegacyPass" ) .
-      all(:conditions => {:event_group_id => event_group_id}) .
-      count
+    def seeder
+      "LegacyPass"
     end
     
+    def peer
+      "LegacyReceive"
+    end
   end
   
   module General

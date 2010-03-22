@@ -178,11 +178,12 @@ class Pick < Event
 end
 
 class Throw < Event
-
+  include Distribute
+  
   after_create :initialize_upload, :associate_with_event_group
 
   def linkable_type
-    "Catch"
+    peer
   end
 
   def info
@@ -201,11 +202,12 @@ class Throw < Event
 end
 
 class Catch < Event
+  include Distribute
 
   after_create :associate_with_event_group
 
   def linkable_type
-    "Throw"
+    seeder
   end
 
   def info
@@ -232,65 +234,52 @@ end
 #############################
 
 class LegacyThrow < Event
-  include Legacy::General
+  include Distribute
   include Legacy::Distribute
+  include Legacy::General
 
   after_create :initialize_upload, :associate_with_event_group
 
   def linkable_type
-    "LegacyCatch"
+    peer
   end
 
 end
 
 class LegacyCatch < Event
-  include Legacy::General
+  include Distribute
   include Legacy::Distribute
+  include Legacy::General
 
   after_create :associate_with_event_group
 
   def linkable_type
-    "LegacyThrow"
+    seeder
   end
 
 end
 
 class LegacyPass < Event
+  include Share
   include Legacy::General
   include Legacy::Share
 
   after_create :initialize_upload, :associate_with_event_group
 
   def linkable_type
-    "LegacyReceive"
+    peer
   end
 
 end
 
 class LegacyReceive < Event
+  include Share
   include Legacy::General
   include Legacy::Share
 
   after_create :associate_with_event_group
 
-  def collisions?
-    (1 < event_group.events.with_type( "LegacyPass" ).count) ||
-    (1 < event_group.events.with_type( "LegacyReceive" ).count)
-  end
-
-  def number_of_peers
-    Event.with_type( "LegacyReceive" ) .
-    all(:conditions => {:event_group_id => event_group_id}) .
-    count
-  end
-
-  def number_of_seeders
-    Event.with_type( "LegacyPass" ) .
-    all(:conditions => {:event_group_id => event_group_id}) .
-    count
-  end
-
   def linkable_type
-    "LegacyPass"
+    seeder
   end
 end

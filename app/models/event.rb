@@ -132,7 +132,7 @@ class Event < ActiveRecord::Base
     end
 
     def associate_with_event_group
-      linked_events = nearby_events
+      linked_events = nearby_events( :types => [seeder, peer] )
 
       if linked_events.empty?
         event_group = EventGroup.create

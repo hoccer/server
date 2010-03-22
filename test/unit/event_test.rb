@@ -304,20 +304,21 @@ class EventTest < ActiveSupport::TestCase
     assert_equal catch_event.ending_at, catch_event.latest_in_group
   end
   
-  test "first (Legacy)Throw on location creates new peer group" do
-    assert_difference "EventGroup.count", +1 do
-      create_event_with_locations(44.1, 44.5, [], LegacyThrow)
-    end
-    assert_not_nil Event.last.event_group
+  test "expired?" do
+    event = create_event_with_times( 14.seconds.ago, 7.seconds.ago )
+    assert event.expired?, "Event should be expired"
   end
   
-  test "following peers join exisiting peer group instead of creating one" do
-    event = create_event_with_locations(44.1, 44.5, [], LegacyThrow)
-    assert_no_difference "EventGroup.count" do
-      create_event_with_locations(44.1, 44.5, [], LegacyCatch)
-    end
+  test "no more events in event_group after expired?" do
+    catch_event = create_event_with_locations(44.1, 44.5, [], Catch)
+    throw_event = create_event_with_locations(44.1, 44.5, [], Throw)
+    group_a     = catch_event.event_group
     
-    assert_not_nil event.event_group
+    expire group_a
+    
+    next_catch_event = create_event_with_locations(44.1, 44.5, [], Catch)
+    
+    assert group_a != next_catch_event.event_group
   end
   
   test "creating a drop event auto creates an upload as well" do

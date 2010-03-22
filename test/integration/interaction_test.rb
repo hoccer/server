@@ -120,9 +120,7 @@ class InteractionTest < ActionController::IntegrationTest
     }
     
     expire EventGroup.last
-    
-    response_body = ActiveSupport::JSON.decode(@response.body)
-    
+
     get peer_path( Event.last.uuid )
     assert_response :success
     

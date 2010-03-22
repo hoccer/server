@@ -35,7 +35,9 @@ class EventsController < ApplicationController
     
     if @event
       # TODO remove Legacy
-      event_info = legacy_info if @event.respond_to?(:legacy?)
+      if @event.legacy?
+        event_info = legacy_info
+      end
       
       event_info ||= resolve_resources(@event.info)
       render :json => event_info.to_json, :status => event_info[:status_code]

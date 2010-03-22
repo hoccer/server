@@ -37,13 +37,13 @@ module LegacyEvents
     end
     
     if gesture_param == "pass" && seeder
-      "legacy_pass"
+      "SweepOut"
     elsif gesture_param == "pass" && !seeder
-      "legacy_receive"
+      "SweepIn"
     elsif gesture_param == "distribute" && seeder
-      "legacy_throw"
+      "Throw"
     elsif gesture_param == "distribute" && !seeder
-      "legacy_catch"
+      "Catch"
     end
   end
   
@@ -53,7 +53,7 @@ module LegacyEvents
       :message  => "Searching for partner"
     }
     
-    if @event.is_a?(LegacyThrow) || @event.is_a?(LegacyPass)
+    if @event.is_a?(Throw) || @event.is_a?(SweepOut)
       response.merge!( :upload_uri => upload_url(@event.upload.uuid) )
     end
     

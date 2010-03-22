@@ -92,7 +92,7 @@ class UploadsControllerTest < ActionController::TestCase
   end
   
   test "fetching an upload without an attachment" do
-    assert event = create_event_with_times( Time.now, 7.seconds.from_now, LegacyPass)
+    assert event = create_event_with_times( Time.now, 7.seconds.from_now, SweepOut)
     assert event.upload
         
     get :show, :id => event.upload.uuid
@@ -100,7 +100,7 @@ class UploadsControllerTest < ActionController::TestCase
   end
   
   test "fetching an upload with an attachment" do
-    assert event = create_event_with_times( Time.now, 7.seconds.from_now, LegacyPass)
+    assert event = create_event_with_times( Time.now, 7.seconds.from_now, SweepOut)
 
     attachment = File.new(
       Rails.root.join("test", "fixtures", "upload_test.jpg")
@@ -117,7 +117,7 @@ class UploadsControllerTest < ActionController::TestCase
   end
   
   test "uploading a html file" do
-    assert event = create_event_with_times( Time.now, 7.seconds.from_now, LegacyPass)
+    assert event = create_event_with_times( Time.now, 7.seconds.from_now, SweepOut)
     
     attachment = File.new(Rails.root.join("test", "fixtures", "test.html"))
     
@@ -132,7 +132,7 @@ class UploadsControllerTest < ActionController::TestCase
   end
   
   test "uploading a zip file" do
-    assert event = create_event_with_times( Time.now, 7.seconds.from_now, LegacyPass)
+    assert event = create_event_with_times( Time.now, 7.seconds.from_now, SweepOut)
     
     attachment = File.new(Rails.root.join("test", "fixtures", "test.zip"))
     

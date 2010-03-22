@@ -76,6 +76,10 @@ class Event < ActiveRecord::Base
   def linkable_type
     nil
   end
+  
+  def legacy?
+    api_version == 1
+  end
 
   def nearby_events custom_options = {}
     options = {
@@ -110,6 +114,15 @@ class Event < ActiveRecord::Base
       within_radius( options[:latitude], options[:longitude], 100.0 ) .
       with_type( options[:types] ) .
       scoped(:conditions => ["events.id != ?", self.id])
+  end
+  
+  def info
+    if legacy?
+      extend Legacy
+      info_hash
+    else
+      info_hash
+    end
   end
 
   private
@@ -157,7 +170,7 @@ class Drop < Event
     "Pick"
   end
 
-  def info
+  def info_hash
     {
       :state        => "ready",
       :message      => "like state but more verbose",
@@ -176,7 +189,7 @@ class Pick < Event
     "Drop"
   end
 
-  def info
+  def info_hash
     linked_events = nearby_events
 
     if linked_events.empty?
@@ -207,7 +220,7 @@ class Throw < Event
     peer
   end
 
-  def info
+  def info_hash
     linked_events = nearby_events
 
     {
@@ -231,7 +244,7 @@ class Catch < Event
     seeder
   end
 
-  def info
+  def info_hash
     linked_events = event_group.events.with_type( linkable_type )
 
     {
@@ -245,62 +258,22 @@ class Catch < Event
 
 end
 
-# TODO remove Legacy
-
-#############################
-#############################
-##### W A R N I N G ! #######
-###### remove ahead  ########
-#############################
-#############################
-
-class LegacyThrow < Event
-  include Distribute
-  include Legacy::Distribute
-  include Legacy::General
-
-  after_create :initialize_upload, :associate_with_event_group
-
+class SweepOut < Event
+  include Pass
+  
   def linkable_type
     peer
   end
-
-end
-
-class LegacyCatch < Event
-  include Distribute
-  include Legacy::Distribute
-  include Legacy::General
-
-  after_create :associate_with_event_group
-
-  def linkable_type
-    seeder
-  end
-
-end
-
-class LegacyPass < Event
-  include Share
-  include Legacy::General
-  include Legacy::Share
-
+  
   after_create :initialize_upload, :associate_with_event_group
-
-  def linkable_type
-    peer
-  end
-
 end
 
-class LegacyReceive < Event
-  include Share
-  include Legacy::General
-  include Legacy::Share
-
-  after_create :associate_with_event_group
-
+class SweepIn < Event
+  include Pass
+  
   def linkable_type
     seeder
   end
+  
+  after_create :associate_with_event_group
 end

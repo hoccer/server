@@ -1,0 +1,17 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: hoccer2_dev
+  pool: 5
+  template: template_postgis
+  username: postgres
+  password:
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: hoccer2_test
+  pool: 5
+  template: template_postgis
+  username: postgres
+  password:

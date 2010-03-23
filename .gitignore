@@ -6,4 +6,5 @@ db/schema.rb
 doc/app/*
 .gitkeep
 config/database.yml
-
+db/schema.rb
+public/system

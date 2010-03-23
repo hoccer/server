@@ -39,7 +39,7 @@ module Legacy
     elsif expired? && 0 < number_of_seeders && 0 < number_of_peers
       {
         :state => :ready,
-        :message => "Downloading content",
+        :message => "Transfering content",
         :expires => 0,
         :resources => ((upload = linked_events.first.upload) ? upload.uuid : []),
         :status_code => 200

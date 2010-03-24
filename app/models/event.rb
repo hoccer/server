@@ -117,12 +117,14 @@ class Event < ActiveRecord::Base
   end
   
   def info
-    if legacy?
-      extend Legacy
-      info_hash
-    else
-      info_hash
+    extend Legacy if legacy?
+    computed_info_hash = info_hash
+    
+    unless computed_info_hash[:state] == :waiting
+      self.update_attribute(:state, computed_info_hash[:state].to_s)
     end
+    
+    computed_info_hash
   end
 
   private

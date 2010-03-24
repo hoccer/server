@@ -111,7 +111,7 @@ class Event < ActiveRecord::Base
   def via_locations options
     Event .
       within_timeframe( options[:starting_at], options[:ending_at] ) .
-      within_radius( options[:latitude], options[:longitude], 100.0 ) .
+      within_radius( options[:latitude], options[:longitude], 200.0 ) .
       with_type( options[:types] ) .
       scoped(:conditions => ["events.id != ?", self.id])
   end

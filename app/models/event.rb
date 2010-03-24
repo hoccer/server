@@ -116,6 +116,24 @@ class Event < ActiveRecord::Base
       scoped(:conditions => ["events.id != ?", self.id])
   end
   
+  def current_state
+    return state.to_sym if state
+    
+    if collisions?
+      :collision
+    elsif !expired?
+      :waiting
+    elsif expired? && 0 <  number_of_seeders && 0 == number_of_peers
+      :no_peers
+    elsif expired? && 0 == number_of_seeders && 0 < number_of_peers
+      :no_seeders
+    elsif expired? && 0 < number_of_seeders && 0 < number_of_peers
+      :ready
+    else
+      :error
+    end
+  end
+  
   def info
     extend Legacy if legacy?
     computed_info_hash = info_hash

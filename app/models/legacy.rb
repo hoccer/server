@@ -1,10 +1,9 @@
 module Legacy
   
   def info_hash
-    linked_events = event_group.events.with_type( linkable_type )
-    # can you smell the state machine ?
-  
-    if collisions?
+    
+    case current_state
+    when :collision
       {
         :state => :collision,
         :message => "Unfortunatly your hoc was intercepted. Try again.",
@@ -12,7 +11,7 @@ module Legacy
         :resources => [],
         :status_code => 409
       }
-    elsif !expired?
+    when :waiting
       {
         :state => :waiting,
         :message => expires.to_s,
@@ -20,7 +19,7 @@ module Legacy
         :resources => [],
         :status_code => 202
       }
-    elsif expired? && 0 <  number_of_seeders && 0 == number_of_peers
+    when :no_peers
       {
         :state => :no_peers,
         :message => "Nobody caught your content.",
@@ -28,7 +27,7 @@ module Legacy
         :resources => [],
         :status_code => 500
       }
-    elsif expired? && 0 == number_of_seeders && 0 < number_of_peers
+    when :no_seeders
       {
         :state => :no_seeders,
         :message => "Nothing was thrown to you.",
@@ -36,7 +35,8 @@ module Legacy
         :resources => [],
         :status_code => 500
       }
-    elsif expired? && 0 < number_of_seeders && 0 < number_of_peers
+    when :ready
+      linked_events = nearby_events
       {
         :state => :ready,
         :message => "Transfering content",
@@ -47,4 +47,5 @@ module Legacy
     end
   
   end
+    
 end

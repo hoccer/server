@@ -45,4 +45,4 @@ Rails::Initializer.run do |config|
 end
 
 ExceptionNotification::Notifier.exception_recipients = %w(hoccer-errors@artcom.de)
-ExceptionNotification::Notifier.sender_address = %("Hoccer Exception" <hoccer-errors@artcom.de>)
+ExceptionNotification::Notifier.sender_address = %{<hoccer-errors@artcom.de>}

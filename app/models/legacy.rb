@@ -2,7 +2,7 @@ module Legacy
   
   def info_hash
     
-    case current_state
+    result = case current_state
     when :collision
       {
         :state => :collision,
@@ -37,15 +37,25 @@ module Legacy
       }
     when :ready
       linked_events = nearby_events
+      upload        = linked_events.first.try(:upload)
+      
       {
         :state => :ready,
         :message => "Transfering content",
         :expires => 0,
-        :resources => ((upload = linked_events.first.upload) ? upload.uuid : []),
+        :resources => (upload ? [upload.uuid] : []),
         :status_code => 200
       }
     end
-  
+    
+    if result[:state] != state
+      Event.update_all(
+        "state = '#{result[:state]}'",
+        ["event_group_id = ?", event_group_id]
+      )
+    end
+    
+    result
   end
     
 end

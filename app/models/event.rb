@@ -117,7 +117,7 @@ class Event < ActiveRecord::Base
   end
   
   def current_state
-    return state.to_sym if state
+    return state.to_sym if state != "waiting"
     
     if collisions?
       :collision
@@ -137,13 +137,9 @@ class Event < ActiveRecord::Base
   def info
     extend Legacy if legacy?
     computed_info_hash = info_hash
-    
-    unless computed_info_hash[:state] == :waiting
-      self.update_attribute(:state, computed_info_hash[:state].to_s)
-    end
-    
     computed_info_hash
   end
+  
 
   private
 

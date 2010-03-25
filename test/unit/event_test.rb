@@ -375,4 +375,66 @@ class EventTest < ActiveSupport::TestCase
     assert_equal :ready, event_b.info[:state]
   end
   
+  test "collision state propagates to all distribute participants" do
+    Event.delete_all
+    event_a = create_event_with_locations(44.1, 44.5, [], Throw)
+    event_b = create_event_with_locations(44.1, 44.5, [], Catch)
+    event_c = create_event_with_locations(44.1, 44.5, [], Throw)
+    event_d = create_event_with_locations(44.1, 44.5, [], Catch)
+    
+    Event.all.each {|e| e.api_version=1; e.save}
+    
+    assert event_d.reload.legacy?
+    assert_equal ["waiting"], Event.all.map(&:state).uniq
+    
+    info = event_d.info
+    
+    assert_equal ["collision"], Event.all.map(&:state).uniq
+  end
+  
+  test "no_seeders state propagates to all distribute participants" do
+    Event.delete_all
+    event_b = create_event_with_locations(44.1, 44.5, [], Catch)
+    event_d = create_event_with_locations(44.1, 44.5, [], Catch)
+    Event.all.each {|e| e.api_version=1; e.save}
+    
+    assert event_d.reload.legacy?
+    assert_equal ["waiting"], Event.all.map(&:state).uniq
+    
+    expire EventGroup.last
+    info = event_d.info
+    
+    assert_equal ["no_seeders"], Event.all.map(&:state).uniq
+  end
+  
+  test "no_peers state propagates to all distribute participants" do
+    Event.delete_all
+    event_d = create_event_with_locations(44.1, 44.5, [], Throw)
+    Event.all.each {|e| e.api_version=1; e.save}
+    
+    assert event_d.reload.legacy?
+    assert_equal ["waiting"], Event.all.map(&:state).uniq
+    
+    expire EventGroup.last
+    info = event_d.info
+    
+    assert_equal ["no_peers"], Event.all.map(&:state).uniq
+  end
+  
+  test "ready state propagates to all distribute participants" do
+    Event.delete_all
+    event_b = create_event_with_locations(44.1, 44.5, [], Catch)
+    event_c = create_event_with_locations(44.1, 44.5, [], Catch)
+    event_d = create_event_with_locations(44.1, 44.5, [], Throw)
+    Event.all.each {|e| e.api_version=1; e.save}
+    
+    assert event_d.reload.legacy?
+    assert_equal ["waiting"], Event.all.map(&:state).uniq
+    
+    expire EventGroup.last
+    info = event_d.info
+    
+    assert_equal ["ready"], Event.all.map(&:state).uniq
+  end
+  
 end

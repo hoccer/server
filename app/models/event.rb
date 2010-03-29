@@ -80,7 +80,15 @@ class Event < ActiveRecord::Base
   def legacy?
     api_version == 1
   end
-
+  
+  def accuracy
+    if location_accuracy && (200.0 < location_accuracy)
+      location_accuracy
+    else
+      200.0
+    end
+  end
+  
   def nearby_events custom_options = {}
     options = {
       :starting_at  => starting_at,
@@ -111,7 +119,7 @@ class Event < ActiveRecord::Base
   def via_locations options
     Event .
       within_timeframe( options[:starting_at], options[:ending_at] ) .
-      within_radius( options[:latitude], options[:longitude], 200.0 ) .
+      within_radius( options[:latitude], options[:longitude], accuracy ) .
       with_type( options[:types] ) .
       scoped(:conditions => ["events.id != ?", self.id])
   end
@@ -136,8 +144,7 @@ class Event < ActiveRecord::Base
   
   def info
     extend Legacy if legacy?
-    computed_info_hash = info_hash
-    computed_info_hash
+    info_hash
   end
   
 

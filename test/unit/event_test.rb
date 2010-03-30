@@ -2,6 +2,39 @@ require 'test_helper'
 
 class EventTest < ActiveSupport::TestCase
   
+  test "pairing by location only sets pairing mode to 1" do
+    event_a = create_event_with_locations(20.501616, 20.345785, [])
+    event_b = create_event_with_locations(20.501616, 20.345785, [])
+    
+    event_a.nearby_events
+    event_b.nearby_events
+    
+    assert_equal 1, event_a.pairing_mode
+    assert_equal 1, event_b.pairing_mode
+  end
+  
+  test "pairing by bssid only sets pairing mode to 2" do
+    event_a = create_event_with_locations(20.0, 1.0, [{:bssid => "ffff"}])
+    event_b = create_event_with_locations(20.1, 2.0, [{:bssid => "ffff"}])
+    
+    event_a.nearby_events
+    event_b.nearby_events
+    
+    assert_equal 2, event_a.pairing_mode
+    assert_equal 2, event_b.pairing_mode
+  end
+  
+  test "pairing by bssid and location sets pairing mode to 3" do
+    event_a = create_event_with_locations(20.0, 1.0, [{:bssid => "ffff"}])
+    event_b = create_event_with_locations(20.0, 1.0, [{:bssid => "ffff"}])
+    
+    event_a.nearby_events
+    event_b.nearby_events
+    
+    assert_equal 3, event_a.pairing_mode
+    assert_equal 3, event_b.pairing_mode
+  end
+  
   test "should not create access points if peer is invalid" do
     assert_no_difference "AccessPointSighting.count" do
       Event.create(

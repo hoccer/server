@@ -109,19 +109,29 @@ class Event < ActiveRecord::Base
   end
   
   def via_accesspoints options
-    Event .
+    results = Event .
       within_timeframe( options[:starting_at], options[:ending_at] ) .
       with_bssids( options[:bssids] ) .
       with_type( options[:types] ) .
       scoped(:conditions => ["events.id != ?", self.id])
+      
+    self.update_attribute(:pairing_mode, 0b10) if 0 < results.size
+    results
   end
   
   def via_locations options
-    Event .
+    results = Event .
       within_timeframe( options[:starting_at], options[:ending_at] ) .
       within_radius( options[:latitude], options[:longitude], accuracy ) .
       with_type( options[:types] ) .
       scoped(:conditions => ["events.id != ?", self.id])
+      
+    update_pairing_mode(0b1) if 0 < results.size
+    results
+  end
+  
+  def update_pairing_mode bits
+    self.update_attribute( :pairing_mode, (pairing_mode | bits) )
   end
   
   def current_state

@@ -96,7 +96,8 @@ class Event < ActiveRecord::Base
       :longitude    => longitude,
       :latitude     => latitude,
       :bssids       => bssids,
-      :types        => linkable_type
+      :types        => linkable_type,
+      :accuracy     => accuracy
     }
     
     options.merge! custom_options
@@ -122,7 +123,7 @@ class Event < ActiveRecord::Base
   def via_locations options
     results = Event .
       within_timeframe( options[:starting_at], options[:ending_at] ) .
-      within_radius( options[:latitude], options[:longitude], accuracy ) .
+      within_radius( options[:latitude], options[:longitude], options[:accuracy] ) .
       with_type( options[:types] ) .
       scoped(:conditions => ["events.id != ?", self.id])
       

@@ -73,8 +73,14 @@ class SanityCheck
   end
   
   def self.peers_by_time
-    (1..14).each do |i|
-      puts "#{i}\t#{SanityCheck.check_peers(i)}"
+    logfile = "hoccer_stats-#{Time.now.strftime("%Y-%m-%d_%H_%M")}"
+    #(0.1..1).each do |i|
+    i = 0.0
+    while i < 1 do
+      File.open("/tmp/#{logfile}", 'w') do |file|
+        file.puts "#{i}\t#{SanityCheck.check_peers(i)}"
+      end
+      i += 0.1
     end
   end
   

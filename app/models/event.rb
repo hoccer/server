@@ -42,7 +42,11 @@ class Event < ActiveRecord::Base
   end
 
   def self.extract_uploads events
-    events.map do |event|
+    events_with_upload = events.select do |event|
+      event.upload && event.upload.uuid
+    end
+    
+    events_with_upload.map do |event|
       {
         :uri          => event.upload.uuid,
         :content_type => event.upload.attachment.content_type,

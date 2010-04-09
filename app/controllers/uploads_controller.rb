@@ -18,12 +18,16 @@ class UploadsController < ApplicationController
   def show
 
     upload = Upload.find_by_uuid params[:id]
+    
+    if upload.nil?
+      render :nothing => true, :status => 404
+    end
 
-    if !upload.attachment_ready?
+    unless upload.nil? && upload.attachment_ready?
       render :nothing => true, :status => 202
     end
 
-    if upload.attachment_ready?
+    if upload && upload.attachment_ready?
       send_file(
         upload.attachment.path(:processed),
         :filename => upload.attachment.original_filename,

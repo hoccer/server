@@ -3,6 +3,12 @@ require 'digest/md5'
 
 class UploadsControllerTest < ActionController::TestCase
   
+  
+  test "get non existant upload returns 404" do
+    get :show, :id => "foobarrbazbeng"
+    assert_response 404
+  end
+  
   test "updating an upload without supplied content_type" do
     Upload.create :uuid => "23"
     

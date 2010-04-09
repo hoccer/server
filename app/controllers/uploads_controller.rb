@@ -21,13 +21,9 @@ class UploadsController < ApplicationController
     
     if upload.nil?
       render :nothing => true, :status => 404
-    end
-
-    unless upload.nil? && upload.attachment_ready?
+    elsif upload && !upload.attachment_ready?
       render :nothing => true, :status => 202
-    end
-
-    if upload && upload.attachment_ready?
+    elsif upload && upload.attachment_ready?
       send_file(
         upload.attachment.path(:processed),
         :filename => upload.attachment.original_filename,

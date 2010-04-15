@@ -86,10 +86,10 @@ class Event < ActiveRecord::Base
   end
   
   def accuracy
-    if location_accuracy && (200.0 < location_accuracy)
+    if location_accuracy && (1000.0 < location_accuracy)
       location_accuracy
     else
-      200.0
+      1000.0
     end
   end
   

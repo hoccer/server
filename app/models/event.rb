@@ -1,4 +1,6 @@
 class Event < ActiveRecord::Base
+  GuaranteedRadius = 100
+  MaxUncertaintiy  = 5050
 
   add_geo_foo
 
@@ -127,12 +129,20 @@ class Event < ActiveRecord::Base
   def via_locations options
     results = Event .
       within_timeframe( options[:starting_at], options[:ending_at] ) .
-      within_radius( options[:latitude], options[:longitude], options[:accuracy] ) .
+      somewhere_near( options[:latitude], options[:longitude], options[:accuracy] ) .
       with_type( options[:types] ) .
       scoped(:conditions => ["events.id != ?", self.id])
       
     update_pairing_mode(0b1) if 0 < results.size
     results
+  end
+
+  def self.somewhere_near lat, lon, accuracy
+    scoped(
+      :conditions => [
+        "ST_Distance_Sphere(point, #{GeoFoo.as_point(lat, lon)}) <= ? + least(?, 2*(location_accuracy + ?))",
+        GuaranteedRadius, MaxUncertaintiy, accuracy]
+    )
   end
   
   def update_pairing_mode bits

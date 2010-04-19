@@ -202,7 +202,7 @@ class EventsControllerTest < ActionController::TestCase
     expected  = ["fa:0a:2a:0a", "0b:09:b0:0b", "01:22:0f:f0", "ff:ff:ff:ff"]
     event     = Event.last
     
-    assert_equal expected, event.access_point_sightings.map(&:bssid)
+    assert_equal expected.sort, event.access_point_sightings.map(&:bssid).sort
   end
   
   

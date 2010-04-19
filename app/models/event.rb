@@ -57,6 +57,20 @@ class Event < ActiveRecord::Base
     end
   end
 
+  def self.somewhere_near lat, lon, accuracy
+    boxSize = bbox_size lat, 1.2 * MaxUncertaintiy # paranoia factor 1.2
+    point = GeoFoo.as_point(lat, lon)
+    scoped(
+      :conditions => [
+        "ST_DWithin(point, #{point}, #{boxSize}) AND "\
+        "ST_Distance_Sphere(point, #{point}) <= ? + least(?, 2*(location_accuracy + ?))",
+        GuaranteedRadius,
+        MaxUncertaintiy,
+        accuracy
+      ]
+    )
+  end
+
   # Instance Methods
 
   def latest_in_group
@@ -135,14 +149,6 @@ class Event < ActiveRecord::Base
       
     update_pairing_mode(0b1) if 0 < results.size
     results
-  end
-
-  def self.somewhere_near lat, lon, accuracy
-    scoped(
-      :conditions => [
-        "ST_Distance_Sphere(point, #{GeoFoo.as_point(lat, lon)}) <= ? + least(?, 2*(location_accuracy + ?))",
-        GuaranteedRadius, MaxUncertaintiy, accuracy]
-    )
   end
   
   def update_pairing_mode bits

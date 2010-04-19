@@ -470,4 +470,31 @@ class EventTest < ActiveSupport::TestCase
     assert_equal ["ready"], Event.all.map(&:state).uniq
   end
   
+  test "for endless waiting state" do
+    
+    event = Throw.create(
+      "starting_at"       => "Tue Apr 13 09:00:22 UTC 2010".to_time,
+      "ending_at"         => "Tue Apr 13 09:00:29 UTC 2010".to_time,
+      "latitude"          => 45.444305,
+      "longitude"         => 8.627495,
+      "event_group_id"    => 306763,
+      "location_accuracy" => 253.846294,
+      "pairing_mode"      => nil,
+      "user_agent"        => "Hoccer /1.0.2 iPhone",
+      "state"             => "waiting",
+      "api_version"       => 1
+    )
+    event.update_attribute(:api_version, 1)
+    event.reload
+    
+    assert_equal :waiting, event.state.to_sym
+    assert event.expired?
+    assert_equal :waiting, event.reload.state.to_sym
+    assert_equal :no_peers, event.current_state
+    assert_equal :waiting, event.reload.state.to_sym
+    event.info[:state]
+    # State changed
+    assert_equal :no_peers, event.reload.state.to_sym
+  end
+  
 end

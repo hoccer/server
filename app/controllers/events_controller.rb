@@ -71,7 +71,7 @@ class EventsController < ApplicationController
       unless bssids.nil? || bssids.empty?
         access_points = {
           :access_point_sightings_attributes => bssids.map do |bssid|
-            { :bssid => bssid }
+            { :bssid => bssid.gsub(/\b([A-Fa-f0-9])\b/, '0\1') }
           end
         }
       end

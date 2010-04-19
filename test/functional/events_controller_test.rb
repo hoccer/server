@@ -189,5 +189,21 @@ class EventsControllerTest < ActionController::TestCase
     assert_equal upload_url(:id => Upload.first.uuid), json_response["uploads"][0]["uri"]
   end
   
+  test "bssid normalization" do
+    post :create, :peer => {
+      :latitude   => 13.44,
+      :longitude  => 52.12,
+      :accuracy   => 42.0,
+      :gesture    => "pass",
+      :seeder     => true,
+      :bssids     => ["fa:a:2a:a", "b:9:b0:b", "1:22:f:f0", "ff:ff:ff:ff"]
+    }
+    
+    expected  = ["fa:0a:2a:0a", "0b:09:b0:0b", "01:22:0f:f0", "ff:ff:ff:ff"]
+    event     = Event.last
+    
+    assert_equal expected, event.access_point_sightings.map(&:bssid)
+  end
+  
   
 end

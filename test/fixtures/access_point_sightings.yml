@@ -1,11 +1,12 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  bssid: MyString
-  signal: 1.5
-  event_id: 1
-
-two:
-  bssid: MyString
-  signal: 1.5
-  event_id: 1
+# one:
+#   bssid: MyString
+#   signal: 1.5
+#   event_id: 1
+# 
+# two:
+#   bssid: MyString
+#   signal: 1.5
+#   event_id: 1
+# 

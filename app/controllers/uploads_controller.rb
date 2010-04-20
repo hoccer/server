@@ -8,6 +8,10 @@ class UploadsController < ApplicationController
 
     content_type = MIME::Types.type_for(upload.attachment.original_filename).to_s
     
+    # Better / More accurate Content-Type computation - But also slower?
+    # 
+    # content_type = %x[file --mime-type -b #{upload.attachment.path}].chomp
+    #
     unless content_type.blank? || content_type == upload.attachment.content_type
       upload.update_attributes :attachment_content_type => content_type
     end

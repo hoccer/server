@@ -48,9 +48,10 @@ module Legacy
       }
     end
     
-    if result[:state] != state
+    if result[:state].to_s != state
+      
       Event.update_all(
-        "state = '#{result[:state]}'",
+        "state = '#{result[:state].to_s}'",
         ["event_group_id = ?", event_group_id]
       )
     end

@@ -37,7 +37,7 @@ module Pass
         :state        => :waiting,
         :message      => "waiting for other participants",
         :expires      => expires,
-        :peers        => (event_group.events - [self]).size ,
+        :peers        => (event_group.events - [self]).size,
         :status_code  => 202
       }
       
@@ -47,7 +47,7 @@ module Pass
         :message      => "Nothing was thrown to you.",
         :uploads      => [],
         :expires      => 0,
-        :peers        => linked_events.size,
+        :peers        => (event_group.events - [self]).size,
         :status_code  => 410
       }
       

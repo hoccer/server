@@ -99,6 +99,39 @@ class EventsControllerTest < ActionController::TestCase
     assert_equal 202, json_response["status_code"]
   end
   
+  test "info response for collision" do
+    throw_event = create_event_with_times(Time.now, 7.seconds.from_now, Throw)
+    throw_event = create_event_with_times(Time.now, 7.seconds.from_now, Throw)
+    
+    get :show, :id => throw_event.uuid
+    json_response = ActiveSupport::JSON.decode( @response.body )
+    
+    assert_response 409
+    assert_equal "collision", json_response["state"]
+  end
+  
+  test "info response for no_peers" do
+    throw_event = create_event_with_times(Time.now, 7.seconds.from_now, Throw)
+    expire throw_event.event_group
+    
+    get :show, :id => throw_event.uuid
+    json_response = ActiveSupport::JSON.decode( @response.body )
+    
+    assert_response 410
+    assert_equal "no_peers", json_response["state"]
+  end
+  
+  test "info response for no_seeders" do
+    catch_event = create_event_with_times(Time.now, 7.seconds.from_now, Catch)
+    expire catch_event.event_group
+    
+    get :show, :id => catch_event.uuid
+    json_response = ActiveSupport::JSON.decode( @response.body )
+    
+    assert_response 410
+    assert_equal "no_seeders", json_response["state"]
+  end
+  
   #############################
   #############################
   ##### W A R N I N G ! #######

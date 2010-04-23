@@ -8,3 +8,4 @@ doc/app/*
 config/database.yml
 db/schema.rb
 public/system
+vendor/plugins/newrelic_rpm

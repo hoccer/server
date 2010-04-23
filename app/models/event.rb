@@ -274,19 +274,6 @@ class Throw < Event
     peer
   end
 
-  def info_hash
-    linked_events = nearby_events
-
-    {
-      :state        => "waiting",
-      :message      => "waiting for other participants",
-      :expires      => ( ending_at - Time.now ),
-      :peers        => linked_events.size,
-      :upload_uri   => upload.uuid,
-      :status_code  => 202
-    }
-  end
-
 end
 
 class Catch < Event
@@ -296,18 +283,6 @@ class Catch < Event
 
   def linkable_type
     seeder
-  end
-
-  def info_hash
-    linked_events = event_group.events.with_type( linkable_type )
-
-    {
-      :state        => "ready",
-      :message      => "content available for download",
-      :uploads      => Event.extract_uploads(linked_events),
-      :peers        => linked_events.size,
-      :status_code  => 202
-    }
   end
 
 end

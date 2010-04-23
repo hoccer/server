@@ -29,7 +29,7 @@ module Pass
         :message      => "Your hoc was intercepted. Try again.", # David said so
         :uploads      => Event.extract_uploads(linked_events),
         :peers        => linked_events.size,
-        :status_code  => 202
+        :status_code  => 409
       }
     elsif !expired?
       info = {
@@ -70,7 +70,7 @@ module Pass
         :message      => "content available for download",
         :uploads      => Event.extract_uploads(nearby_events(:types => seeder)),
         :peers        => linked_events.size,
-        :status_code  => 202
+        :status_code  => 200
       }
     end
   end

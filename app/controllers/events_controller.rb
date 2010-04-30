@@ -49,7 +49,7 @@ class EventsController < ApplicationController
   def destroy
     if @event = Event.find_by_uuid( params[:id] )
       @event.update_attributes :state => "canceled"
-      render :nothing => true, :status => 410
+      render :nothing => true, :status => 200
     else
       render :nothing => true, :status => 400
     end

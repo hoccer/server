@@ -86,7 +86,7 @@ class Event < ActiveRecord::Base
   end
 
   def expires
-    ( latest_in_group - Time.now ).to_i
+    ( latest_in_group - Time.now ).ceil
   end
 
   def bssids

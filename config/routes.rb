@@ -4,6 +4,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :peers, :controller => :events
   map.resources :pieces
   map.resources :uploads
+  map.resources :error_reports
   
   # The priority is based upon order of creation: first created -> highest priority.
 

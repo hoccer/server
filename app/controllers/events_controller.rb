@@ -46,6 +46,15 @@ class EventsController < ApplicationController
     end
   end
   
+  def destroy
+    if @event = Event.find_by_uuid( params[:id] )
+      @event.update_attributes :state => "canceled"
+      render :nothing => true, :status => 410
+    else
+      render :nothing => true, :status => 400
+    end
+  end
+  
   private
   
     def resolve_resources info_hash

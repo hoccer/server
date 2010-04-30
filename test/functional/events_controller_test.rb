@@ -132,6 +132,28 @@ class EventsControllerTest < ActionController::TestCase
     assert_equal "no_seeders", json_response["state"]
   end
   
+  test "cancleing a distribute event" do
+    catch_event = create_event_with_times(Time.now, 7.seconds.from_now, Catch)
+    
+    assert_no_difference "Event.count" do
+      delete :destroy, :id => catch_event.uuid
+    end
+    
+    assert_equal "canceled", catch_event.reload.state
+    assert_equal :canceled, catch_event.info[:state]
+  end
+  
+  test "cancleing a pass event" do
+    pass_event = create_event_with_times(Time.now, 7.seconds.from_now, SweepOut)
+    
+    assert_no_difference "Event.count" do
+      delete :destroy, :id => pass_event.uuid
+    end
+    
+    assert_equal "canceled", pass_event.reload.state
+    assert_equal :canceled, pass_event.info[:state]
+  end
+  
   #############################
   #############################
   ##### W A R N I N G ! #######

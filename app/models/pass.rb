@@ -70,6 +70,15 @@ module Pass
         :status_code  => 200
       }
       
+    when :canceled
+      {
+        :state        => :canceled,
+        :message      => "Event was canceled",
+        :uploads      => [],
+        :expires      => 0,
+        :peers        => (event_group.events - [self]).size,
+        :status_code  => 410
+      }
     end
     
     if upload

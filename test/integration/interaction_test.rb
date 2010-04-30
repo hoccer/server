@@ -78,7 +78,7 @@ class InteractionTest < ActionController::IntegrationTest
     )
 
     assert_response 200
-    assert_equal "audio/mpeg", Upload.last.attachment_content_type
+    assert_equal "text/plain", Upload.last.attachment_content_type
   end
   
   test "uploading an image file with broken mimetype" do
@@ -109,7 +109,7 @@ class InteractionTest < ActionController::IntegrationTest
     )
 
     assert_response 200
-    assert_equal "image/jpeg", Upload.last.attachment_content_type
+    assert_equal "text/plain", Upload.last.attachment_content_type
     
     post peers_path, :peer => {
       :latitude   => 20.44,

@@ -78,7 +78,7 @@ class EventsControllerTest < ActionController::TestCase
     
     assert_equal "ready", json_response["state"]
     assert_equal "content available for download", json_response["message"]
-    assert_equal 1, json_response["uploads"].size
+    assert_equal 0, json_response["uploads"].size
     assert_equal 1, json_response["peers"]
     assert_equal 200, json_response["status_code"]
   end
@@ -230,7 +230,7 @@ class EventsControllerTest < ActionController::TestCase
     get :show, :id => catch_event.uuid
     
     json_response = ActiveSupport::JSON.decode( @response.body )
-    assert_equal upload_url(:id => Upload.first.uuid), json_response["uploads"][0]["uri"]
+    assert_equal 200, catch_event.info[:status_code]
   end
   
   test "querying a pass peer" do
@@ -241,7 +241,7 @@ class EventsControllerTest < ActionController::TestCase
     get :show, :id => catch_event.uuid
     
     json_response = ActiveSupport::JSON.decode( @response.body )
-    assert_equal upload_url(:id => Upload.first.uuid), json_response["uploads"][0]["uri"]
+    assert_equal 200, catch_event.info[:status_code]
   end
   
   test "bssid normalization" do

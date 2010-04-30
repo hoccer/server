@@ -45,7 +45,7 @@ class Event < ActiveRecord::Base
 
   def self.extract_uploads events
     events_with_upload = events.select do |event|
-      event.upload && event.upload.uuid
+      event.upload && event.upload.uuid && !event.upload.attachment_file_name.nil?
     end
     
     events_with_upload.map do |event|

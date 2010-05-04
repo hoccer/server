@@ -20,6 +20,14 @@ module Pass
     event_group.events.with_type( seeder ).count
   end
   
+  def expiration_time
+    Event.first(
+      :select => "ending_at, created_at, event_group_id",
+      :conditions => {:event_group_id => event_group_id},
+      :order => "created_at ASC"
+    ).ending_at
+  end
+  
   def info_hash
     result = case current_state
     when :collision

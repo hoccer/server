@@ -73,20 +73,21 @@ class Event < ActiveRecord::Base
 
   # Instance Methods
 
-  def latest_in_group
-    Event.first(
-      :select => "ending_at, event_group_id",
-      :conditions => {:event_group_id => event_group_id},
-      :order => "ending_at DESC"
-    ).ending_at
-  end
+  # TODO FIXME CONSOLIDATE
+  # def expiration_time
+  #   Event.first(
+  #     :select => "ending_at, event_group_id",
+  #     :conditions => {:event_group_id => event_group_id},
+  #     :order => "ending_at DESC"
+  #   ).ending_at
+  # end
 
   def expired?
-    latest_in_group < Time.now
+    expiration_time < Time.now
   end
 
   def expires
-    ( latest_in_group - Time.now ).ceil
+    ( expiration_time - Time.now ).ceil
   end
 
   def bssids

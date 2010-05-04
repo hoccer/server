@@ -102,14 +102,6 @@ class Event < ActiveRecord::Base
     api_version == 1
   end
   
-  def accuracy
-    if location_accuracy && (1200.0 < location_accuracy)
-      location_accuracy
-    else
-      1200.0
-    end
-  end
-  
   def nearby_events custom_options = {}
     options = {
       :starting_at  => starting_at,
@@ -118,7 +110,7 @@ class Event < ActiveRecord::Base
       :latitude     => latitude,
       :bssids       => bssids,
       :types        => linkable_type,
-      :accuracy     => accuracy
+      :accuracy     => location_accuracy
     }
     
     options.merge! custom_options

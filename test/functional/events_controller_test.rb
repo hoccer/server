@@ -37,6 +37,21 @@ class EventsControllerTest < ActionController::TestCase
     assert_redirected_to  event_path(:id => Event.last.uuid)
   end
   
+  test "lifetime of drop events" do
+    assert_difference "Drop.count", +1 do
+      post :create, :event => {
+        :type               => "drop",
+        :latitude           => 52.0,
+        :longitude          => 13.0,
+        :location_accuracy  => 100.0,
+        :lifetime           => 23.seconds,
+        :bssids             => ["ffff", "cccc"],
+      }
+    end
+    
+    assert_equal 23, Event.last.ending_at - Event.last.starting_at
+  end
+  
   test "info response for lonesome drop event" do
     create_event_with_locations( 32.1, 10.5, [{:bssid => "bbbb", :signal => 0.7}], Drop)
     

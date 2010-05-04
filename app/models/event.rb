@@ -192,9 +192,15 @@ class Event < ActiveRecord::Base
       self.api_version ||= 2
     end
 
+    # TODO Revisit for cleaner prettier implementation -> lifetime etc
     def verify_lifetime
       self.starting_at ||= Time.now
-      self.ending_at   ||= 7.seconds.from_now
+      
+      if respond_to?(:lifetime) && lifetime
+        self.ending_at = starting_at + lifetime
+      else
+        self.ending_at ||= 7.seconds.from_now
+      end
     end
 
     def associate_with_event_group
@@ -211,7 +217,9 @@ end
 
 class Drop < Event
 
-  after_create :initialize_upload
+  after_create    :initialize_upload
+  
+  attr_accessor   :lifetime
 
   def linkable_type
     "Pick"

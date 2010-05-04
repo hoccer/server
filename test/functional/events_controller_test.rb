@@ -189,6 +189,10 @@ class EventsControllerTest < ActionController::TestCase
     json_response = ActiveSupport::JSON.decode( @response.body )
     assert_equal json_response["peer_uri"], event_url(Event.last.uuid)
     assert_equal json_response["upload_uri"], upload_url(Upload.last.uuid)
+    
+    expire EventGroup.last
+    assert_equal 1, (linked_events = Event.last.event_group.events.with_type( "SweepOut" )).size
+    assert_not_nil linked_events.first.try(:upload)
   end
   
   test "peers do not receive an upload url upon creation" do
@@ -230,6 +234,21 @@ class EventsControllerTest < ActionController::TestCase
     get :show, :id => catch_event.uuid
     
     json_response = ActiveSupport::JSON.decode( @response.body )
+    assert_equal 200, catch_event.info[:status_code]
+  end
+  
+  test "legacy clients have proper uploads in info hash" do
+    throw_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, Throw)
+    catch_event = create_event_with_times(7.seconds.ago, 1.seconds.ago, Catch)
+    
+    assert catch_event.expired?, "Event Group is not expired"
+    catch_event.update_attribute(:api_version, 1)
+    
+    get :show, :id => catch_event.uuid
+    
+    json_response = ActiveSupport::JSON.decode( @response.body )
+    
+    assert_equal throw_event.upload.uuid, catch_event.info[:resources][0]
     assert_equal 200, catch_event.info[:status_code]
   end
   

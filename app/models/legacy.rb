@@ -36,7 +36,7 @@ module Legacy
         :status_code => 500
       }
     when :ready
-      linked_events = nearby_events
+      linked_events = event_group.events.with_type( seeder )
       upload        = linked_events.first.try(:upload)
       
       {

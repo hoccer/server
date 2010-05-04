@@ -331,14 +331,21 @@ class EventTest < ActiveSupport::TestCase
   end
   
   test "first event in distribute sets lifetime" do
-    catch_event = create_event_with_locations(44.1, 44.5, [], Catch)
-    throw_event = create_event_with_locations(44.1, 44.5, [], Throw)
+    catch_event = create_event_with_times( Time.now, (Time.now + 11.seconds), Catch)
+    throw_event = create_event_with_times( Time.now, (Time.now + 23.seconds), Throw)
     
-    assert_equal catch_event.ending_at, catch_event.latest_in_group
+    assert_equal catch_event.ending_at, throw_event.expiration_time
+  end
+  
+  test "first event in pass sets lifetime" do
+    sweep_in_event  = create_event_with_times( Time.now, (Time.now + 11.seconds), SweepIn)
+    sweep_out_event = create_event_with_times( Time.now, (Time.now + 23.seconds), SweepOut)
+    
+    assert_equal sweep_in_event.ending_at, sweep_out_event.expiration_time
   end
   
   test "expired?" do
-    event = create_event_with_times( 14.seconds.ago, 7.seconds.ago )
+    event = create_event_with_times( 14.seconds.ago, 7.seconds.ago, Throw )
     assert event.expired?, "Event should be expired"
   end
   

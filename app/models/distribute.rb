@@ -20,7 +20,7 @@ module Distribute
     event_group.events.with_type( seeder ).count
   end
   
-  def latest_in_group
+  def expiration_time
     Event.first(
       :select => "ending_at, created_at, event_group_id",
       :conditions => {:event_group_id => event_group_id},

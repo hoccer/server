@@ -167,7 +167,7 @@ class Event < ActiveRecord::Base
   end
   
   def info
-    extend Legacy if legacy?
+    extend Hoccer::Legacy if legacy?
     info_hash
   end
   
@@ -216,58 +216,29 @@ class Event < ActiveRecord::Base
 end
 
 class Drop < Event
+  include Hoccer::Cache
 
   after_create    :initialize_upload
   
   attr_accessor   :lifetime
 
   def linkable_type
-    "Pick"
-  end
-
-  def info_hash
-    {
-      :state        => "ready",
-      :message      => "like state but more verbose",
-      :expires      => (Time.now - created_at),
-      :upload_uri   => upload.uuid,
-      :peers        => nearby_events.size,
-      :status_code  => 200
-    }
+    peer
   end
 
 end
 
 class Pick < Event
-
+  include Hoccer::Cache
+  
   def linkable_type
-    "Drop"
-  end
-
-  def info_hash
-    linked_events = nearby_events
-
-    if linked_events.empty?
-      {
-        :state        => "no_content",
-        :message      => "Nothing to pick up from this location",
-        :status_code  => 424
-      }
-    else
-      {
-        :state        => "ready",
-        :message      => "content available for download",
-        :uploads      => Event.extract_uploads( linked_events ),
-        :peers        => linked_events.size,
-        :status_code  => 200
-      }
-    end
+    seeder
   end
 
 end
 
 class Throw < Event
-  include Distribute
+  include Hoccer::Distribute
   
   after_create :initialize_upload, :associate_with_event_group
 
@@ -278,7 +249,7 @@ class Throw < Event
 end
 
 class Catch < Event
-  include Distribute
+  include Hoccer::Distribute
 
   after_create :associate_with_event_group
 
@@ -289,7 +260,7 @@ class Catch < Event
 end
 
 class SweepOut < Event
-  include Pass
+  include Hoccer::Pass
   
   def linkable_type
     peer
@@ -299,7 +270,7 @@ class SweepOut < Event
 end
 
 class SweepIn < Event
-  include Pass
+  include Hoccer::Pass
   
   def linkable_type
     seeder

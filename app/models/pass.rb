@@ -74,6 +74,7 @@ module Pass
         :state        => :ready,
         :message      => "content available for download",
         :uploads      => Event.extract_uploads(event_group.events),
+        :expires      => 0,
         :peers        => (event_group.events - [self]).size,
         :status_code  => 200
       }

@@ -270,19 +270,21 @@ end
 class SweepOut < Event
   include Hoccer::Pass
   
+  after_create :initialize_upload, :associate_with_event_group
+  
   def linkable_type
     peer
   end
   
-  after_create :initialize_upload, :associate_with_event_group
 end
 
 class SweepIn < Event
   include Hoccer::Pass
   
+  after_create :associate_with_event_group
+  
   def linkable_type
     seeder
   end
   
-  after_create :associate_with_event_group
 end

@@ -43,6 +43,8 @@ class EventsController < ApplicationController
       end
       
       event_info ||= resolve_resources(@event.info)
+      event_info.merge! :event_uri => event_url(@event) unless @event.legacy?
+      
       render :json => event_info.to_json, :status => event_info[:status_code]
     else
       render :nothing => true, :status => 404

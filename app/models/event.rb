@@ -197,7 +197,7 @@ class Event < ActiveRecord::Base
       self.starting_at ||= Time.now
       
       if respond_to?(:lifetime) && lifetime
-        self.ending_at = starting_at + lifetime
+        self.ending_at = starting_at + lifetime.to_i
       else
         self.ending_at ||= 7.seconds.from_now
       end

@@ -98,6 +98,14 @@ class Event < ActiveRecord::Base
     nil
   end
   
+  def seeder?
+    seeder == type
+  end
+  
+  def peer?
+    peer == type
+  end
+  
   def legacy?
     api_version == 1
   end

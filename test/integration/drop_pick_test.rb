@@ -3,6 +3,27 @@ require 'test_helper'
 class DropPickTest < ActionController::IntegrationTest
   fixtures :all
   
+  test "lonesome pick event" do
+    post events_path, :event => {
+      :type               => "pick",
+      :latitude           => 52.0,
+      :longitude          => 13.0,
+      :location_accuracy  => 100.0,
+      :bssids             => ["ffff", "cccc"]
+    }
+    
+    assert_response 303
+    follow_redirect!
+    
+    assert_response 424
+    
+    json_response = ActiveSupport::JSON.decode(@response.body)
+    
+    assert_equal json_response.keys.sort, %w(event_uri message state status_code)
+  end
+  
+  
+  
   test "create drop event and verify response" do
     
     # 1. Create Drop Event
@@ -32,7 +53,7 @@ class DropPickTest < ActionController::IntegrationTest
     put(
       upload_path(:id => Upload.last.uuid),
       :upload => { :attachment => test_upload },
-      :html => { :multipart => true }
+      :html   => { :multipart => true }
     )
     
     drop_event.reload

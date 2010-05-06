@@ -17,12 +17,24 @@ module Hoccer
       false
     end
     
+    def expired?
+      true
+    end
+    
     def number_of_peers
-      event_group.events.with_type( peer ).count
+      if peer?
+        nearby_events.count + 1
+      else
+        nearby_events.count
+      end
     end
   
     def number_of_seeders
-      event_group.events.with_type( seeder ).count
+      if seeder?
+        nearby_events.count + 1
+      else
+        nearby_events.count
+      end
     end
     
     def expiration_time
@@ -35,7 +47,6 @@ module Hoccer
     
     def info_hash
       linked_events = nearby_events
-      
       
       result = case current_state
         
@@ -68,11 +79,9 @@ module Hoccer
         
       when :no_seeders
         {
-          :state        => "no_seeders",
-          :message      => "waiting for other participants",
-          :expires      => 0,
-          :peers        => (linked_events - [self]).size,
-          :status_code  => 410
+          :state        => "empty_cache",
+          :message      => "Nothing to pick up from this location",
+          :status_code  => 424
         }
         
       when :ready

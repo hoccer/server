@@ -13,10 +13,13 @@ class EventsController < ApplicationController
     
     params[:event].merge! :user_agent => request.user_agent
     
-    event_type  = params[:event].delete(:type)
-    base        = Event.const_get(event_type.camelize)
-    
-    @event = base.new params[:event]
+    begin
+      event_type  = params[:event].delete(:type)
+      base        = Event.const_get(event_type.camelize)
+      @event      = base.new params[:event]
+    rescue
+      render :text => "Bad Event Type", :status => 400
+    end
 
     if @event.save
       if legacy_client # TODO remove Legacy

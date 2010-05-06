@@ -22,6 +22,44 @@ class DropPickTest < ActionController::IntegrationTest
     assert_equal json_response.keys.sort, %w(event_uri message state status_code)
   end
   
+  test "pick event with drop event nearby" do
+    post events_path, :event => {
+      :type               => "drop",
+      :latitude           => 52.0,
+      :longitude          => 13.0,
+      :location_accuracy  => 100.0,
+      :lifetime           => 30.minutes,
+      :bssids             => ["ffff", "cccc"]
+    }
+    
+    follow_redirect!
+    
+    # Upload file to upload_uri
+    
+    test_upload = fixture_file_upload("test_upload.jpeg", "image/jpeg")
+    
+    put(
+      upload_path(:id => Upload.last.uuid),
+      :upload => { :attachment => test_upload },
+      :html   => { :multipart => true }
+    )
+    
+    post events_path, :event => {
+      :type               => "pick",
+      :latitude           => 52.0,
+      :longitude          => 13.0,
+      :location_accuracy  => 100.0,
+      :bssids             => ["ffff", "cccc"]
+    }
+    
+    follow_redirect!
+    
+    puts @response.body
+    json_response = ActiveSupport::JSON.decode(@response.body)
+    
+    
+  end
+  
   
   
   test "create drop event and verify response" do

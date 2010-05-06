@@ -30,10 +30,14 @@ module Hoccer
     end
   
     def number_of_seeders
+      seeders = nearby_events.select do |e|
+        e.upload && e.upload.attachment_file_name
+      end
+      
       if seeder?
-        nearby_events.count + 1
+        seeders.length + 1
       else
-        nearby_events.count
+        seeders.length
       end
     end
     
@@ -85,12 +89,13 @@ module Hoccer
         }
         
       when :ready
+        
         {
           :state        => "ready",
-          :message      => "content ready for downloading",
+          :message      => "Content ready for downloading",
           :expires      => 0,
           :peers        => (linked_events - [self]).size,
-          :uploads      => Event.extract_uploads(event_group.events),
+          :uploads      => Event.extract_uploads(linked_events),
           :status_code  => 200
         }
         

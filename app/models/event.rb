@@ -52,7 +52,9 @@ class Event < ActiveRecord::Base
       {
         :uri          => event.upload.uuid,
         :content_type => event.upload.attachment.content_type,
-        :filename     => event.upload.attachment.original_filename
+        :filename     => event.upload.attachment.original_filename,
+        :latitude     => event.latitude,
+        :longitude    => event.longitude
       }
     end
   end

@@ -74,7 +74,8 @@ class DropPickTest < ActionController::IntegrationTest
     
     json_response = ActiveSupport::JSON.decode(@response.body)
     
-    assert_equal json_response.keys.sort, %w(event_uri message state status_code)
+    expected_keys = %w(event_uri message state status_code expires).sort
+    assert_equal expected_keys, json_response.keys.sort
   end
   
   test "pick event with drop event nearby but upload not finished" do

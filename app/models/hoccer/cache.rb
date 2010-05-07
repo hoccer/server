@@ -49,30 +49,27 @@ module Hoccer
       ).ending_at
     end
     
+    def current_state
+      if seeder? && upload.attachment_file_name.nil?
+        :waiting
+      elsif seeder? && !upload.attachment_file_name.nil?
+        :ready
+      elsif peer? && number_of_seeders == 0
+        :no_seeders
+      elsif peer? && 1 <= number_of_seeders
+        :ready
+      else
+        :error
+      end
+      
+    end
+    
     def info_hash
       linked_events = nearby_events
       
       result = case current_state
         
-      # when :waiting
-      #   {
-      #     :state        => "waiting",
-      #     :message      => "waiting for other participants",
-      #     :expires      => expires,
-      #     :peers        => (linked_events - [self]).size,
-      #     :status_code  => 202
-      #   }
-      #   
-      # when :collision
-      #   {
-      #     :state        => "collision",
-      #     :message      => "waiting for other participants",
-      #     :expires      => 0,
-      #     :peers        => (linked_events - [self]).size,
-      #     :status_code  => 409
-      #   }
-      #   
-      when :no_peers
+      when :waiting
         {
           :state        => "waiting",
           :message      => "waiting for other participants",
@@ -109,6 +106,8 @@ module Hoccer
           :status_code  => 410
         }
         
+      when :error
+        {:state => :error}
       end
       
       if upload

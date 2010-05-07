@@ -15,7 +15,12 @@ class DropPickTest < ActionController::IntegrationTest
     
     follow_redirect!
     
-    puts @response.body.inspect
+    assert_response 202
+    
+    json_response = ActiveSupport::JSON.decode(@response.body)
+    
+    assert_equal "waiting", json_response["state"]
+    assert (29.minutes..30.minutes).include? json_response["expires"]
   end
   
   test "lonesome pick event" do

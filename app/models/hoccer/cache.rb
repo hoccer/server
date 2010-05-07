@@ -87,7 +87,7 @@ module Hoccer
         {
           :state        => "ready",
           :message      => "Content ready for downloading",
-          :expires      => (ending_at - Time.now).ceil,
+          :expires      => (seeder? ? (ending_at - Time.now).ceil : 0),
           :peers        => (linked_events - [self]).size,
           :uploads      => Event.extract_uploads(linked_events),
           :status_code  => 200

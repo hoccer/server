@@ -9,10 +9,6 @@ module Hoccer
       "Drop"
     end
     
-    def info_hash
-      {}
-    end
-    
     def collisions?
       false
     end
@@ -81,6 +77,7 @@ module Hoccer
       when :no_seeders
         {
           :state        => "empty_cache",
+          :expires      => 0,
           :message      => "Nothing to pick up from this location",
           :status_code  => 424
         }

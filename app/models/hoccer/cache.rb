@@ -54,31 +54,31 @@ module Hoccer
       
       result = case current_state
         
-      when :waiting
+      # when :waiting
+      #   {
+      #     :state        => "waiting",
+      #     :message      => "waiting for other participants",
+      #     :expires      => expires,
+      #     :peers        => (linked_events - [self]).size,
+      #     :status_code  => 202
+      #   }
+      #   
+      # when :collision
+      #   {
+      #     :state        => "collision",
+      #     :message      => "waiting for other participants",
+      #     :expires      => 0,
+      #     :peers        => (linked_events - [self]).size,
+      #     :status_code  => 409
+      #   }
+      #   
+      when :no_peers
         {
           :state        => "waiting",
           :message      => "waiting for other participants",
-          :expires      => expires,
+          :expires      => (ending_at - Time.now).ceil,
           :peers        => (linked_events - [self]).size,
           :status_code  => 202
-        }
-        
-      when :collision
-        {
-          :state        => "collision",
-          :message      => "waiting for other participants",
-          :expires      => 0,
-          :peers        => (linked_events - [self]).size,
-          :status_code  => 409
-        }
-        
-      when :no_peers
-        {
-          :state        => "no_peers",
-          :message      => "waiting for other participants",
-          :expires      => 0,
-          :peers        => (linked_events - [self]).size,
-          :status_code  => 410
         }
         
       when :no_seeders

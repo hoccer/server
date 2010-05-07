@@ -21,6 +21,12 @@ class DropPickTest < ActionController::IntegrationTest
     
     assert_equal "waiting", json_response["state"]
     assert (29.minutes..30.minutes).include? json_response["expires"]
+    
+    expected_keys = %w(
+      event_uri state message expires upload_uri peers status_code
+    ).sort
+    
+    assert_equal expected_keys, json_response.keys.sort
   end
   
   test "drop event state changes from 202 to 200 after upload" do
@@ -128,7 +134,15 @@ class DropPickTest < ActionController::IntegrationTest
     
     follow_redirect!
 
+    assert_response 200
+    
     json_response = ActiveSupport::JSON.decode(@response.body)
+    
+    expected_keys = %w[
+      expires status_code peers uploads message event_uri state
+    ].sort
+    
+    assert_equal expected_keys, json_response.keys.sort
   end
   
   test "create drop event and verify response" do

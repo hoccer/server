@@ -40,15 +40,16 @@ namespace :hoccer do
     @statistics[:uploads][:after]       = Upload.count
     
     if File.exist?( logfile )
-    File.open(logfile, "a+") do |file|
-      file.puts "=" * 79
-      file.puts timestamp
-      file.puts "Events before:       #{@statistics[:events][:before]}"
-      file.puts "Events after:        #{@statistics[:events][:after]}"
-      file.puts "EventGroups before:  #{@statistics[:event_groups][:before]}"
-      file.puts "EventGroups after:   #{@statistics[:event_groups][:after]}"
-      file.puts "Uploads before:      #{@statistics[:uploads][:before]}"
-      file.puts "Uploads after:       #{@statistics[:uploads][:after]}"
+      File.open(logfile, "a+") do |file|
+        file.puts "=" * 79
+        file.puts timestamp
+        file.puts "Events before:       #{@statistics[:events][:before]}"
+        file.puts "Events after:        #{@statistics[:events][:after]}"
+        file.puts "EventGroups before:  #{@statistics[:event_groups][:before]}"
+        file.puts "EventGroups after:   #{@statistics[:event_groups][:after]}"
+        file.puts "Uploads before:      #{@statistics[:uploads][:before]}"
+        file.puts "Uploads after:       #{@statistics[:uploads][:after]}"
+      end
     end
   end
   

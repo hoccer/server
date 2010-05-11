@@ -1,5 +1,7 @@
 class ErrorReportsController < ApplicationController
   
+  skip_before_filter :verify_authenticity_token
+  
   def create
     error_report = ErrorReport.new params[:error_report]
     

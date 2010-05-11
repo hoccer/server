@@ -11,7 +11,7 @@ class Event < ActiveRecord::Base
 
   belongs_to              :event_group
   has_many                :access_point_sightings
-  has_one                 :upload
+  has_one                 :upload, :dependent => :destroy
 
   accepts_nested_attributes_for :access_point_sightings
   

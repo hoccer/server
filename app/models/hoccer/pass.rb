@@ -34,7 +34,7 @@ module Hoccer
       when :collision
         {
           :state        => :collision,
-          :message      => "Your Hoc was intercepted. Try again.", # David said so
+          :message      => "Transfer was intercepted by a third person. Try again.",
           :uploads      => [],
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,
@@ -44,7 +44,7 @@ module Hoccer
       when :waiting
         {
           :state        => :waiting,
-          :message      => "waiting for counterpart",
+          :message      => "linking to nearby counterpart",
           :expires      => expires,
           :peers        => (event_group.events - [self]).size,
           :status_code  => 202
@@ -53,7 +53,7 @@ module Hoccer
       when :no_seeders
         {
           :state        => :no_seeders,
-          :message      => "Data must be dragged from an nearby screen to yours.",
+          :message      => "Data must be dragged from an nearby screen to yours. Try again.",
           :uploads      => [],
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,
@@ -63,7 +63,7 @@ module Hoccer
       when :no_peers
         {
           :state        => :no_peers,
-          :message      => "Your data must be dragged to an nearby screen.",
+          :message      => "Your data must be dragged to an nearby screen. Try again.",
           :uploads      => [],
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,

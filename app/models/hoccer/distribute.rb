@@ -35,7 +35,7 @@ module Hoccer
       when :waiting
         {
           :state        => "waiting",
-          :message      => "waiting for other participants",
+          :message      => "linking to nearby participants",
           :expires      => expires,
           :peers        => (event_group.events - [self]).size,
           :status_code  => 202
@@ -44,7 +44,7 @@ module Hoccer
       when :collision
         {
           :state        => "collision",
-          :message      => "waiting for other participants",
+          :message      => "Transfer was intercepted by a second thrower. Try again.",
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,
           :status_code  => 409
@@ -53,7 +53,7 @@ module Hoccer
       when :no_peers
         {
           :state        => "no_peers",
-          :message      => "waiting for other participants",
+          :message      => "No one nearby catched your content. Try again.",
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,
           :status_code  => 410
@@ -62,7 +62,7 @@ module Hoccer
       when :no_seeders
         {
           :state        => "no_seeders",
-          :message      => "waiting for other participants",
+          :message      => "For catching, a nearby person needs to throw data to you.",
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,
           :status_code  => 410
@@ -71,7 +71,7 @@ module Hoccer
       when :ready
         {
           :state        => "ready",
-          :message      => "content ready for downloading",
+          :message      => "ready for download",
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,
           :uploads      => Event.extract_uploads(event_group.events),
@@ -81,7 +81,7 @@ module Hoccer
       when :canceled
         {
           :state        => :canceled,
-          :message      => "Event was canceled",
+          :message      => "Hoc was canceled",
           :uploads      => [],
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,

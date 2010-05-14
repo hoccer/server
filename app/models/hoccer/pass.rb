@@ -44,7 +44,7 @@ module Hoccer
       when :waiting
         {
           :state        => :waiting,
-          :message      => "linking to nearby counterpart",
+          :message      => "linking to nearby screen",
           :expires      => expires,
           :peers        => (event_group.events - [self]).size,
           :status_code  => 202

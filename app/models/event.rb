@@ -178,6 +178,15 @@ class Event < ActiveRecord::Base
   
   def info
     extend Hoccer::Legacy if legacy?
+
+    if event_group.nil? || event_group.events.empty?
+      linked_events = nearby_events.select{|x| x.event_group}
+      unless linked_events.empty?
+        event_group.destroy if event_group
+        linked_events.first.event_group.events << self
+      end
+    end
+
     info_hash
   end
   

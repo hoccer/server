@@ -59,6 +59,10 @@ module Hoccer
       end
       
     end
+
+    def info
+      info_hash
+    end
     
     def info_hash
       linked_events = nearby_events

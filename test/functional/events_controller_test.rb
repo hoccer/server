@@ -2,6 +2,39 @@ require 'test_helper'
 
 class EventsControllerTest < ActionController::TestCase
 
+
+  test "lonely catch event joins lonely throw event while polling" do
+
+    throw_event = create_event_with_times(Time.now, 7.seconds.from_now, Throw)
+    catch_event = create_event_with_times(Time.now, 7.seconds.from_now, Catch)
+ 
+    catch_event.update_attributes :event_group_id => nil
+    assert_nil catch_event.reload.event_group
+
+    get :show, :id => catch_event.uuid
+    assert_response :success
+
+    assert_not_nil catch_event.reload.event_group
+    assert_equal 2, catch_event.event_group.events.count
+
+  end
+  
+  test "more complex post creation eventgroup merge" do
+    event_1 = create_event_with_times(Time.now, 7.seconds.from_now, Throw)
+    event_2 = create_event_with_times(Time.now, 7.seconds.from_now, Catch)
+    event_3 = create_event_with_times(Time.now, 7.seconds.from_now, Catch)
+    event_4 = create_event_with_times(Time.now, 7.seconds.from_now, Throw)
+
+    event_1.update_attributes :event_group_id => 1
+    event_3.update_attributes :event_group_id => 2
+
+    get :show, :id => event_1.uuid
+    assert_response 409
+
+    get :show, :id => event_3.uuid
+    assert_response 409
+  end
+
   test "create drop event" do
     
     assert_difference "Drop.count", +1 do
@@ -109,7 +142,7 @@ class EventsControllerTest < ActionController::TestCase
     
     assert_response 202
     assert_equal "waiting", json_response["state"]
-    assert_equal "waiting for other participants", json_response["message"]
+    assert_equal "linking to nearby participants", json_response["message"]
     assert 0 < json_response["expires"], "Event already expired"
     assert_not_nil json_response["upload_uri"]
     assert_equal 0, json_response["peers"]

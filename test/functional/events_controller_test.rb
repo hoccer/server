@@ -35,6 +35,24 @@ class EventsControllerTest < ActionController::TestCase
     assert_response 409
   end
 
+  test "two sweep out events with different event_groups should be merged" do
+    event_group_1 = EventGroup.create
+    event_group_2 = EventGroup.create
+    event_1 = create_event_with_times(Time.now, 7.seconds.from_now, SweepOut)
+    event_2 = create_event_with_times(Time.now, 7.seconds.from_now, SweepOut)
+    event_1.update_attributes(:event_group_id => event_group_1.id)
+    event_2.update_attributes(:event_group_id => event_group_2.id)
+
+    assert event_1.event_group != event_2.event_group
+    
+    get :show, :id => event_1.uuid
+
+    get :show, :id => event_2.uuid
+
+    assert event_1.reload.event_group_id == event_2.reload.event_group_id
+
+  end
+
   test "create drop event" do
     
     assert_difference "Drop.count", +1 do

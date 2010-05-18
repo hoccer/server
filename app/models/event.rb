@@ -188,11 +188,14 @@ class Event < ActiveRecord::Base
   def info
     extend Hoccer::Legacy if legacy?
 
-    if event_group.nil? || event_group.events.empty?
-      linked_events = nearby_events.select{|x| x.event_group}
+    if event_group.nil? || (event_group.events - [self]).empty?
+      linked_events = nearby_events(:types => [seeder, peer]).select do |e|
+        e.event_group && !(e.event_group.events - [self]).empty?
+      end
       unless linked_events.empty?
-        event_group.destroy if event_group
+        old_event_group_id = event_group.try(:id)
         linked_events.first.event_group.events << self
+        EventGroup.find(old_event_group_id).destroy if old_event_group_id
       end
     end
 

@@ -161,7 +161,7 @@ class Event < ActiveRecord::Base
   def current_state
     return state.to_sym if state != "waiting"
     
-    if collisions?
+    new_state = if collisions?
       :collision
     elsif !expired?
       :waiting
@@ -174,6 +174,15 @@ class Event < ActiveRecord::Base
     else
       :error
     end
+
+    if new_state != state
+      Event.update_all(
+        "state = '#{new_state.to_s}'",
+        ["event_group_id = ?", event_group_id]
+      )
+    end
+
+    new_state
   end
   
   def info

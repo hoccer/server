@@ -49,14 +49,6 @@ module Hoccer
         }
       end
       
-      if result[:state].to_s != state
-        
-        Event.update_all(
-          "state = '#{result[:state].to_s}'",
-          ["event_group_id = ?", event_group_id]
-        )
-      end
-      
       result
     end
       

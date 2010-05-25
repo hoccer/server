@@ -161,7 +161,7 @@ class Event < ActiveRecord::Base
   def current_state
     return state.to_sym if state != "waiting"
     
-    if collisions?
+    new_state = if collisions?
       :collision
     elsif !expired?
       :waiting
@@ -174,10 +174,31 @@ class Event < ActiveRecord::Base
     else
       :error
     end
+
+    if new_state != state
+      Event.update_all(
+        "state = '#{new_state.to_s}'",
+        ["event_group_id = ?", event_group_id]
+      )
+    end
+
+    new_state
   end
   
   def info
     extend Hoccer::Legacy if legacy?
+
+    if event_group.nil? || (event_group.events - [self]).empty?
+      linked_events = nearby_events(:types => [seeder, peer]).select do |e|
+        e.event_group && !(e.event_group.events - [self]).empty?
+      end
+      unless linked_events.empty?
+        old_event_group_id = event_group.try(:id)
+        linked_events.first.event_group.events << self
+        EventGroup.find(old_event_group_id).destroy if old_event_group_id
+      end
+    end
+
     info_hash
   end
   

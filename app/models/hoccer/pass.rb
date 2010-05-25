@@ -34,7 +34,7 @@ module Hoccer
       when :collision
         {
           :state        => :collision,
-          :message      => "Your hoc was intercepted. Try again.", # David said so
+          :message      => "Transfer was intercepted by a third person. Try again.",
           :uploads      => [],
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,
@@ -44,7 +44,7 @@ module Hoccer
       when :waiting
         {
           :state        => :waiting,
-          :message      => "waiting for other participants",
+          :message      => "linking to nearby screen",
           :expires      => expires,
           :peers        => (event_group.events - [self]).size,
           :status_code  => 202
@@ -53,7 +53,7 @@ module Hoccer
       when :no_seeders
         {
           :state        => :no_seeders,
-          :message      => "Nothing was thrown to you.",
+          :message      => "Data must be dragged from an nearby screen to yours. Try again.",
           :uploads      => [],
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,
@@ -63,7 +63,7 @@ module Hoccer
       when :no_peers
         {
           :state        => :no_peers,
-          :message      => "Nobody caught your content.",
+          :message      => "Your data must be dragged to an nearby screen. Try again.",
           :uploads      => [],
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,
@@ -73,7 +73,7 @@ module Hoccer
       when :ready
         {
           :state        => :ready,
-          :message      => "content available for download",
+          :message      => "ready for download",
           :uploads      => Event.extract_uploads(event_group.events),
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,
@@ -83,7 +83,7 @@ module Hoccer
       when :canceled
         {
           :state        => :canceled,
-          :message      => "Event was canceled",
+          :message      => "Hoc was canceled.",
           :uploads      => [],
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,

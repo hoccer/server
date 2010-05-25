@@ -159,7 +159,7 @@ class Event < ActiveRecord::Base
   end
   
   def current_state
-    return state.to_sym if state != "waiting"
+    return state.to_sym unless %w(waiting, error).include?( state )
     
     new_state = if collisions?
       :collision

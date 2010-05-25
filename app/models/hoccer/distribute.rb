@@ -22,11 +22,13 @@ module Hoccer
     end
     
     def expiration_time
-      Event.first(
+      reference = Event.first(
         :select => "ending_at, created_at, event_group_id",
         :conditions => {:event_group_id => event_group_id},
         :order => "created_at ASC"
-      ).ending_at
+      )
+
+      reference.nil? ? 0 : reference.ending_at
     end
     
     def info_hash
@@ -84,8 +86,18 @@ module Hoccer
           :message      => "Hoc was canceled",
           :uploads      => [],
           :expires      => 0,
-          :peers        => (event_group.events - [self]).size,
+          :peers        => 0,
           :status_code  => 410
+        }
+
+      when :error
+        {
+          :state        => :error,
+          :message      => "An error occurred",
+          :uploads      => [],
+          :expires      => 0,
+          :peers        => 0,
+          :status_code  => 400
         }
         
       end

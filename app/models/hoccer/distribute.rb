@@ -28,7 +28,7 @@ module Hoccer
         :order => "created_at ASC"
       )
 
-      reference.nil? Time.now : reference.ending_at
+      reference.nil? ? Time.now : reference.ending_at
     end
     
     def info_hash

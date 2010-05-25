@@ -4,15 +4,19 @@ class UploadsController < ApplicationController
 
   def update
     upload = Upload.find_by_uuid params[:id]
-    upload.update_attributes( params[:upload] )
-    
-    content_type = %x[file --mime-type -b #{upload.attachment.path}].chomp
-    
-    unless content_type.blank? || content_type == upload.attachment.content_type
-      upload.update_attributes :attachment_content_type => content_type
-    end
 
-    render :nothing => true, :status => 200
+    if upload && upload.update_attributes( params[:upload] )
+    
+      content_type = %x[file --mime-type -b #{upload.attachment.path}].chomp
+    
+      unless content_type.blank? || content_type == upload.attachment.content_type
+        upload.update_attributes :attachment_content_type => content_type
+      end
+
+      render :nothing => true, :status => 200
+    else
+      render :nothing => true, :status => 404
+    end
   end
 
   def show

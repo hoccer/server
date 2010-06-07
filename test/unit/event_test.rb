@@ -498,7 +498,7 @@ class EventTest < ActiveSupport::TestCase
     assert event.expired?
     assert_equal :waiting, event.reload.state.to_sym
     assert_equal :no_peers, event.current_state
-    assert_equal :waiting, event.reload.state.to_sym
+    assert_equal :no_peers, event.reload.state.to_sym
     event.info[:state]
     # State changed
     assert_equal :no_peers, event.reload.state.to_sym

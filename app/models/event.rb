@@ -236,13 +236,15 @@ class Event < ActiveRecord::Base
 
     def associate_with_event_group
       linked_events = nearby_events( :types => [seeder, peer] )
-
+      linked_events = linked_events.select(&:event_group)
+      
       if linked_events.empty?
         event_group = EventGroup.create
-        event_group.events << self
       else
-        linked_events.first.event_group.events << self
+        event_group = linked_events.first.event_group
       end
+
+      event_group.events << self
     end
 end
 

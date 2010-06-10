@@ -9,8 +9,16 @@ class EventsController < ApplicationController
 
   def create
     legacy_client = convert_legacy_params # TODO remove Legacy
-    convert_bssid_params
+
+    unless legacy_client
+      valid_columns = Event.column_names
+      valid_columns += ["bssids", "lifetime"]
+      params[:event].delete_if do |k,v|
+        not valid_columns.include?( k )
+      end
+    end
     
+    convert_bssid_params
     params[:event].merge! :user_agent => request.user_agent
     
     begin

@@ -73,7 +73,7 @@ module Hoccer
       when :ready
         {
           :state        => "ready",
-          :message      => "ready for transfer",
+          :message      => "transferring",
           :expires      => 0,
           :peers        => (event_group.events - [self]).size,
           :uploads      => Event.extract_uploads(event_group.events),

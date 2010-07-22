@@ -102,6 +102,40 @@ class EventsControllerTest < ActionController::TestCase
     
     assert_equal 23, Event.last.ending_at - Event.last.starting_at
   end
+
+  test "pairing with multiple partly shared bssids and different locations" do
+    post :create, :event => {
+        :type               => "catch",
+        :latitude           => 2.0,
+        :longitude          => 1.0,
+        :location_accuracy  => 100.0,
+        :starting_at        => Time.now,
+        :bssids             => ["aaa", "bbb", "ccc"]
+      }
+
+      post :create, :event => {
+        :type               => "throw",
+        :latitude           => 5.0,
+        :longitude          => 3.0,
+        :location_accuracy  => 100.0,
+        :starting_at        => Time.now,
+        :ending_at          => 7.seconds.from_now,
+        :bssids             => ["ddd", "bbb", "fff"]
+      }
+
+      post :create, :event => {
+        :type               => "catch",
+        :latitude           => 5.0,
+        :longitude          => 1.0,
+        :location_accuracy  => 100.0,
+        :starting_at        => Time.now,
+        :ending_at          => 7.seconds.from_now,
+        :bssids             => ["fff", "eee", "ggg"]
+      }
+
+      debugger
+      1+2
+  end
   
   # TODO review tests
   

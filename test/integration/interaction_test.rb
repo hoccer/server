@@ -1,6 +1,31 @@
 require 'test_helper'
 
 class InteractionTest < ActionController::IntegrationTest
+
+  test "aborted polling results in waiting state after expiring" do
+    post events_path, :event => {
+      :type               => "throw",
+      :latitude           => 52.0,
+      :longitude          => 13.0,
+      :location_accuracy  => 100.0,
+      :starting_at        => Time.now,
+      :ending_at          => 7.seconds.from_now,
+      :bssids             => ["ffff", "cccc"]
+    }
+
+    get event_path(:id => Event.last.uuid)
+    assert_response 202
+
+    sleep(1)
+
+    get event_path(:id => Event.last.uuid)
+    assert_response 202 
+
+    expire EventGroup.last
+    assert Event.last.expired?
+
+    assert_equal "waiting", Event.last.state
+  end
   
   test "pairing by bssids" do
     EventGroup.delete_all

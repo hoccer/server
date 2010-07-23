@@ -2,6 +2,62 @@ require 'test_helper'
 
 class InteractionTest < ActionController::IntegrationTest
 
+  test "deleting an event rejoining an event group afterwards" do
+    post events_path, :event => {
+      :type               => "throw",
+      :latitude           => 52.0,
+      :longitude          => 13.0,
+      :location_accuracy  => 100.0,
+      :starting_at        => Time.now,
+      :ending_at          => 7.seconds.from_now,
+      :bssids             => ["ffff", "cccc"]
+    }
+
+    throw_event = Event.last
+
+    post events_path, :event => {
+      :type               => "catch",
+      :latitude           => 52.0,
+      :longitude          => 13.0,
+      :location_accuracy  => 100.0,
+      :starting_at        => Time.now,
+      :ending_at          => 7.seconds.from_now,
+      :bssids             => ["ffff", "cccc"]
+    }
+
+    catch_event_a = Event.last
+
+    post events_path, :event => {
+      :type               => "catch",
+      :latitude           => 52.0,
+      :longitude          => 13.0,
+      :location_accuracy  => 100.0,
+      :starting_at        => Time.now,
+      :ending_at          => 7.seconds.from_now,
+      :bssids             => ["ffff", "cccc"]
+    }
+
+    catch_event_b = Event.last
+
+    delete event_path( :id => catch_event_a.uuid )
+
+    assert_nil    catch_event_a.reload.event_group
+    assert_equal  2, throw_event.event_group.events.count
+
+    post events_path, :event => {
+      :type               => "catch",
+      :latitude           => 52.0,
+      :longitude          => 13.0,
+      :location_accuracy  => 100.0,
+      :starting_at        => Time.now,
+      :ending_at          => 7.seconds.from_now,
+      :bssids             => ["ffff", "cccc"]
+    }
+
+    assert_equal 3, throw_event.event_group.events.count
+    assert_equal Event.last.event_group, throw_event.event_group
+  end
+
   test "aborted polling results in waiting state after expiring" do
     post events_path, :event => {
       :type               => "throw",

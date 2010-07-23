@@ -86,7 +86,7 @@ module Hoccer
           :message      => "Hoc was canceled.",
           :uploads      => [],
           :expires      => 0,
-          :peers        => (event_group.events - [self]).size,
+          :peers        => 0,
           :status_code  => 410
         }
       end

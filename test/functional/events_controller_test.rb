@@ -132,9 +132,6 @@ class EventsControllerTest < ActionController::TestCase
         :ending_at          => 7.seconds.from_now,
         :bssids             => ["fff", "eee", "ggg"]
       }
-
-      debugger
-      1+2
   end
   
   # TODO review tests
@@ -254,6 +251,7 @@ class EventsControllerTest < ActionController::TestCase
     
     assert_equal "canceled", pass_event.reload.state
     assert_equal :canceled, pass_event.info[:state]
+    assert_nil   pass_event.event_group
   end
   
   #############################

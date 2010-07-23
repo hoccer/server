@@ -103,7 +103,7 @@ module Hoccer
           :message      => "Event was canceled",
           :uploads      => [],
           :expires      => 0,
-          :peers        => (linked_events - [self]).size,
+          :peers        => 0,
           :status_code  => 410
         }
         

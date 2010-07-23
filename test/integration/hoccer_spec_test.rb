@@ -124,4 +124,81 @@ class HoccerSpecTest < ActionController::IntegrationTest
       assert_equal expected_keys.sort, response.keys.sort
     end
   end
+
+  test "no_peers state" do
+    post events_path, :event => {
+      :type               => Throw,
+      :latitude           => 52.0,
+      :longitude          => 13.0,
+      :location_accuracy  => 100.0,
+      :starting_at        => Time.now,
+      :ending_at          => 7.seconds.from_now,
+      :bssids             => ["ffff", "cccc"]
+    }
+
+    expire Event.last.event_group
+
+    get event_path( Event.last.uuid )
+    assert_response 410
+
+    response = ActiveSupport::JSON.decode( @response.body )
+    assert_equal "no_peers", response["state"]
+    expected_keys = %w(
+      event_uri state message expires upload_uri peers status_code
+    )
+
+    assert_equal expected_keys.sort, response.keys.sort
+  end
+
+  test "no_seeders state" do
+    post events_path, :event => {
+      :type               => Catch,
+      :latitude           => 52.0,
+      :longitude          => 13.0,
+      :location_accuracy  => 100.0,
+      :starting_at        => Time.now,
+      :ending_at          => 7.seconds.from_now,
+      :bssids             => ["ffff", "cccc"]
+    }
+
+    expire Event.last.event_group
+
+    get event_path( Event.last.uuid )
+    assert_response 410
+
+    response = ActiveSupport::JSON.decode( @response.body )
+    assert_equal "no_seeders", response["state"]
+    expected_keys = %w(
+      event_uri state message expires peers status_code
+    )
+
+    assert_equal expected_keys.sort, response.keys.sort
+  end
+
+  test "ready state" do
+    post events_path, :event => {
+      :type               => Catch,
+      :latitude           => 52.0,
+      :longitude          => 13.0,
+      :location_accuracy  => 100.0,
+      :starting_at        => Time.now,
+      :ending_at          => 7.seconds.from_now,
+      :bssids             => ["ffff", "cccc"]
+    }
+
+    post events_path, :event => {
+      :type               => Throw,
+      :latitude           => 52.0,
+      :longitude          => 13.0,
+      :location_accuracy  => 100.0,
+      :starting_at        => Time.now,
+      :ending_at          => 7.seconds.from_now,
+      :bssids             => ["ffff", "cccc"]
+    }
+
+    expire Event.last.event_group
+
+    get event_path( Event.last.uuid )
+    assert_response 200
+  end
 end

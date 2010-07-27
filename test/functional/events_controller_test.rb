@@ -3,11 +3,30 @@ require 'test_helper'
 class EventsControllerTest < ActionController::TestCase
 
 
+  test "pairing of 2 events without location data" do
+    post :create, :event => {
+      :type               => "throw",
+      :starting_at        => Time.now,
+      :ending_at          => 7.seconds.from_now,
+      :bssids             => ["ddd", "bbb", "fff"]
+    }
+
+    post :create, :event => {
+      :type               => "catch",
+      :starting_at        => Time.now,
+      :ending_at          => 7.seconds.from_now,
+      :bssids             => ["xxx", "bbb", "zzz"]
+    }
+
+    assert_equal 2, EventGroup.last.events.size
+    assert_equal ["Catch", "Throw"], EventGroup.last.events.map(&:type).sort
+  end
+
   test "lonely catch event joins lonely throw event while polling" do
 
     throw_event = create_event_with_times(Time.now, 7.seconds.from_now, Throw)
     catch_event = create_event_with_times(Time.now, 7.seconds.from_now, Catch)
- 
+
     catch_event.update_attributes :event_group_id => nil
     assert_nil catch_event.reload.event_group
 
@@ -18,7 +37,7 @@ class EventsControllerTest < ActionController::TestCase
     assert_equal 2, catch_event.event_group.events.count
 
   end
-  
+
   test "more complex post creation eventgroup merge" do
     event_1 = create_event_with_times(Time.now, 7.seconds.from_now, Throw)
     event_2 = create_event_with_times(Time.now, 7.seconds.from_now, Catch)
@@ -44,7 +63,7 @@ class EventsControllerTest < ActionController::TestCase
     event_2.update_attributes(:event_group_id => event_group_2.id)
 
     assert event_1.event_group != event_2.event_group
-    
+
     get :show, :id => event_1.uuid
 
     get :show, :id => event_2.uuid

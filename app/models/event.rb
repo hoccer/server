@@ -4,7 +4,7 @@ class Event < ActiveRecord::Base
 
   add_geo_foo
 
-  validates_presence_of   :latitude, :longitude
+  #validates_presence_of   :latitude, :longitude
 
   before_create           :generate_uuid, :verify_lifetime, :set_api_version
   before_save             :calculate_postgis_point
@@ -122,13 +122,15 @@ class Event < ActiveRecord::Base
       :types        => linkable_type,
       :accuracy     => location_accuracy
     }
-    
+
     options.merge! custom_options
-    
-    unless bssids.empty?
-      via_accesspoints( options ) | via_locations( options )
-    else
+
+    if latitude.nil? and longitude.nil?
+      via_accesspoints( options )
+    elsif bssids.empty?
       via_locations( options )
+    else
+      via_accesspoints( options ) | via_locations( options )
     end
   end
   
@@ -210,9 +212,11 @@ class Event < ActiveRecord::Base
     end
 
     def calculate_postgis_point
-      self.point = connection.execute(
-        "SELECT #{GeoFoo.as_point(latitude, longitude)}"
-      )[0]["st_geomfromtext"]
+      if latitude and longitude
+        self.point = connection.execute(
+          "SELECT #{GeoFoo.as_point(latitude, longitude)}"
+        )[0]["st_geomfromtext"]
+      end
     end
 
     def initialize_upload

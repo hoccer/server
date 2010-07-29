@@ -38,11 +38,13 @@ module Hoccer
     end
     
     def expiration_time
-      Event.first(
+      reference = Event.first(
         :select => "ending_at, created_at, event_group_id",
         :conditions => {:event_group_id => event_group_id},
         :order => "created_at ASC"
       ).ending_at
+
+      reference ? reference.ending_at : self.ending_at
     end
     
     def current_state

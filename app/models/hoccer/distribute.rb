@@ -33,7 +33,7 @@ module Hoccer
 
     def info_hash
       tmp_state   = current_state
-      tmp_seeder  =* event_group.events.with_type( seeder )
+      tmp_seeder  = event_group.events.with_type( seeder ).first if event_group
 
       if peer? && tmp_seeder && tmp_seeder.upload.attachment_ready?
         tmp_state = :ready

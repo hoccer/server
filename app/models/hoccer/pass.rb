@@ -31,8 +31,10 @@ module Hoccer
     end
 
     def info_hash
-      if 1 == (event_group.events  - [self]).size
-        self.update_attributes(:expires_at => Time.now, :state => "ready")
+      if event_group && 2 == event_group.events.size
+        event_group.events.each do |event|
+          event.update_attributes(:ending_at => Time.now)
+        end
       end
 
       result = case current_state

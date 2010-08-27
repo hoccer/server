@@ -31,19 +31,21 @@ module Hoccer
     end
 
     def info_hash
+      tmp_state         = current_state
+
       if event_group
         tmp_seeder        = event_group.events.with_type( seeder ).first
-        event_group_size  = event_group.events.size
         upload_ready      = tmp_seeder.upload.attachment_ready? if tmp_seeder
       end
 
-      if event_group_size == 2 && tmp_seeder && upload_ready
+      if tmp_state == :waiting && peer? && tmp_seeder && upload_ready
         event_group.events.each do |event|
           event.update_attributes(:ending_at => Time.now)
         end
+        tmp_state = :ready
       end
 
-      result = case current_state
+      result = case tmp_state
       when :collision
         {
           :state        => :collision,

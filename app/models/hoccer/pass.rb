@@ -31,11 +31,11 @@ module Hoccer
     end
 
     def info_hash
-      tmp_state = current_state
+      if 1 == (event_group.events  - [self]).size
+        self.update_attributes(:expires_at => Time.now, :state => "ready")
+      end
 
-      tmp_state = :ready if 1 == (event_group.events  - [self]).size
-
-      result = case tmp_state
+      result = case current_state
       when :collision
         {
           :state        => :collision,

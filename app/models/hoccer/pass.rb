@@ -33,7 +33,7 @@ module Hoccer
     def info_hash
       tmp_state = current_state
 
-      tmp_state = :ready if 1 < (event_group.events  - [self]).size
+      tmp_state = :ready if 1 == (event_group.events  - [self]).size
 
       result = case tmp_state
       when :collision

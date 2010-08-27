@@ -39,7 +39,7 @@ module Hoccer
         tmp_state = :ready
       end
 
-      result = case current_state
+      result = case tmp_state
 
       when :waiting
         {

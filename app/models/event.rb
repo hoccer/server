@@ -14,7 +14,7 @@ class Event < ActiveRecord::Base
   has_one                 :upload, :dependent => :destroy
 
   accepts_nested_attributes_for :access_point_sightings
-  
+
   attr_protected          :api_version
 
   # Class Methods
@@ -47,7 +47,7 @@ class Event < ActiveRecord::Base
     events_with_upload = events.select do |event|
       event.upload && event.upload.uuid && !event.upload.attachment_file_name.nil?
     end
-    
+
     events_with_upload.map do |event|
       {
         :uri          => event.upload.uuid,
@@ -99,19 +99,19 @@ class Event < ActiveRecord::Base
   def linkable_type
     nil
   end
-  
+
   def seeder?
     seeder == type
   end
-  
+
   def peer?
     peer == type
   end
-  
+
   def legacy?
     api_version == 1
   end
-  
+
   def nearby_events custom_options = {}
     options = {
       :starting_at  => starting_at,
@@ -133,36 +133,36 @@ class Event < ActiveRecord::Base
       via_accesspoints( options ) | via_locations( options )
     end
   end
-  
+
   def via_accesspoints options
     results = Event .
       within_timeframe( options[:starting_at], options[:ending_at] ) .
       with_bssids( options[:bssids] ) .
       with_type( options[:types] ) .
       scoped(:conditions => ["events.id != ?", self.id])
-      
+
     self.update_attribute(:pairing_mode, 0b10) if 0 < results.size
     results
   end
-  
+
   def via_locations options
     results = Event .
       within_timeframe( options[:starting_at], options[:ending_at] ) .
       somewhere_near( options[:latitude], options[:longitude], options[:accuracy] ) .
       with_type( options[:types] ) .
       scoped(:conditions => ["events.id != ?", self.id])
-      
+
     update_pairing_mode(0b1) if 0 < results.size
     results
   end
-  
+
   def update_pairing_mode bits
     self.update_attribute( :pairing_mode, (pairing_mode | bits) )
   end
-  
+
   def current_state
     return state.to_sym unless %w(waiting error).include?( state )
-    
+
     new_state = if collisions?
       :collision
     elsif !expired?
@@ -186,7 +186,7 @@ class Event < ActiveRecord::Base
 
     new_state
   end
-  
+
   def info
     extend Hoccer::Legacy if legacy?
 
@@ -203,7 +203,7 @@ class Event < ActiveRecord::Base
 
     info_hash
   end
-  
+
 
   private
 
@@ -222,7 +222,7 @@ class Event < ActiveRecord::Base
     def initialize_upload
       upload = Upload.create :uuid => UUID.generate(:compact), :event_id => id
     end
-    
+
     def set_api_version
       self.api_version ||= 2
     end
@@ -230,7 +230,7 @@ class Event < ActiveRecord::Base
     # TODO Revisit for cleaner prettier implementation -> lifetime etc
     def verify_lifetime
       self.starting_at ||= Time.now
-      
+
       if respond_to?(:lifetime) && lifetime
         self.ending_at = starting_at + lifetime.to_i
       else
@@ -241,7 +241,7 @@ class Event < ActiveRecord::Base
     def associate_with_event_group
       linked_events = nearby_events( :types => [seeder, peer] )
       linked_events = linked_events.select(&:event_group)
-      
+
       if linked_events.empty?
         event_group = EventGroup.create
       else
@@ -256,7 +256,7 @@ class Drop < Event
   include Hoccer::Cache
 
   after_create    :initialize_upload
-  
+
   attr_accessor   :lifetime
 
   def linkable_type
@@ -267,7 +267,7 @@ end
 
 class Pick < Event
   include Hoccer::Cache
-  
+
   def linkable_type
     seeder
   end
@@ -276,7 +276,7 @@ end
 
 class Throw < Event
   include Hoccer::Distribute
-  
+
   after_create :initialize_upload, :associate_with_event_group
 
   def linkable_type
@@ -298,22 +298,22 @@ end
 
 class SweepOut < Event
   include Hoccer::Pass
-  
+
   after_create :initialize_upload, :associate_with_event_group
-  
+
   def linkable_type
     peer
   end
-  
+
 end
 
 class SweepIn < Event
   include Hoccer::Pass
-  
+
   after_create :associate_with_event_group
-  
+
   def linkable_type
     seeder
   end
-  
+
 end

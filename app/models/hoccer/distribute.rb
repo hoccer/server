@@ -32,6 +32,13 @@ module Hoccer
     end
 
     def info_hash
+      tmp_state   = current_state
+      tmp_seeder  =* event_group.events.with_type( seeder )
+
+      if peer? && tmp_seeder && tmp_seeder.upload.attachment_ready?
+        tmp_state = :ready
+      end
+
       result = case current_state
 
       when :waiting

@@ -2,29 +2,60 @@ require "rubygems"
 require "active_support"
 require 'digest/sha1'
 
+
 class Client
+
+  @simulate = true;
 
   def initialize lat=nil, long=nil, accuracy=nil
     server = "http://api.hoccer.com"
-    puts "POST #{server}/v3/clients"
+    http_post "#{server}/v3/clients"
     id = Digest::SHA1.hexdigest Time.now.to_s
     @client_uri = "#{server}/v3/clients/#{id}"
 
-    set_environment lat, long, accuracy
+    set_gps lat, long, accuracy
   end
 
-  def set_environment lat, long, accuracy
-    environment = {:latitude => lat, :longitude => long, :accuracy => accuracy}
+  def set_gps lat, long, accuracy
+    environment = {:gps => {:latitude => lat, :longitude => long, :accuracy => accuracy}}
 
-    puts "PUT #{@client_uri}/environment\n{gps: #{environment.to_json}}"
+    http_put "#{@client_uri}/environment\n#{environment.to_json}"
   end
 
   def send mode, payload
-    puts "POST #{@client_uri}/action/#{mode}\n#{payload}"
+    http_post "#{@client_uri}/action/#{mode}\n#{payload}"
   end
 
   def receive mode
-    puts "GET #{@client_uri}/action/#{mode}"
+    http_get "#{@client_uri}/action/#{mode}"
+  end
+
+  private
+
+  def http_get uri
+    unless @simulate
+
+    else
+      puts "GET #{uri}"
+      "no data in simulation mode"
+    end
+  end
+
+  def http_put uri
+    unless @simulate
+
+    else
+      puts "PUT #{uri}"
+    end
+  end
+
+  def http_post uri
+    unless @simulate
+
+    else
+      puts "POST #{uri}"
+      "no data in simulation mode"
+    end
   end
 
 end

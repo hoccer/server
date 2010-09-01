@@ -18,10 +18,19 @@ class Client
     puts "PUT #{@client_uri}/environment\n{gps: #{environment.to_json}}"
   end
 
+  def send mode, payload
+    puts "POST #{@client_uri}/action/#{mode}\n#{payload}"
+  end
+
+  def receive mode
+    puts "GET #{@client_uri}/action/#{mode}"
+  end
 
 end
 
 c = Client.new
 c.set_environment 2, 4, 100
 
+c.send :pass, "{keks: \"lecker\"}"
+c.receive :pass
 

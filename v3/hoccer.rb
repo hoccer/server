@@ -9,36 +9,37 @@ module Hoccer
     end
 
     # Initial client registration
-    post "/client" do
+    apost "/client" do
       # 1. Create Client Object
       # 2. Create Client Environment
       # => redirect http://api.hoccer.com/v3/client/<client_id>
     end
 
     # Returns client URI
-    get "/client/:uuid" do
+    aget "/client/:uuid" do
       # => "http://api.hoccer.com/v3/client/<client_id>"
     end
 
     # Writes environment updates
-    put "/client/:uuid/environment" do
+    aput "/client/:uuid/environment" do
       # => 200 OK
     end
 
-    delete "/client/:uuid/environment" do
+    adelete "/client/:uuid/environment" do
       # => 200 OK
     end
 
     # Sharing and Pairing
 
     # Share
-    post "/client/:uuid/action/:id" do
+    apost "/client/:uuid/action/:action" do
       # => Redirect http://api.hoccer.com/v3/client/action/id
+      EM.add_timer(7) { body { "boom" } }
     end
 
     # Admin view for action ( Long Polling )
-    get "/client/:uuid/action/:id" do
-
+    aget "/client/:uuid/action/:id" do
+      body "hello async"
     end
 
     # Receive ( Long Polling )

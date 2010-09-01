@@ -46,16 +46,10 @@ class ServerTest < Test::Unit::TestCase
     in_time = 0
     out_time = 0
     data = "{...}"
-    st = Thread.new{
-      out_time = Time.now
-      sc.send :pass, data
-    }
-    rt = Thread.new{
-      rc.receive :pass
-      in_time = Time.now
-    }
-    st.join
-    rt.join
+    st = Thread.new{out_time = Time.now; sc.send :pass, data}
+    rt = Thread.new{rc.receive :pass; in_time = Time.now}
+    st.join; rt.join
+
     snappiness = in_time - out_time
     puts "snappiness: #{snappiness}"
     assert_in_delta 0.1, snappiness, 0.01

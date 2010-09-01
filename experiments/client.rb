@@ -28,9 +28,4 @@ class Client
 
 end
 
-c = Client.new
-c.set_environment 2, 4, 100
-
-c.send :pass, "{keks: \"lecker\"}"
-c.receive :pass
 

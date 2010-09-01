@@ -8,12 +8,12 @@ class Client
   def initialize lat=nil, long=nil, accuracy=nil
     #@simulate = true;
 
-    @server = "api.hoccer.com"
-    http_post "#/v3/clients", "{client:'ruby tester'}"
+    @server = "localhost"
+    id = http_post "#/v3/clients", "{client:'ruby tester'}"
     id = Digest::SHA1.hexdigest Time.now.to_s
     @client_uri = "/v3/clients/#{id}"
 
-    set_gps lat, long, accuracy
+    set_gps lat, long, accuracy if lat
   end
 
   def set_gps lat, long, accuracy
@@ -36,10 +36,10 @@ class Client
   def http_get uri
     unless @simulate
       Net::HTTP.start(@server) {|http|
-        http.get uri
-        raise NoOneSharedError if http.code == 410
-        raise CollisionError if http.code == 409
-        return http.body
+        response = http.get uri
+        raise NoOneSharedError if response.code == 410
+        raise CollisionError if response.code == 409
+        return response.body
       }
     else
       puts "GET #{uri}"
@@ -51,8 +51,7 @@ class Client
   def http_put uri, payload
     unless @simulate
       Net::HTTP.start(@server) {|http|
-        http.put uri, payload
-        return http.body
+        return (http.request_put uri, payload).body
       }
     else
       puts "PUT #{uri}\n#{payload}"
@@ -62,10 +61,10 @@ class Client
   def http_post uri, payload
     unless @simulate
       Net::HTTP.start(@server) {|http|
-        http.post uri, payload
-        raise NoOneReceivedError if http.code == 410
-        raise CollisionError if http.code == 409
-        return http.body
+        response = http.request_post uri, payload
+        raise NoOneReceivedError if response.code == 410
+        raise CollisionError if response.code == 409
+        return response.body
       }
     else
       puts "POST #{uri}\n#{payload}"

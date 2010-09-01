@@ -1,16 +1,17 @@
 require "rubygems"
 require "active_support"
 require 'digest/sha1'
+require 'net/http'
 
 class Client
 
   def initialize lat=nil, long=nil, accuracy=nil
     #@simulate = true;
 
-    server = "http://api.hoccer.com"
-    http_post "#{server}/v3/clients"
+    @server = "api.hoccer.com"
+    http_post "#/v3/clients", "{client:'ruby tester'}"
     id = Digest::SHA1.hexdigest Time.now.to_s
-    @client_uri = "#{server}/v3/clients/#{id}"
+    @client_uri = "/v3/clients/#{id}"
 
     set_gps lat, long, accuracy
   end
@@ -22,7 +23,7 @@ class Client
   end
 
   def send mode, payload
-    http_post "#{@client_uri}/action/#{mode}\n#{payload}"
+    http_post "#{@client_uri}/action/#{mode}", "#{payload}"
     raise NoOneReceivedError
   end
 
@@ -34,7 +35,12 @@ class Client
 
   def http_get uri
     unless @simulate
-      raise NoOneSharedError
+      Net::HTTP.start(@server) {|http|
+        http.get uri
+        raise NoOneSharedError if http.code == 410
+        raise CollisionError if http.code == 409
+        return http.body
+      }
     else
       puts "GET #{uri}"
       "no data in simulation mode"
@@ -42,19 +48,27 @@ class Client
 
   end
 
-  def http_put uri
+  def http_put uri, payload
     unless @simulate
-
+      Net::HTTP.start(@server) {|http|
+        http.put uri, payload
+        return http.body
+      }
     else
-      puts "PUT #{uri}"
+      puts "PUT #{uri}\n#{payload}"
     end
   end
 
-  def http_post uri
+  def http_post uri, payload
     unless @simulate
-
+      Net::HTTP.start(@server) {|http|
+        http.post uri, payload
+        raise NoOneReceivedError if http.code == 410
+        raise CollisionError if http.code == 409
+        return http.body
+      }
     else
-      puts "POST #{uri}"
+      puts "POST #{uri}\n#{payload}"
       "no data in simulation mode"
     end
   end
@@ -65,4 +79,7 @@ class NoOneSharedError < RuntimeError
 end
 
 class NoOneReceivedError < RuntimeError
+end
+
+class CollisionError < RuntimeError
 end

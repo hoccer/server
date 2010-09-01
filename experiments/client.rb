@@ -4,12 +4,13 @@ require 'digest/sha1'
 
 class Client
 
-  def initialize
+  def initialize lat=nil, long=nil, accuracy=nil
     server = "http://api.hoccer.com"
     puts "POST #{server}/v3/clients"
     id = Digest::SHA1.hexdigest Time.now.to_s
     @client_uri = "#{server}/v3/clients/#{id}"
 
+    set_environment lat, long, accuracy
   end
 
   def set_environment lat, long, accuracy

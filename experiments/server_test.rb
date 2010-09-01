@@ -6,45 +6,36 @@ require "test/unit"
 
 require "client"
 
-def share lat, long, sleep_time, payload
-  c = Client.new
-  c.set_environment lat, long, 100
-
-  sleep sleep_time
-
-  start_sending = Time.now
-  c.send :pass, payload
-  start_sending
-end
-
-def receive lat, long, sleep_time
-  c = Client.new
-  c.set_environment lat, long, 100
-
-  sleep sleep_time
-
-  c.receive :pass
-end
-  
 class ServerTest < Test::Unit::TestCase
 
   def test_simple_pairing
+    sc = Client.new 33.324, 22.112, 100
+    rc = Client.new 33.321, 22.115, 100
+
     data = "{...}"
-    share = Thread.new{share 33.324, 22.112, 0, data}
-    receive = Thread.new{receive 33.321, 22.115, 0}
-    assert_equal data, receive.value
+    st = Thread.new{sc.send :pass, data}
+    rt = Thread.new{rc.receive :pass}
+    assert_equal data, rt.value
   end
 
   def test_snappiness
+    sc = Client.new 33.324, 22.112, 100
+    rc = Client.new 33.321, 22.115, 100
+
+    in_time = 0
+    out_time = 0
     data = "{...}"
-    done_receiving = 0
-    share = Thread.new{share 33.324, 22.112, 0, data}
-    receive = Thread.new{
-      receive 33.321, 22.115, 1
-      done_receiving = Time.now
+    st = Thread.new{
+      out_time = Time.now
+      sc.send :pass, data
     }
-    assert_not_equal data, receive.value
-    puts "snappiness is #{done_receiving - share.value}"
+    rt = Thread.new{
+      rc.receive :pass
+      in_time = Time.now
+    }
+    st.join
+    rt.join
+    puts "snappiness is #{in_time - out_time}"
   end
 
 end

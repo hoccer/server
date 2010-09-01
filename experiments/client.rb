@@ -5,9 +5,10 @@ require 'digest/sha1'
 
 class Client
 
-  @simulate = true;
 
   def initialize lat=nil, long=nil, accuracy=nil
+    @simulate = true;
+
     server = "http://api.hoccer.com"
     http_post "#{server}/v3/clients"
     id = Digest::SHA1.hexdigest Time.now.to_s
@@ -39,6 +40,7 @@ class Client
       puts "GET #{uri}"
       "no data in simulation mode"
     end
+
   end
 
   def http_put uri

@@ -38,7 +38,6 @@ class ServerTest < Test::Unit::TestCase
     assert_equal data, rt.value
   end
 
-
   def test_snappiness
     sc = Client.new 33.324, 22.112, 100
     rc = Client.new 33.321, 22.115, 100
@@ -52,7 +51,24 @@ class ServerTest < Test::Unit::TestCase
 
     snappiness = in_time - out_time
     puts "snappiness: #{snappiness}"
-    assert_in_delta 0.1, snappiness, 0.01
+    assert_in_delta 0.1, snappiness, 0.01, "should take about 100ms"
   end
+
+  def test_capacity
+    hoc_count = 1000
+    data = "{...}"
+
+    threads = []
+    flooding_started = Time.now
+    for i in 1..hoc_count
+      threads << Thread.new{ (Client.new 33.324, 22.112, 100).send :pass, data }
+      threads << Thread.new{ (Client.new 33.321, 22.115, 100).receive :pass }
+    end
+
+    threads.each{|t| t.join}
+
+    assert_in_delta 0.1, Time.now - flooding_started, 0.01, "should be able to do #{hoc_count} hocs in 100ms"
+  end
+  
 
 end

@@ -5,9 +5,8 @@ require 'digest/sha1'
 
 class Client
 
-
   def initialize lat=nil, long=nil, accuracy=nil
-    @simulate = true;
+    #@simulate = true;
 
     server = "http://api.hoccer.com"
     http_post "#{server}/v3/clients"

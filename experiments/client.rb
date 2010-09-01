@@ -2,7 +2,6 @@ require "rubygems"
 require "active_support"
 require 'digest/sha1'
 
-
 class Client
 
   def initialize lat=nil, long=nil, accuracy=nil
@@ -24,6 +23,7 @@ class Client
 
   def send mode, payload
     http_post "#{@client_uri}/action/#{mode}\n#{payload}"
+    raise NoOneReceivedError
   end
 
   def receive mode
@@ -34,7 +34,7 @@ class Client
 
   def http_get uri
     unless @simulate
-
+      raise NoOneSharedError
     else
       puts "GET #{uri}"
       "no data in simulation mode"
@@ -61,4 +61,8 @@ class Client
 
 end
 
+class NoOneSharedError < RuntimeError
+end
 
+class NoOneReceivedError < RuntimeError
+end

@@ -38,9 +38,9 @@ class ServerTest < Test::Unit::TestCase
   def test_snappiness
     data = "{...}"
     done_receiving = 0
-    share = Thread.new{share 33.324, 22.112, 1, data}
+    share = Thread.new{share 33.324, 22.112, 0, data}
     receive = Thread.new{
-      receive 33.321, 22.115, 0
+      receive 33.321, 22.115, 1
       done_receiving = Time.now
     }
     assert_not_equal data, receive.value

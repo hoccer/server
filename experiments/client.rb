@@ -18,7 +18,7 @@ class Client
     http_put "#{@uri}/environment", "{environment.to_json}"
   end
 
-  def send mode, payload
+  def share mode, payload
     http_post "#{@uri}/action/#{mode}", "#{payload}"
     raise NoOneReceivedError
   end

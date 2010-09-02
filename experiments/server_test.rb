@@ -17,7 +17,7 @@ class ServerTest < Test::Unit::TestCase
     sc = Client.new 33.324, 22.112, 100
     rc = Client.new 33.321, 22.115, 100
 
-    st = Thread.new{sc.send :pass, @data}
+    st = Thread.new{sc.share :pass, @data}
     rt = Thread.new{rc.receive :pass}
     assert_equal @data, rt.value
   end
@@ -26,7 +26,7 @@ class ServerTest < Test::Unit::TestCase
     s = Client.new 33.324, 22.112, 100
     r = Client.new 33.321, 22.115, 100
 
-    s.send :pass, @data
+    s.share :pass, @data
     assert_equal @data, (r.receive :pass)
   end
 
@@ -34,7 +34,7 @@ class ServerTest < Test::Unit::TestCase
     sc = Client.new 33.324, 22.112, 100
     rc = Client.new 33.321, 22.115, 100
 
-    st = Thread.new{sc.send :pass, @data}
+    st = Thread.new{sc.share :pass, @data}
     rt = Thread.new{sleep 1; rc.receive :pass}
     assert_equal @data, rt.value
   end
@@ -43,7 +43,7 @@ class ServerTest < Test::Unit::TestCase
     sc = Client.new 33.324, 22.112, 100
     rc = Client.new 33.321, 22.115, 100
 
-    st = Thread.new{sleep 1; sc.send :pass, @data}
+    st = Thread.new{sleep 1; sc.share :pass, @data}
     rt = Thread.new{rc.receive :pass}
     assert_equal @data, rt.value
   end
@@ -53,7 +53,7 @@ class ServerTest < Test::Unit::TestCase
     r = Client.new 33.321, 22.115, 100
 
     assert_raise NoOneReceivedError do
-      s.send :pass, @data
+      s.share :pass, @data
     end 
     assert_raise NoOneSharedError do
       r.receive :pass

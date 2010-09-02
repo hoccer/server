@@ -1,4 +1,3 @@
-require 'eventmachine'
 module Hoccer
 
   class App < Sinatra::Base
@@ -13,20 +12,23 @@ module Hoccer
       # 1. Create Client Object
       # 2. Create Client Environment
       # => redirect http://api.hoccer.com/v3/client/<client_id>
+      # => 200 OK
+      body "gaba"
     end
 
     # Returns client URI
-    aget "/client/:uuid" do
+    aget "/client/uuid" do
       # => "http://api.hoccer.com/v3/client/<client_id>"
+      body "ok it is"
     end
 
     # Writes environment updates
     aput "/client/:uuid/environment" do
-      # => 200 OK
+      body "bang"
     end
 
     adelete "/client/:uuid/environment" do
-      # => 200 OK
+      body "baz"
     end
 
     # Sharing and Pairing
@@ -43,16 +45,10 @@ module Hoccer
     end
 
     # Receive ( Long Polling )
-    aget "/client/:uuid/action/:action" do
-      # => { json : data }
+    aget "/client/:uuid/action/:action" do |uuid, action|
+      body  "foo + #{action} + #{uuid}"
     end
 
   end
 
 end
-
-__END__
-
-Writing the environment
-
-Long polling gers

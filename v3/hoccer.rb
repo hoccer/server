@@ -1,25 +1,24 @@
 module Hoccer
-
   class App < Sinatra::Base
     register Sinatra::Async
 
-    aget "/high" do
-      EM.add_timer(3) { body { "delayed for #{3} seconds" } }
-    end
-
     # Initial client registration
     apost "/client" do
-      # 1. Create Client Object
-      # 2. Create Client Environment
-      # => redirect http://api.hoccer.com/v3/client/<client_id>
-      # => 200 OK
-      body "gaba"
+      db = EM::Mongo::Connection.new.db('hoccer')
+      collection = db.collection('people')
+      collection.insert( JSON.parse(params["json"]))
+
+      body { params.inspect }
     end
 
     # Returns client URI
     aget "/client/uuid" do
       # => "http://api.hoccer.com/v3/client/<client_id>"
-      body "ok it is"
+      db = EM::Mongo::Connection.new.db('hoccer')
+      collection = db.collection('people')
+      collection.find do |result|
+        body { result.inspect }
+      end
     end
 
     # Writes environment updates
@@ -50,5 +49,4 @@ module Hoccer
     end
 
   end
-
 end

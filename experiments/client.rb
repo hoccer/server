@@ -1,4 +1,3 @@
-require 'digest/sha1'
 require 'net/http'
 require 'json'
 

@@ -26,10 +26,12 @@ class Benchmkarker
     data = "{...}"
 
     threads = []
+    lat = 33.321; long = 22.115
     flooding_started = Time.now
-    for i in 1..hoc_count
-      threads << Thread.new{ (Client.new 33.324, 22.112, 100).share :pass, data }
-      threads << Thread.new{ (Client.new 33.321, 22.115, 100).receive :pass }
+      for i in 1..hoc_count
+      lat += 0.05; long += 0.05
+      threads << Thread.new{ (Client.new lat, long, 100).share :pass, data }
+      threads << Thread.new{ (Client.new lat + 0.001, long + 0.002, 100).receive :pass }
     end
 
     threads.each{|t| t.join}
@@ -41,4 +43,4 @@ end
 
 benchmarker = Benchmkarker.new
 methods = benchmarker.public_methods.select{|m| m.starts_with? "benchmark"}
-methods.each {|b| benchmarker.share b.to_sym}
+methods.each {|b| benchmarker.send b.to_sym}

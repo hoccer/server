@@ -3,10 +3,12 @@ module Hoccer
     register Sinatra::Async
 
     # Initial client registration
-    apost "/client" do
+    apost "/clients" do
+
       db = EM::Mongo::Connection.new.db('hoccer')
       collection = db.collection('people')
-      collection.insert( JSON.parse(params["json"]))
+      debugger
+      collection.insert( JSON.parse(params.keys.first) )
 
       body { params.inspect }
     end

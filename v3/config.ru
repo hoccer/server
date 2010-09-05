@@ -1,9 +1,10 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
-require 'ruby-debug'
+
 require 'eventmachine'
-require 'em-mongo'
+require 'sinatra'
 require 'sinatra/async'
-require 'json'
 require 'hoccer'
+
+EM.kqueue? ? EM.kqueue : EM.epoll
 
 run Hoccer::App

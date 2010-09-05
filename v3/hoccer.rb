@@ -1,54 +1,66 @@
 module Hoccer
-  class App < Sinatra::Base
-    register Sinatra::Async
 
-    # Initial client registration
-    apost "/clients" do
+  class Client
 
-      db = EM::Mongo::Connection.new.db('hoccer')
-      collection = db.collection('people')
-      debugger
-      collection.insert( JSON.parse(params.keys.first) )
+    attr_accessor :client_id, :request
 
-      body { params.inspect }
-    end
-
-    # Returns client URI
-    aget "/client/uuid" do
-      # => "http://api.hoccer.com/v3/client/<client_id>"
-      db = EM::Mongo::Connection.new.db('hoccer')
-      collection = db.collection('people')
-      collection.find do |result|
-        body { result.inspect }
-      end
-    end
-
-    # Writes environment updates
-    aput "/client/:uuid/environment" do
-      body "bang"
-    end
-
-    adelete "/client/:uuid/environment" do
-      body "baz"
-    end
-
-    # Sharing and Pairing
-
-    # Share
-    apost "/client/:uuid/action/:action" do
-      # => Redirect http://api.hoccer.com/v3/client/action/id
-      EM.add_timer(7) { body { "boom" } }
-    end
-
-    # Admin view for action ( Long Polling )
-    aget "/client/:uuid/action/:id" do
-      body "hello async"
-    end
-
-    # Receive ( Long Polling )
-    aget "/client/:uuid/action/:action" do |uuid, action|
-      body  "foo + #{action} + #{uuid}"
+    def initialize client_id, request
+      @client_id = client_id
+      @request   = request
     end
 
   end
+
+  class ClientPool
+
+    def initialize
+      @pool = {}
+    end
+
+    def insert client
+      @pool[client.client_id] = client
+    end
+
+    def remove client
+      @pool.delete client.client_id
+    end
+
+    def clients
+      @pool
+    end
+
+  end
+
+  class App < Sinatra::Base
+
+    register Sinatra::Async
+
+    @@client_pool = ClientPool.new
+
+    def client_id
+      rand(2**16)
+    end
+
+    aget "/hi" do
+      @client = Client.new client_id, self
+      @@client_pool.insert @client
+
+      EM::Timer.new(7) do
+        @@client_pool.clients[@client.client_id].request.body { "hello" }
+        @@client_pool.remove @client
+      end
+
+      timer = EventMachine::PeriodicTimer.new(0.1) do
+        if 1 < @@client_pool.clients.size
+          timer.cancel
+          @@client_pool.clients.values.each do |client|
+            client.request.body { @@client_pool.clients.size }
+          end
+        end
+      end
+
+    end
+
+  end
+
 end

@@ -27,6 +27,7 @@ module Hoccer
 
         EM.next_tick do
           client.environment = JSON.parse( params["json"] )
+          client.rebuild_groups
         end
       else
         halt 412

@@ -7,18 +7,10 @@ module Hoccer
     @@pool    = {}
     @@groups  = {}
 
-    def initialize options = {}
-
-      if options.empty?
-        @uuid = UUID.generate(:compact)
-      end
-
-    end
-
     class << self
 
-      def create
-        client = self.new
+      def create options = {}
+        client = self.new options
 
         if @@pool[client.uuid].nil?
           @@pool[client.uuid] = client
@@ -36,6 +28,29 @@ module Hoccer
       end
 
     end
+
+    def initialize options
+      @uuid = UUID.generate(:compact)
+
+      unless options.empty?
+        @environment = options[:environment]
+      end
+    end
+
+    def neighbors
+      @@pool.values.select do |client|
+        client.group_id == self.group_id && client.uuid != self.uuid
+      end
+    end
+
+    def rebuild_groups
+      @@pool.values.each do |other_client|
+        if other_client.environment[:foo] == "bar"
+          self.group_id, other_client.group_id = 1,1
+        end
+      end
+    end
+
 
   end
 

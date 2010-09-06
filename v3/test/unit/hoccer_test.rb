@@ -43,4 +43,20 @@ class TestHoccer < Test::Unit::TestCase
     assert_nil      @client.group_id
   end
 
+  test "clients updates its environment with being grouped" do
+    @client_2 = Client.create( :environment => { :foo => "bar" } )
+
+    with_events do
+      env = {:foo => "bar"}.to_json
+      put "/clients/#{@client.uuid}/environment", :json => env
+      assert_async
+      async_continue
+      assert_equal 200, last_response.status
+    end
+
+    assert_not_nil @client.group_id
+    assert_equal @client.group_id, @client_2.group_id
+    assert_equal 1, @client.neighbors.size
+  end
+
 end

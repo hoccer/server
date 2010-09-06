@@ -12,9 +12,11 @@ module.exports =  function() {
   }        
   
   var deliverContent = function(mode) {
-    var actions = (sender[mode] || []).concat(receiver[mode] || []);
-    for (var key in actions) {
-      actions[key].success();
+    var s = sender[mode][0];
+    s.success();
+    
+    for (var key in receiver[mode]) {
+      receiver[mode][key].success(s.payload);
     }
   }
   
@@ -24,11 +26,7 @@ module.exports =  function() {
       return;
     }
     
-    sys.puts("sender:" + sys.inspect(sender));
-    sys.puts("receiver:" + sys.inspect(receiver));
-    
     if ((sender[mode] || []).length == 1 && (receiver[mode] || []).length > 0) {
-      sys.puts("success");
       deliverContent(mode);
       return;
     }
@@ -38,13 +36,14 @@ module.exports =  function() {
     users: users,
     sender: sender,
     receiver: receiver,
-    
+  
     addUser: function(user) {
+      sys.puts("adding user " + user + " to " 
+            + sys.inspect(users) );
       users.push(user);
     },
     
     send: function(action) {
-      sys.puts("send");
       var senderForMode = sender[action.mode] || [];
       senderForMode.push(action);
       sender[action.mode] = senderForMode;
@@ -53,7 +52,6 @@ module.exports =  function() {
     },
     
     receive: function(action) {
-      sys.puts("receive");
       var receiverForMode = receiver[action.mode] || [];
       receiverForMode.push(action);
       receiver[action.mode] = receiverForMode;

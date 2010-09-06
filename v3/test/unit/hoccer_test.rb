@@ -1,28 +1,22 @@
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", ".."))
-require 'test/unit'
-require 'eventmachine'
-require 'sinatra/async'
-require "sinatra/async/test"
-require 'hoccer'
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
+require 'helper'
 
 class TestHoccer < Test::Unit::TestCase
   include Sinatra::Async::Test::Methods
 
   def app
-    @app ||=Hoccer::App.new
+    @app ||= Hoccer::App.new
   end
 
-  def app= sin_app
-    @app = sin_app
-  end
-
-  def test_my_tests
-    assert true
+  def setup
+    Client.delete_all
+    @client = Client.create
   end
 
   def test_basic_route
     get "high"
     assert_async
+    async_continue
   end
 
   def test_creating_new_uuid
@@ -32,11 +26,9 @@ class TestHoccer < Test::Unit::TestCase
   end
 
   def test_client_self_reference
-    post "clients"
-    my_uuid = last_response.headers["Location"].match(/[a-z0-9]+$/)[0]
-
-    get "/clients/#{my_uuid}"
-    assert_equal "yay", last_response.body
+    get "/clients/#{@client.uuid}"
+    expected = "{\"uri\":\"/clients/#{@client.uuid}\"}"
+    assert_equal expected, last_response.body
   end
 
   def test_self_reference_with_malicious_uuid
@@ -45,13 +37,14 @@ class TestHoccer < Test::Unit::TestCase
   end
 
   def test_putting_the_environment
-    #post "clients"
-    #my_uuid = last_response.headers["Location"].match(/[a-z0-9]+$/)[0]
-    l_app = app
-    get "/high"
-    assert_async
-    app = l_app
-    async_continue
+    with_events do
+      put "/clients/#{@client.uuid}/environment", :json => {:foo => "bar"}.to_json
+      assert_async
+      async_continue
+      assert_equal 200, last_response.status
+    end
+
+    assert_not_nil @client.environment
   end
 
 end

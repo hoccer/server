@@ -34,6 +34,10 @@ module Hoccer
       end
     end
 
+    post %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action|
+      halt 303
+    end
+
     #aget "/clients/:uuid/actions/:action" do |uuid, action|
     #  client = Client.new uuid, self
     #  @@client_pool.insert @client

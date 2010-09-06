@@ -59,4 +59,13 @@ class TestHoccer < Test::Unit::TestCase
     assert_equal 1, @client.neighbors.size
   end
 
+  test "posting an action" do
+    @client.environment = { :foo => "bar" }
+    @client_2 = Client.create( :environment => { :foo => "bar" } )
+
+    json = {:inline => "hallo welt"}.to_json
+    post "/clients/#{@client.uuid}/action/pass", :json => json
+    assert_equal 303, last_response.status
+  end
+
 end

@@ -2,9 +2,10 @@ module Hoccer
 
   class Client
 
-    attr_accessor :uuid, :request, :environment
+    attr_accessor :uuid, :request, :environment, :group_id
 
-    @@pool = {}
+    @@pool    = {}
+    @@groups  = {}
 
     def initialize options = {}
 

@@ -13,38 +13,34 @@ class TestHoccer < Test::Unit::TestCase
     @client = Client.create
   end
 
-  def test_basic_route
-    get "high"
-    assert_async
-    async_continue
-  end
-
-  def test_creating_new_uuid
+  test "registering a new client" do
     post "clients"
     assert_equal 303, last_response.status
     assert last_response.headers["Location"] =~ /\/clients\/[a-z0-9]/
   end
 
-  def test_client_self_reference
+  test "client requests self_reference" do
     get "/clients/#{@client.uuid}"
     expected = "{\"uri\":\"/clients/#{@client.uuid}\"}"
     assert_equal expected, last_response.body
   end
 
-  def test_self_reference_with_malicious_uuid
+  test "client requests self reference with malicious_uuid" do
     get "/clients/c7dde7f09bef012d8e37001f5bf1b5ba"
     assert_equal 412, last_response.status
   end
 
-  def test_putting_the_environment
+  test "client updates its environment without being grouped" do
     with_events do
-      put "/clients/#{@client.uuid}/environment", :json => {:foo => "bar"}.to_json
+      env = {:foo => "bar"}.to_json
+      put "/clients/#{@client.uuid}/environment", :json => env
       assert_async
       async_continue
       assert_equal 200, last_response.status
     end
 
-    assert_not_nil @client.environment
+    assert_not_nil  @client.environment
+    assert_nil      @client.group_id
   end
 
 end

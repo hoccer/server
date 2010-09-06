@@ -7,11 +7,6 @@ module Hoccer
 
     register Sinatra::Async
 
-    aget "/high" do
-      content_type :json
-      body { {:message => "hello"}.to_json }
-    end
-
     post "/clients" do
       client = Client.create
       redirect "/clients/#{client.uuid}", 303

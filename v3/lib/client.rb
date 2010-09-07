@@ -2,7 +2,11 @@ module Hoccer
 
   class Client
 
-    attr_accessor :uuid, :request, :environment, :group_id
+    attr_accessor :uuid,
+                  :request,
+                  :environment,
+                  :group_id,
+                  :actions
 
     @@pool    = {}
     @@groups  = {}
@@ -30,7 +34,8 @@ module Hoccer
     end
 
     def initialize options
-      @uuid = UUID.generate(:compact)
+      @actions  = {}
+      @uuid     = UUID.generate(:compact)
 
       unless options.empty?
         @environment = options[:environment]

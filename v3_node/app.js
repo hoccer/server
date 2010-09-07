@@ -1,7 +1,7 @@
 var sys = require('sys');
 
 var app = require('./server').create();
-app.listen(8080);
+app.listen(9292);
   
 // var db = new mongo.Db(
 //   'test', //dbname

@@ -91,20 +91,20 @@ module.exports = {
     assert.ok(successfulSend);
     assert.ok(successfulReceived);
     assert.equal("Hello", receivedContent); 
-  }, 
-  
-  'test two servers': function(assert) {
-    var s1 = require("../server").create();
-    var s2 = require("../server").create();
-    
-    s1.groupPool.addUser(123);
-    s2.groupPool.addUser(456);
-    
-    assert.ok(s1 !== s2);
-    
-    assert.equal(1, s1.groupPool.groupForUser(123).users.length);
-    assert.equal(1, s2.groupPool.groupForUser(456).users.length);
   }
+  
+  // 'test two servers': function(assert) {
+  //   var s1 = require("../server").create();
+  //   var s2 = require("../server").create();
+  //   
+  //   s1.groupPool.addUser(123);
+  //   s2.groupPool.addUser(456);
+  //   
+  //   assert.ok(s1 !== s2);
+  //   
+  //   assert.equal(1, s1.groupPool.groupForUser(123).users.length);
+  //   assert.equal(1, s2.groupPool.groupForUser(456).users.length);
+  // }
   
   
 }

@@ -3,8 +3,6 @@ require 'client'
 module Hoccer
 
   class App < Sinatra::Base
-    set :environment, :test
-
     register Sinatra::Async
 
     post "/clients" do

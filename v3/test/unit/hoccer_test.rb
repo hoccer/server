@@ -4,10 +4,6 @@ require 'helper'
 class TestHoccer < Test::Unit::TestCase
   include Sinatra::Async::Test::Methods
 
-  def app
-    @app ||= Hoccer::App.new
-  end
-
   def setup
     Client.delete_all
     @client = Client.create

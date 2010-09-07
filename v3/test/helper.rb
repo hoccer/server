@@ -10,6 +10,11 @@ require 'hoccer'
 class Test::Unit::TestCase
   include Hoccer
 
+  def app
+    Hoccer::App.set :environment, :test
+    @app ||= Hoccer::App.new
+  end
+
   unless defined?(Spec)
     # test "verify something" do
     #   ...

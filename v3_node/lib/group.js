@@ -16,6 +16,7 @@ module.exports =  function() {
     s.success();
     
     for (var key in receiver[mode]) {
+      sys.puts(s.payload);
       receiver[mode][key].success(s.payload);
     }
   }
@@ -38,8 +39,6 @@ module.exports =  function() {
     receiver: receiver,
   
     addUser: function(user) {
-      sys.puts("adding user " + user + " to " 
-            + sys.inspect(users) );
       users.push(user);
     },
     

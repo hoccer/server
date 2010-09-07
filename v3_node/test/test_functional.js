@@ -36,16 +36,55 @@ module.exports = {
       {status: 200});
   },
   
-  'GET client/:id/environment/:mode': function(assert) {
-    var server2 = require("../server").create();
-    // server2.groupPool.clear();
-    // server2.groupPool.addUser("123456");
+  'GET client/:id/action/:mode - without partner': function(assert) {
+    var server = require("../server").create();
+    server.groupPool.addUser("123456");
 
     assert.response(
-      server2, 
+      server, 
       {url: "/client/123456/action/distribute"},
-      {status: 404}
+      {status: 204}
     );  
+  },
+  
+  'POST client/:id/action/:mode': function(assert) {
+    var server = require("../server").create();
+    server.groupPool.addUser("123456");
+
+    assert.response(
+      server,
+      { url: "/client/123456/action/distribute", 
+          method: "POST",
+          body: '{"Hello": "World"}'
+      },
+      { status: 402 });
+  },
+  
+  'valid distribution 1-to-1': function(assert) {
+    var server = require("../server").create();
+    server.groupPool.addUser("123456");
+    server.groupPool.addUser("456789");
+    
+    assert.response(
+      server,
+      { url: "/client/123456/action/distribute", 
+          method: "POST",
+          body: '{"Hello":"World"}',
+          headers: {"Content-Type": "application/json"}
+      },
+      { status: 402 }
+    );
+    
+    assert.response(
+      server,
+      { url: "/client/456789/action/distribute"},
+      { status: 200 },
+      function(res) {
+        assert.equal('{"Hello":"World"}', res.body);
+      }
+    );
+    
+    
   }
   
   

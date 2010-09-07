@@ -48,6 +48,16 @@ module.exports = {
     setTimeout(function() { assert.ok(hasError); }, 10);     
   },
   
+  'test two groupes': function(assert) {
+    var g1 = Group(), g2 = Group();
+    
+    g1.addUser('1');
+    g2.addUser('2');
+    
+    assert.equal(1, g1.users.length);
+    assert.equal(1, g2.users.length);
+  },
+  
   'test #successful exchanged': function(assert) {
     var group               = Group(),
       successfulSend        = false,
@@ -65,7 +75,7 @@ module.exports = {
       },
       error   : function() {}
     });
-
+ 
     assert.ok(!successfulSend);
     assert.ok(!successfulReceived); 
     
@@ -81,5 +91,20 @@ module.exports = {
     assert.ok(successfulSend);
     assert.ok(successfulReceived);
     assert.equal("Hello", receivedContent); 
-  } 
+  }, 
+  
+  'test two servers': function(assert) {
+    var s1 = require("../server").create();
+    var s2 = require("../server").create();
+    
+    s1.groupPool.addUser(123);
+    s2.groupPool.addUser(456);
+    
+    assert.ok(s1 !== s2);
+    
+    assert.equal(1, s1.groupPool.groupForUser(123).users.length);
+    assert.equal(1, s2.groupPool.groupForUser(456).users.length);
+  }
+  
+  
 }

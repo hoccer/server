@@ -1,9 +1,7 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "lib"))
 
-require 'eventmachine'
-require 'sinatra'
-require 'sinatra/async'
-require 'hoccer'
+require 'init'
 
 EM.kqueue? ? EM.kqueue : EM.epoll
 

@@ -6,7 +6,8 @@ module Hoccer
                   :request,
                   :environment,
                   :group_id,
-                  :actions
+                  :actions,
+                  :mode
 
     @@pool    = {}
     @@groups  = {}
@@ -42,10 +43,20 @@ module Hoccer
       end
     end
 
+    def all_in_group
+      @@pool.values.select do |client|
+        client.group_id == self.group_id
+      end
+    end
+
     def neighbors
       @@pool.values.select do |client|
         client.group_id == self.group_id && client.uuid != self.uuid
       end
+    end
+
+    def sender?
+      @mode == :sender
     end
 
     def rebuild_groups

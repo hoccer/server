@@ -27,13 +27,11 @@ class TestHoccer < Test::Unit::TestCase
   end
 
   test "client updates its environment without being grouped" do
-    with_events do
-      env = {:foo => "bar"}.to_json
-      put "/clients/#{@client.uuid}/environment", :json => env
-      assert_async
-      async_continue
-      assert_equal 200, last_response.status
-    end
+    env = {:foo => "bar"}.to_json
+    put "/clients/#{@client.uuid}/environment", :json => env
+    assert_async
+    em_async_continue
+    assert_equal 200, last_response.status
 
     assert_not_nil  @client.environment
     assert_nil      @client.group_id
@@ -42,28 +40,42 @@ class TestHoccer < Test::Unit::TestCase
   test "clients updates its environment with being grouped" do
     @client_2 = Client.create( :environment => { :foo => "bar" } )
 
-    with_events do
-      env = {:foo => "bar"}.to_json
-      put "/clients/#{@client.uuid}/environment", :json => env
-      assert_async
-      async_continue
-      assert_equal 200, last_response.status
-    end
+    env = {:foo => "bar"}.to_json
+    put "/clients/#{@client.uuid}/environment", :json => env
+    assert_async
+    em_async_continue
+    assert_equal 200, last_response.status
 
     assert_not_nil @client.group_id
     assert_equal @client.group_id, @client_2.group_id
     assert_equal 1, @client.neighbors.size
   end
 
-  test "posting an action" do
+  test "posting a share action" do
     @client.environment = { :foo => "bar" }
     @client_2 = Client.create( :environment => { :foo => "bar" } )
 
     json = {:inline => "hallo welt"}.to_json
     post "/clients/#{@client.uuid}/action/pass", :json => json
     assert_equal 303, last_response.status
-    assert_equal "pass", @client.actions.keys.include?( "pass" )
-    assert_equal true, @client.sender?
+    assert_equal true, @client.actions.keys.include?( "pass" )
+  end
+
+  test "trying to receive with an action" do
+    @client.environment = { :foo => "bar" }
+    @client_2 = Client.create( :environment => { :foo => "bar" } )
+    @client.rebuild_groups
+
+    assert_equal @client.group_id, @client_2.group_id
+    @client.actions[:pass] = [{:inline => "foo"}]
+    @client.mode = :sender
+    @client.request = FakeRequest.new
+
+    get "/clients/#{@client_2.uuid}/action/pass"
+    assert_async
+    em_async_continue
+
+    assert_equal 200, last_response.status
   end
 
 end

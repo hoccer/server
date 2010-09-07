@@ -4,6 +4,15 @@ require 'test/unit'
 require 'eventmachine'
 require 'init'
 
+
+class FakeRequest
+
+  def body
+
+  end
+
+end
+
 class Test::Unit::TestCase
   include Hoccer
 

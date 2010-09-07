@@ -4,7 +4,7 @@ require "rubygems"
 require "active_support"
 require "test/unit"
 
-require "client"
+require "./client"
 
 class ServerTest < Test::Unit::TestCase
 

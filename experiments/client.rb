@@ -30,6 +30,7 @@ class Client
 
   def http_get uri
     uri = URI.parse(uri)
+
     Net::HTTP.start(uri.host, 9292) {|http|
       response = http.get uri.path
       raise NoOneSharedError if response.code == 410
@@ -47,6 +48,7 @@ class Client
 
   def http_post uri, payload
     uri = URI.parse(uri)
+
     Net::HTTP.start(uri.host, 9292) {|http|
       response = http.request_post uri.path, payload
       raise NoOneReceivedError if response.code == 410

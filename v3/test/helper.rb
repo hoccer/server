@@ -1,11 +1,8 @@
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
+
 require 'test/unit'
 require 'eventmachine'
-require 'sinatra'
-require 'sinatra/async'
-require "sinatra/async/test"
-require 'uuid'
-require 'json'
-require 'hoccer'
+require 'init'
 
 class Test::Unit::TestCase
   include Hoccer

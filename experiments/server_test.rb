@@ -14,10 +14,7 @@ class ServerTest < Test::Unit::TestCase
   end
 
   def test_pairing_immediately
-<<<<<<< HEAD
-    puts @data
-=======
->>>>>>> c3980f351ca3ec0812db2d4b4c2ac8a866fe9f2f
+
     sc = Client.new 33.324, 22.112, 100
     rc = Client.new 33.321, 22.115, 100
 
@@ -25,8 +22,6 @@ class ServerTest < Test::Unit::TestCase
     rt = Thread.new{rc.receive :pass}
     assert_equal @data, rt.value
   end
-
-<<<<<<< HEAD
  # def test_pairing_one_after_another
  #   s = Client.new 33.324, 22.112, 100
  #   r = Client.new 33.321, 22.115, 100
@@ -64,7 +59,6 @@ class ServerTest < Test::Unit::TestCase
  #     r.receive :pass
  #   end
  # end
-=======
   def test_pairing_one_after_another
     s = Client.new 33.324, 22.112, 100
     r = Client.new 33.321, 22.115, 100
@@ -102,5 +96,4 @@ class ServerTest < Test::Unit::TestCase
       r.receive :pass
     end
   end
->>>>>>> c3980f351ca3ec0812db2d4b4c2ac8a866fe9f2f
 end

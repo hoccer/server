@@ -24,7 +24,7 @@ module Hoccer
         ahalt 200
 
         EM.next_tick do
-          client.environment = JSON.parse( params.keys.first )
+          client.environment = JSON.parse( request.env["rack.input"].read )
           client.rebuild_groups
         end
       else

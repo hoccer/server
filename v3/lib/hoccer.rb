@@ -24,7 +24,7 @@ module Hoccer
         ahalt 200
 
         EM.next_tick do
-          client.environment = JSON.parse( params["json"] )
+          client.environment = JSON.parse( params.keys.first )
           client.rebuild_groups
         end
       else
@@ -34,7 +34,7 @@ module Hoccer
 
     post %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action|
       if client = Client.find( uuid )
-        payload = JSON.parse( params["json"] )
+        payload = JSON.parse( params.keys.first )
         client.actions[action] = payload
         client.mode = :sender
         halt 303

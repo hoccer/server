@@ -7,7 +7,9 @@ var    Group = require('./lib/group'),
    GroupPool = require('./lib/groupPool');
 
 exports.create = function() {
-  var app   = express.createServer();
+  var app   = express.createServer(
+    express.logger()
+  );
   
   app.configure(function() {
     app.use(express.methodOverride());
@@ -19,13 +21,11 @@ exports.create = function() {
   app.post('/clients', function(req, res) {
     var id = uuid.generate("ascii").replace(/-/g, "");
     app.groupPool.addUser(id)
-    res.redirect("http://" + req.socket.remoteAddress 
-                    + ":" + req.socket.remotePort + "/clients/" + id, 303);
+    res.redirect("http://" + req.headers.host + "/clients/" + id, 303);
   });
   
   app.get('/clients/:id', function(req, res) {
-    res.send({uri: "http://" + req.socket.remoteAddress 
-                    + ":" + req.socket.remotePort + "/clients/" + req.params.id}, 
+    res.send({uri: "http://" + req.headers.host +  "/clients/" + req.params.id}, 
              {'Content-Type': 'application/json'});
   });
   

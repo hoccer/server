@@ -33,28 +33,49 @@ module Hoccer
     end
 
     post %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action|
-      halt 303
+      if client = Client.find( uuid )
+        payload = JSON.parse( params["json"] )
+        client.actions[action] = payload
+        client.mode = :sender
+        halt 303
+      else
+        halt 412
+      end
     end
 
-    #aget "/clients/:uuid/actions/:action" do |uuid, action|
-    #  client = Client.new uuid, self
-    #  @@client_pool.insert @client
+    aget %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action|
+      if client = Client.find( uuid )
 
-    #  EM::Timer.new(7) do
-    #    @@client_pool.clients[client.client_id].request.body { "hello" }
-    #    @@client_pool.remove client
-    #  end
+        client.request = self
 
-    #  timer = EventMachine::PeriodicTimer.new(0.1) do
-    #    if 1 < @@client_pool.clients.size
-    #      timer.cancel
-    #      @@client_pool.clients.values.each do |client|
-    #        client.request.body { @@client_pool.clients.size }
-    #      end
-    #    end
-    #  end
+        if client.actions[action].nil?
+          client.actions[action] = {}
+        end
 
-    #end
+        EM::Timer.new(7) do
+          client.all_in_group.each do |client|
+            client.request.body { {"message" => "timeout"}.to_json }
+            client.actions.delete( action )
+          end
+        end
+
+        timer = EventMachine::PeriodicTimer.new(0.1) do
+          clients   = client.all_in_group.select(&:sender?)
+          receiver  = client.all_in_group.reject(&:sender?)
+
+          if clients.size >= 1 && receiver.size >= 1
+            timer.cancel
+            client.all_in_group.each do |client|
+              client.request.body { "success" }
+            end
+          end
+        end
+
+      else
+        halt 412
+      end
+
+    end
 
   end
 

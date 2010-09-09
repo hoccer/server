@@ -1,30 +1,15 @@
 var sys = require("sys"), 
    uuid = require("uuid"); 
 
-var express = require('express');
-var Group = require('./lib/group'); 
+var  express = require('express');
 
-var GroupPool = function() {
-  var users = [];
-  var fakeGlobalGroup = Group();
-
-  return {
-    addUser: function(user) {
-      fakeGlobalGroup.addUser(user);
-    },
-    
-    groupForUser: function(user) {
-      return fakeGlobalGroup;
-    },
-    
-    clear: function() {
-      fakeGlobalGroup = Group();
-    }
-  }
-};
+var    Group = require('./lib/group'),
+   GroupPool = require('./lib/groupPool');
 
 exports.create = function() {
-  var app   = express.createServer();
+  var app   = express.createServer(
+    express.logger()
+  );
   
   app.configure(function() {
     app.use(express.methodOverride());
@@ -33,39 +18,47 @@ exports.create = function() {
   
   app.groupPool = GroupPool();
     
-  app.post('/client', function(req, res) {
-    var id = uuid.generate("hex");
+  app.post('/clients', function(req, res) {
+    var id = uuid.generate("ascii").replace(/-/g, "");
     app.groupPool.addUser(id)
-    res.redirect("/client/" + id, 303);
+    res.redirect("http://" + req.headers.host + "/clients/" + id, 303);
   });
   
-  app.get('/client/:id', function(req, res) {
-    res.send({uri: "/client/" + req.params.id}, 
+  app.get('/clients/:id', function(req, res) {
+    res.send({uri: "http://" + req.headers.host +  "/clients/" + req.params.id}, 
              {'Content-Type': 'application/json'});
   });
   
-  app.put('/client/:id/environment', function(req, res) {
+  app.put('/clients/:id/environment', function(req, res) {
+    // app.groupPool.updateUser(req.params.id, req.body);
+    
     res.send(200);
   });
   
-  app.post("/client/:id/action/:mode", function(req, res) {
+  app.post("/clients/:id/action/:mode", function(req, res) {
     var group = app.groupPool.groupForUser(req.params.id);
     if (!group) {
       res.send(412);
     }
     
-    group.send({
-      mode: req.params.mode,
-      payload: req.rawBody,
-      success: function(content) { sys.puts("success") },
-      error: function() { }
+    sys.puts("group ok");
+    var rawBody = "";
+    req.addListener("data", function(chunk) {rawBody += chunk});
+    req.addListener("end", function() {
+      sys.puts("data ok");
+      group.send({
+        mode: req.params.mode,
+        payload: rawBody,
+        success: function(content) { sys.puts("success") },
+        error: function() { }
+      });
+      
+      sys.puts("redirect");
+      res.send(303);
     });
-    
-    res.send(402);
   });
   
-  app.get("/client/:id/action/:mode", function(req, res) {
-    sys.puts(req.params.mode + "\n");
+  app.get("/clients/:id/action/:mode", function(req, res) {
     var group = app.groupPool.groupForUser(req.params.id);
         
     if (!group) {

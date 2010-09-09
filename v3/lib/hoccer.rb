@@ -20,21 +20,24 @@ module Hoccer
     end
 
     aput %r{/clients/([a-f0-9]{32,32})/environment} do |uuid|
+      puts "aput"
       if client = Client.find( uuid )
+      puts "#{client}"
         ahalt 200
-
         EM.next_tick do
-          client.environment = JSON.parse( request.body.string )
+          client.environment = JSON.parse( request.body.read )
           client.rebuild_groups
+          
         end
       else
+        puts "halt"
         halt 412
       end
     end
 
     post %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action|
       if client = Client.find( uuid )
-        payload = JSON.parse( params.keys.first )
+        payload = JSON.parse( request.body.read )
         client.actions[action] = payload
         client.mode = :sender
         halt 303
@@ -44,6 +47,7 @@ module Hoccer
     end
 
     aget %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action|
+      puts "aget"
       if client = Client.find( uuid )
         ahalt 204 if client.all_in_group.size < 2
 

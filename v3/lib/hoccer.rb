@@ -27,7 +27,7 @@ module Hoccer
         EM.next_tick do
           client.environment = JSON.parse( request.body.read )
           client.rebuild_groups
-          
+
         end
       else
         puts "halt"
@@ -73,7 +73,9 @@ module Hoccer
           if clients.size >= 1 && receiver.size >= 1
             timer.cancel
             client.all_in_group.each do |client|
-              client.request.body { "success" }
+              if client.request
+                client.request.body { "success" }
+              end
             end
           end
         end

@@ -45,6 +45,7 @@ module Hoccer
 
     aget %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action|
       if client = Client.find( uuid )
+        ahalt 204 if client.group.size < 2
 
         client.request = self
 

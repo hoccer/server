@@ -24,7 +24,7 @@ module Hoccer
         ahalt 200
 
         EM.next_tick do
-          client.environment = JSON.parse( request.env["rack.input"].read )
+          client.environment = JSON.parse( request.body.string )
           client.rebuild_groups
         end
       else
@@ -54,7 +54,9 @@ module Hoccer
 
         EM::Timer.new(7) do
           client.all_in_group.each do |client|
-            client.request.body { {"message" => "timeout"}.to_json }
+            if client.request
+              client.request.body { {"message" => "timeout"}.to_json }
+            end
             client.actions.delete( action )
           end
         end

@@ -37,7 +37,7 @@ module Hoccer
         payload = JSON.parse( params.keys.first )
         client.actions[action] = payload
         client.mode = :sender
-        halt 303
+        redirect "/clients/#{client.uuid}/action/#{action}", 303
       else
         halt 412
       end

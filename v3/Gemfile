@@ -1,0 +1,8 @@
+source "http://rubygems.org"
+
+gem "eventmachine"
+gem "sinatra"
+gem "async_sinatra"
+gem 'async-rack'
+gem "thin"
+gem 'uuid'

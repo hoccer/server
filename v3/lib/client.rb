@@ -75,18 +75,14 @@ module Hoccer
     end
 
     def nearby? other_client
-      puts "MY: #{environment}"
-      puts "OTHER: #{other_client.environment}"
       if self.environment && other_client.environment
-        my_lon    = environment["gps"]["longitude"].to_i
-        my_lat    = environment["gps"]["latitude"].to_i
+        my_lon    = environment["gps"]["longitude"].to_i rescue nil
+        my_lat    = environment["gps"]["latitude"].to_i  rescue nil
 
-        other_lon = other_client.environment["gps"]["longitude"].to_i
-        other_lat = other_client.environment["gps"]["latitude"].to_i
+        other_lon = other_client.environment["gps"]["longitude"].to_i rescue nil
+        other_lat = other_client.environment["gps"]["latitude"].to_i  rescue nil
 
-        puts "#{my_lon} => #{other_lon}"
-        puts "#{my_lat} => #{other_lat}"
-
+        return if [my_lon, my_lat, other_lon, other_lat].any?(&:nil?)
         my_lon == other_lon && my_lat == other_lat
       else
         false

@@ -1,8 +1,10 @@
 source "http://rubygems.org"
 
-gem "eventmachine"
+gem "eventmachine", "0.12.11"
 gem "sinatra"
 gem "async_sinatra"
 gem 'async-rack'
+gem 'rack-test'
+gem 'ruby-debug19'
 gem "thin"
 gem 'uuid'

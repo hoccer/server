@@ -1,5 +1,5 @@
 # Require Libraries
-
+require "bundler/setup"
 require 'eventmachine'
 require 'async-rack'
 require 'sinatra/async'

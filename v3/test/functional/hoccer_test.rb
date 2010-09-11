@@ -76,8 +76,11 @@ class TestHoccer < Test::Unit::TestCase
       }
     )
     json = {:inline => "hallo welt"}.to_json
+
     post "/clients/#{@client.uuid}/action/pass", json
     assert_equal 303, last_response.status
+    exp = "/clients/#{@client.uuid}/action/pass/#{@client.actions["pass"].uuid}"
+    assert_equal exp, last_response.headers["Location"]
     assert_equal true, @client.actions.keys.include?( "pass" )
   end
 

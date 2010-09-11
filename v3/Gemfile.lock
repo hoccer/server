@@ -1,3 +1,9 @@
+GIT
+  remote: git://github.com/eventmachine/eventmachine.git
+  revision: 5f1b8d7
+  specs:
+    eventmachine (0.12.11)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -8,7 +14,6 @@ GEM
       sinatra (>= 1.0)
     columnize (0.3.1)
     daemons (1.1.0)
-    eventmachine (0.12.11)
     linecache19 (0.5.11)
       ruby_core_source (>= 0.1.4)
     macaddr (1.0.0)
@@ -40,7 +45,7 @@ PLATFORMS
 DEPENDENCIES
   async-rack
   async_sinatra
-  eventmachine (= 0.12.11)
+  eventmachine (= 0.12.11)!
   rack-test
   ruby-debug19
   sinatra

@@ -1,6 +1,6 @@
 source "http://rubygems.org"
 
-gem "eventmachine", "0.12.11"
+gem "eventmachine", "0.12.11", :git => "git://github.com/eventmachine/eventmachine.git"
 gem "sinatra"
 gem "async_sinatra"
 gem 'async-rack'

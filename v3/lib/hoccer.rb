@@ -73,7 +73,7 @@ module Hoccer
           end
         end
 
-        timer = EventMachine::PeriodicTimer.new(0.1) do
+        timer = EM::PeriodicTimer.new(0.1) do
           clients   = client.all_in_group.select(&:sender?)
           receiver  = client.all_in_group.select(&:receiver?)
 

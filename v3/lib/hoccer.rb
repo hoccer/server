@@ -1,9 +1,21 @@
 require 'client'
+require 'action'
 
 module Hoccer
 
   class App < Sinatra::Base
     register Sinatra::Async
+
+    def action_info_path action
+      [
+        "",
+        "clients",
+        "#{action[:client_uuid]}",
+        "action",
+        "#{action[:name]}",
+        "#{action[:uuid]}"
+      ].join("/")
+    end
 
     post "/clients" do
       client = Client.create
@@ -40,12 +52,13 @@ module Hoccer
       end
     end
 
-    post %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action|
+    post %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action_name|
       if client = Client.find( uuid )
         payload = JSON.parse( request.body.read )
-        client.actions[action] = payload
+        action  = (client.actions[action_name] = { :payload => payload })
+
         client.mode = :sender
-        redirect "/clients/#{client.uuid}/action/#{action}", 303
+        redirect action_info_path( action ), 303
       else
         halt 412
       end

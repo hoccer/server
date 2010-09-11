@@ -1,4 +1,3 @@
-require 'ruby-debug'
 module Hoccer
 
   class Client
@@ -36,8 +35,8 @@ module Hoccer
     end
 
     def initialize options
-      @actions  = {}
       @uuid     = UUID.generate(:compact)
+      @actions  = ActionStore.new(@uuid)
 
       unless options.empty?
         @environment = options[:environment]

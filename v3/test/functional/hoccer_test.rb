@@ -75,13 +75,13 @@ class TestHoccer < Test::Unit::TestCase
         "gps" => { "longitude" => 13, "latitude" => 14 }
       }
     )
-    json = {:inline => "hallo welt"}.to_json
+    json = [{:inline => "hallo welt"}].to_json
 
     post "/clients/#{@client.uuid}/action/pass", json
     assert_equal 303, last_response.status
-    exp = "/clients/#{@client.uuid}/action/pass/#{@client.actions["pass"].uuid}"
+    exp = "/clients/#{@client.uuid}/action/pass/#{@client.actions[:pass][:uuid]}"
     assert_equal exp, last_response.headers["Location"]
-    assert_equal true, @client.actions.keys.include?( "pass" )
+    assert_equal true, @client.actions.keys.include?( :pass )
   end
 
   test "trying to receive with an action" do
@@ -94,7 +94,7 @@ class TestHoccer < Test::Unit::TestCase
     @client.rebuild_groups
 
     assert_equal @client.group_id, @client_2.group_id
-    @client.actions[:pass] = [{:inline => "foo"}]
+    @client.actions[:pass] = { :payload =>[{:inline => "foo"}] }
     @client.mode = :sender
     @client.request = FakeRequest.new
 

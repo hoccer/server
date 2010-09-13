@@ -96,26 +96,7 @@ module Hoccer
           end
         end
 
-        timer = EM::PeriodicTimer.new(0.1) do
-          clients   = client.all_in_group.select(&:sender?)
-          receiver  = client.all_in_group.select(&:receiver?)
-
-          if clients.size >= 1 && receiver.size >= 1
-            timer.cancel
-            client.all_in_group.each do |client|
-              if client.request
-                puts "Y A Y"
-
-                data_list = clients.map do |client|
-                  client.actions[action][:payload]
-                end
-
-                client.request.body { data_list.to_json }
-                client.request = nil
-              end
-            end
-          end
-        end
+        client.verify_group( action )
 
       else
         halt 412

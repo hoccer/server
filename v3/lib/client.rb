@@ -32,6 +32,36 @@ module Hoccer
         @@pool = {}
       end
 
+      # Calculates the distance in meters between two peers
+      def distance loc_a, loc_b
+        if ( loc_a.nil? || loc_b.nil? )
+          return nil
+        end
+
+        distance_latitude   = (loc_a["latitude"]   - loc_b["latitude"]).to_rad
+        distance_longitude  = (loc_a["longitude"]  - loc_b["longitude"]).to_rad
+
+        a = (Math.sin(distance_latitude/2) ** 2) +
+            (Math.cos(loc_a["latitude"].to_rad) *
+             Math.cos(loc_b["latitude"].to_rad)) *
+            (Math.sin(distance_longitude/2) ** 2)
+
+        if a < 0 || a > 1
+          puts(
+            #"!!!!! #{a}; #{peer_a.latitude}; #{peer_a.longitude}" +
+            "Something went wrong calculationg the distance"
+            #"#{peer_b.latitude}; #{peer_b.longitude}"
+          )
+        end
+
+        c = 2 * Math.atan2(
+          Math.sqrt(a),
+          Math.sqrt(1-a)
+        )
+
+        distance = 6367516 * c
+
+      end
     end
 
     def initialize options
@@ -75,16 +105,33 @@ module Hoccer
 
     def nearby? other_client
       if self.environment && other_client.environment
-        my_lon    = environment["gps"]["longitude"].to_i rescue nil
-        my_lat    = environment["gps"]["latitude"].to_i  rescue nil
-
-        other_lon = other_client.environment["gps"]["longitude"].to_i rescue nil
-        other_lat = other_client.environment["gps"]["latitude"].to_i  rescue nil
-
-        return if [my_lon, my_lat, other_lon, other_lat].any?(&:nil?)
-        my_lon == other_lon && my_lat == other_lat
+        distance = Client.distance(
+          self.environment["gps"],
+          other_client.environment["gps"]
+        )
+        distance && distance < 1000.0
       else
         false
+      end
+    end
+
+    def verify_group action
+      clients   = all_in_group.select(&:sender?)
+      receiver  = all_in_group.select(&:receiver?)
+
+      if clients.size >= 1 && receiver.size >= 1
+        all_in_group.each do |client|
+          if client.request
+            puts "Y A Y"
+
+            data_list = clients.map do |client|
+              client.actions[action][:payload]
+            end
+
+            client.request.body { data_list.to_json }
+            client.request = nil
+          end
+        end
       end
     end
 

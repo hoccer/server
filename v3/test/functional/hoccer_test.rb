@@ -53,11 +53,11 @@ class TestHoccer < Test::Unit::TestCase
   test "clients updates its environment with being grouped" do
     @client_2 = Client.create(
       :environment => {
-        "gps" => { "longitude" => 13, "latitude" => 14 }
+        "gps" => { "longitude" => 13.1, "latitude" => 14.1 }
       }
     )
 
-    env = {"gps" => { "longitude" => 13, "latitude" => 14 }}.to_json
+    env = {"gps" => { "longitude" => 13.1, "latitude" => 14.1 }}.to_json
     put "/clients/#{@client.uuid}/environment", env
     assert_async
     em_async_continue
@@ -69,10 +69,10 @@ class TestHoccer < Test::Unit::TestCase
   end
 
   test "posting a share action" do
-    @client.environment = {"gps" => { "longitude" => 13, "latitude" => 14 }}
+    @client.environment = {"gps" => { "longitude" => 13.1, "latitude" => 14.1 }}
     @client_2 = Client.create(
       :environment => {
-        "gps" => { "longitude" => 13, "latitude" => 14 }
+        "gps" => { "longitude" => 13.1, "latitude" => 14.1 }
       }
     )
     json = [{:inline => "hallo welt"}].to_json
@@ -85,10 +85,10 @@ class TestHoccer < Test::Unit::TestCase
   end
 
   test "trying to receive with an action" do
-    @client.environment = {"gps" => { "longitude" => 13, "latitude" => 14 }}
+    @client.environment = {"gps" => { "longitude" => 13.1, "latitude" => 14.2 }}
     @client_2 = Client.create(
       :environment => {
-        "gps" => { "longitude" => 13, "latitude" => 14 }
+        "gps" => { "longitude" => 13.1, "latitude" => 14.2}
       }
     )
     @client.rebuild_groups
@@ -106,7 +106,7 @@ class TestHoccer < Test::Unit::TestCase
   end
 
   test "deleting the client environment" do
-    @client.environment = {"gps" => { "longitude" => 13, "latitude" => 14 }}
+    @client.environment = {"gps" => { "longitude" => 13.2, "latitude" => 14.2 }}
 
     delete "/clients/#{@client.uuid}/environment"
     assert_equal 200, last_response.status
@@ -116,14 +116,14 @@ class TestHoccer < Test::Unit::TestCase
 
   test "sharing actual data" do
     # Prepare sending client
-    @client.environment = {"gps" => { "longitude" => 13, "latitude" => 14 }}
+    @client.environment = {"gps" => { "longitude" => 13.2, "latitude" => 14.2 }}
     @client.actions[:pass] = { :payload => { :inline => "hello world !!1" } }
     @client.mode = :sender
 
     # Prepare receiving client
     @client_2 = Client.create(
       :environment => {
-        "gps" => { "longitude" => 13, "latitude" => 14 }
+        "gps" => { "longitude" => 13.2, "latitude" => 14.2 }
       }
     )
 

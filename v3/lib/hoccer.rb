@@ -52,6 +52,16 @@ module Hoccer
       end
     end
 
+    delete %r{/clients/([a-f0-9]{32,32})/environment} do |uuid|
+      if client = Client.find( uuid )
+        client.environment = {}
+        client.group_id = nil
+        halt 200
+      else
+        halt 412
+      end
+    end
+
     post %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action_name|
       if client = Client.find( uuid )
         payload = JSON.parse( request.body.read )

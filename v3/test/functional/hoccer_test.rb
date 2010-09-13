@@ -105,4 +105,13 @@ class TestHoccer < Test::Unit::TestCase
     assert_equal 200, last_response.status
     puts last_response.body
   end
+
+  test "deleting the client environment" do
+    @client.environment = {"gps" => { "longitude" => 13, "latitude" => 14 }}
+
+    delete "/clients/#{@client.uuid}/environment"
+    assert_equal 200, last_response.status
+    assert_nil @client.group_id
+    assert_equal Hash.new, @client.environment
+  end
 end

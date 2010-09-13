@@ -105,7 +105,12 @@ module Hoccer
             client.all_in_group.each do |client|
               if client.request
                 puts "Y A Y"
-                client.request.body { "success" }
+
+                data_list = clients.map do |client|
+                  client.actions[action][:payload]
+                end
+
+                client.request.body { data_list.to_json }
                 client.request = nil
               end
             end

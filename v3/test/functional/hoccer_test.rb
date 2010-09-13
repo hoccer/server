@@ -103,7 +103,6 @@ class TestHoccer < Test::Unit::TestCase
     em_async_continue
 
     assert_equal 200, last_response.status
-    puts last_response.body
   end
 
   test "deleting the client environment" do
@@ -113,5 +112,30 @@ class TestHoccer < Test::Unit::TestCase
     assert_equal 200, last_response.status
     assert_nil @client.group_id
     assert_equal Hash.new, @client.environment
+  end
+
+  test "sharing actual data" do
+    # Prepare sending client
+    @client.environment = {"gps" => { "longitude" => 13, "latitude" => 14 }}
+    @client.actions[:pass] = { :payload => { :inline => "hello world !!1" } }
+    @client.mode = :sender
+
+    # Prepare receiving client
+    @client_2 = Client.create(
+      :environment => {
+        "gps" => { "longitude" => 13, "latitude" => 14 }
+      }
+    )
+
+    # Group them together
+    @client.rebuild_groups
+    assert_not_nil @client.group_id
+    assert_equal @client.group_id, @client_2.group_id
+    get "/clients/#{@client_2.uuid}/action/pass"
+    assert_async
+    em_async_continue
+    expected = '[{"inline":"hello world !!1"}]'
+    assert_equal expected, last_response.body
+    assert_equal 200, last_response.status
   end
 end

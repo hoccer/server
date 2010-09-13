@@ -3,6 +3,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "lib"))
 
 require 'init'
 
-EM.kqueue? ? EM.kqueue : EM.epoll
+# Change this to EM.epoll on linux
+EM.kqueue
 
 run Hoccer::App

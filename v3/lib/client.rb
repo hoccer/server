@@ -41,9 +41,9 @@ module Hoccer
         distance_latitude   = (loc_a["latitude"]   - loc_b["latitude"]).to_rad
         distance_longitude  = (loc_a["longitude"]  - loc_b["longitude"]).to_rad
 
-        a = (Math.sin(distance_latitude/2) ** 2) +
-            (Math.cos(loc_a["latitude"].to_rad) *
-             Math.cos(loc_b["latitude"].to_rad)) *
+        a = (Math.sin(distance_latitude/2) ** 2)  +
+            (Math.cos(loc_a["latitude"].to_rad)   *
+             Math.cos(loc_b["latitude"].to_rad))  *
             (Math.sin(distance_longitude/2) ** 2)
 
         if a < 0 || a > 1

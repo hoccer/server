@@ -116,8 +116,8 @@ module Hoccer
     end
 
     def verify_group action
-      clients   = all_in_group.select(&:sender?)
-      receiver  = all_in_group.select(&:receiver?)
+      clients   = all_in_group.select { |c| c.sender? && c.actions[action] }
+      receiver  = all_in_group.select { |c| c.receiver? && c.actions[action] }
 
       if clients.size >= 1 && receiver.size >= 1
         all_in_group.each do |client|

@@ -41,6 +41,12 @@ class TestClient
     response
   end
 
+  def receive_unthreaded mode
+    Net::HTTP.start(@server, @port) {|http|
+      http.get( action_path(mode) )
+    }
+  end
+
   def receive mode
     t = Thread.new do
       Net::HTTP.start(@server, @port) {|http|
@@ -58,6 +64,14 @@ class TestClient
         }
       end
       t.value
+    end
+  end
+
+  def follow_redirect_unthreadded
+    if @redirect_location
+      Net::HTTP.start(@server, @port) {|http|
+        http.get( @redirect_location )
+      }
     end
   end
 

@@ -72,7 +72,7 @@ class TestRequest < Test::Unit::TestCase
     time_taken = Time.now - start_time
 
     assert time_taken >= 7, "Should timeout after 7 seconds"
-    assert_equal "200", response.header.code
+    assert_equal "204", response.header.code
 
     client_1.delete_environment
     client_2.delete_environment
@@ -95,7 +95,7 @@ class TestRequest < Test::Unit::TestCase
     time_taken = Time.now - start_time
 
     assert time_taken >= 7, "Should timeout after 7 seconds"
-    assert_equal "200", response.header.code
+    assert_equal "204", response.header.code
 
     client_1.delete_environment
     client_2.delete_environment
@@ -114,7 +114,7 @@ class TestRequest < Test::Unit::TestCase
     })
 
     client_1.share( "pass", {:inline => "foobar"} )
-    assert_equal "200", client_1.follow_redirect.header.code
+    assert_equal "204", client_1.follow_redirect.header.code
 
     expected = "[{\"inline\":\"foobar\"}]"
     assert_equal expected, client_2.receive( "pass" ).body

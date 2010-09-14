@@ -90,6 +90,7 @@ module Hoccer
         EM::Timer.new(7) do
           client.all_in_group.each do |client|
             if client.request
+              client.request.status 204
               client.request.body { {"message" => "timeout"}.to_json }
             end
             client.actions.delete( action )

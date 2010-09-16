@@ -1,0 +1,12 @@
+source "http://rubygems.org"
+
+#gem "eventmachine", "0.12.11", :git => "git://github.com/eventmachine/eventmachine.git"
+gem "eventmachine"
+gem "em-mongo"
+gem "sinatra"
+gem "async_sinatra"
+gem 'async-rack'
+gem 'rack-test'
+gem 'ruby-debug19'
+gem "thin"
+gem 'uuid'

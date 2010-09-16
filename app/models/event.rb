@@ -197,7 +197,11 @@ class Event < ActiveRecord::Base
       unless linked_events.empty?
         old_event_group_id = event_group.try(:id)
         linked_events.first.event_group.events << self
-        EventGroup.find(old_event_group_id).destroy if old_event_group_id
+        if old_event_group_id
+          old_group = EventGroup.find(old_event_group_id)
+          logger.info "<< Delete group with event sizes #{old_group.events.size}"
+          old_group.destroy
+        end
       end
     end
 

@@ -211,6 +211,8 @@ class Event < ActiveRecord::Base
             event.lock!('FOR UPDATE NOWAIT')
           end
 
+          logger.info "GROUP: #{new_group_members.map(&:id).inspect}
+
           new_group_members.each do |event|
             event.update_attributes(:event_group_id => new_group.id)
           end

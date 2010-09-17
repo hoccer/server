@@ -211,8 +211,6 @@ class Event < ActiveRecord::Base
             event.lock!('FOR UPDATE NOWAIT')
           end
 
-          raise ActiveRecord::StatementInvalid
-
           new_group_members.each do |event|
             event.update_attributes(:event_group_id => new_group.id)
           end

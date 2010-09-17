@@ -190,19 +190,38 @@ class Event < ActiveRecord::Base
   def info
     extend Hoccer::Legacy if legacy?
 
-    if event_group.nil? || (event_group.events - [self]).empty?
-      linked_events = nearby_events(:types => [seeder, peer]).select do |e|
-        e.event_group && !(e.event_group.events - [self]).empty?
-      end
-      unless linked_events.empty?
-        old_event_group_id = event_group.try(:id)
-        linked_events.first.event_group.events << self
-        if old_event_group_id
-          old_group = EventGroup.find(old_event_group_id)
-          logger.info "<< Delete group with event sizes #{old_group.events.size}"
-          old_group.destroy
+    # nil, [] or [e1,e2]
+    neighbors = (event_group.events - [self]) if event_group
+    neighbors ||= []
+
+    return info_hash if (neighbors.size > 0)
+
+    possible_neighbors = nearby_events(:types => [peer, seeder])
+
+    if neighbors.empty? && possible_neighbors.empty?
+      logger.info "GROUP: Really, there is nobody around"
+    elsif neighbors.empty? && !possible_neighbors.empty?
+      logger.info "GROUP: Empty group but new neighbors around. REGROUP!"
+
+      begin
+        Event.transaction do
+          new_group = EventGroup.create!
+
+          new_group_members = ( possible_neighbors + [self] ).map do |event|
+            event.lock!('FOR UPDATE NOWAIT')
+          end
+
+          raise ActiveRecord::StatementInvalid
+
+          new_group_members.each do |event|
+            event.update_attributes(:event_group_id => new_group.id)
+          end
         end
+      rescue ActiveRecord::StatementInvalid => ex
+        logger.info "GROUP: Could not aqcuire lock"
       end
+    else
+      logger.warn "!!! You really shouldn't be here"
     end
 
     info_hash

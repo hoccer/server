@@ -207,15 +207,15 @@ class Event < ActiveRecord::Base
         Event.transaction do
           new_group = EventGroup.create!
 
-          new_group_members = ( possible_neighbors + [self] ).map do |event|
+          ( possible_neighbors + [self] ).each do |event|
+            logger.info "GROUP: Trying to Lock event with id #{event.id}"
             event.lock!('FOR UPDATE NOWAIT')
-          end
-
-          logger.info "GROUP: #{new_group_members.map(&:id).inspect}
-
-          new_group_members.each do |event|
+            logger.info "GROUP: Locked event with id #{event.id}"
             event.update_attributes(:event_group_id => new_group.id)
+            logger.info "GROUP: Updated event with id #{event.id}"
           end
+
+          logger.info "GROUP: #{new_group.events.map(&:id).inspect}"
         end
       rescue ActiveRecord::StatementInvalid => ex
         logger.info "GROUP: Could not aqcuire lock"

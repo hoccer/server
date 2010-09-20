@@ -16,6 +16,14 @@ class TestClient
     post "/store", data.to_json
   end
 
+  def remove uuid
+    delete "/store/#{uuid}"
+  end
+
+  def query data
+    post "/query", data.to_json
+  end
+
   def request method, path, data = ""
     Net::HTTP.start(@server, @port) do |http|
       http.send( "request_#{method}".to_sym, path, data )

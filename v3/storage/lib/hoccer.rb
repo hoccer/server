@@ -21,6 +21,17 @@ module GeoStore
       end
     end
 
+    delete %r{/store/([a-f0-9]{24,24}$)} do |uuid|
+      @@db ||= EM::Mongo::Connection.new.db('db')
+      collection = @@db.collection('test')
+
+      if collection.remove( { :_id => BSON::ObjectId.from_string(uuid) } )
+        halt 200
+      else
+        halt 404
+      end
+    end
+
     apost %r{/query} do
       payload = JSON.parse(request.body.read)
 

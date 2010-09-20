@@ -12,6 +12,8 @@ module GeoStore
       @@db ||= EM::Mongo::Connection.new.db('db')
       collection = @@db.collection('test')
       EM.next_tick do
+        payload["lifetime"]  ||= 1800
+        payload["ending_at"] = (Time.now.to_i + payload["lifetime"].abs)
         result = collection.insert( payload )
 
         response  = { :url => "/store/#{ result["_id"].to_s }" }
@@ -28,7 +30,14 @@ module GeoStore
 
       if box = payload["box"]
         EM.next_tick do
-          collection.find({"environment.gps" => {"$within" => {"$box" => box}}}) do |res|
+          query = {
+            "environment.gps" => {
+              "$within" => {"$box" => box}
+            },
+            "ending_at" => {"$lt" => (Time.now.to_i)}
+          }
+
+          collection.find( query ) do |res|
             new_results = res.map do |item|
               item.delete("_id")
               item
@@ -37,10 +46,16 @@ module GeoStore
           end
         end
       else
-        center    = payload["gps"]["longitude"], payload["gps"]["latitude"]
-        radius    = (payload["gps"]["accuracy"].to_f/6371)
         EM.next_tick do
-          collection.find({"environment.gps" => {"$within" => { "$center" => [center, radius]}}}) do |res|
+          center    = payload["gps"]["longitude"], payload["gps"]["latitude"]
+          radius    = (payload["gps"]["accuracy"].to_f/6371)
+          query     = {
+            "environment.gps" => {
+              "$within" => { "$center" => [center, radius] }
+            },
+            "ending_at" => {"$lt" => (Time.now.to_i)}
+          }
+          collection.find( query ) do |res|
             new_results = res.map do |item|
               item.delete("_id")
               item

@@ -60,6 +60,7 @@ module.exports =  function() {
     },
     
     send: function(action) {
+      sys.puts("send");
       var senderForMode = sender[action.mode] || [];
       senderForMode.push(action);
       sender[action.mode] = senderForMode;
@@ -68,6 +69,7 @@ module.exports =  function() {
     },
     
     receive: function(action) {
+      sys.puts("receive");
       var receiverForMode = receiver[action.mode] || [];
       receiverForMode.push(action);
       receiver[action.mode] = receiverForMode;

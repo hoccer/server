@@ -12,10 +12,11 @@ module GeoStore
       @@db ||= EM::Mongo::Connection.new.db('db')
       collection = @@db.collection('test')
       EM.next_tick do
-        collection.insert( payload )
-      end
+        result = collection.insert( payload )
 
-      body { "yeag" }
+        response  = { :url => "/store/#{ result["_id"].to_s }" }
+        ahalt 201, {'Content-Type' => 'application/json'}, response.to_json
+      end
     end
 
     apost %r{/query} do

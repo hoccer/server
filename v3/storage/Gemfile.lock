@@ -7,6 +7,7 @@ GEM
     async_sinatra (0.2.2)
       sinatra (>= 1.0)
     bson (1.0.7)
+    bson_ext (1.0.7)
     columnize (0.3.1)
     daemons (1.1.0)
     em-mongo (0.2.12)
@@ -44,6 +45,7 @@ PLATFORMS
 DEPENDENCIES
   async-rack
   async_sinatra
+  bson_ext
   em-mongo
   eventmachine
   rack-test

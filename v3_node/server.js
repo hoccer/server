@@ -13,7 +13,7 @@ exports.create = function() {
   
   app.configure(function() {
     app.use(express.methodOverride());
-    app.use(express.bodyDecoder());
+    // app.use(express.bodyDecoder());
   });
   
   app.groupPool = GroupPool();
@@ -25,7 +25,7 @@ exports.create = function() {
   });
   
   app.get('/clients/:id', function(req, res) {
-    res.send({uri: "http://" + req.headers.host +  "/clients/" + req.params.id}, 
+    res.send({uri: "/clients/" + req.params.id}, 
              {'Content-Type': 'application/json'});
   });
   
@@ -54,9 +54,18 @@ exports.create = function() {
       });
       
       sys.puts("redirect");
-      res.send(303);
+      res.redirect("http://" + req.headers.host + "/client/12/action/distribute/12", 303);
     });
   });
+  
+  app.get("/client/12/action/distribute/12", function(req, res) {
+    setTimeout(function() {
+      res.send(200);  
+    }, 1000);
+    
+  });
+  
+  
   
   app.get("/clients/:id/action/:mode", function(req, res) {
     var group = app.groupPool.groupForUser(req.params.id);

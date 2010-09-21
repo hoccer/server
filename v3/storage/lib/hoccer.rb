@@ -45,7 +45,7 @@ module GeoStore
             "environment.gps" => {
               "$within" => {"$box" => box}
             },
-            "ending_at" => {"$lt" => (Time.now.to_i)}
+            "ending_at" => {"$gt" => (Time.now.to_i)}
           }
 
           collection.find( query ) do |res|

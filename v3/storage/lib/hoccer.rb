@@ -22,8 +22,7 @@ module GeoStore
     end
 
     delete %r{/store/([a-f0-9]{24,24}$)} do |uuid|
-      @@db ||= EM::Mongo::Connection.new.db('db')
-      collection = @@db.collection('test')
+      collection = db.collection('test')
 
       if collection.remove( { :_id => BSON::ObjectId.from_string(uuid) } )
         halt 200
@@ -36,8 +35,7 @@ module GeoStore
       payload = JSON.parse(request.body.read)
 
       puts payload.inspect
-      @@db ||= EM::Mongo::Connection.new.db('db')
-      collection = @@db.collection('test')
+      collection = db.collection('test')
 
       EM.next_tick do
         query = {}
@@ -67,7 +65,11 @@ module GeoStore
         end
       end
     end
-
+    
+    def db 
+      @@db ||= EM::Mongo::Connection.new.db('db')
+    end
+    
   end
 
 end

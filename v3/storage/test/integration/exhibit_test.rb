@@ -27,5 +27,5 @@ class ExhibitTest < Test::Unit::TestCase
     )
     assert_equal "200", response.header.code
   end
-
+  
 end

@@ -39,41 +39,31 @@ module GeoStore
       @@db ||= EM::Mongo::Connection.new.db('db')
       collection = @@db.collection('test')
 
-      if box = payload["box"]
-        EM.next_tick do
-          query = {
-            "environment.gps" => {
-              "$within" => {"$box" => box}
-            },
-            "ending_at" => {"$gt" => (Time.now.to_i)}
-          }
+      EM.next_tick do
+        query = {}
+        query["ending_at"] = {"$gt" => (Time.now.to_i)}
+        query["params"] = payload["find"] if payload["find"]
 
-          collection.find( query ) do |res|
-            new_results = res.map do |item|
-              item.delete("_id")
-              item
-            end
-            body { new_results.to_json }
-          end
-        end
-      else
-        EM.next_tick do
+        if box = payload["box"]
+          query["environment.gps"] = {
+            "$within" => {"$box" => box}
+          }
+        else
           center    = payload["gps"]["longitude"], payload["gps"]["latitude"]
           radius    = (payload["gps"]["accuracy"].to_f/6371)
-          query     = {
-            "environment.gps" => {
-              "$within" => { "$center" => [center, radius] }
-            },
-            "ending_at" => {"$gt" => (Time.now.to_i)}
-          }
-
-          collection.find( query ) do |res|
-            new_results = res.map do |item|
-              item.delete("_id")
-              item
-            end
-            body { new_results.to_json }
+          query["environment.gps"] = {
+            "$within" => { "$center" => [center, radius] }
+          }  
+        end
+        
+        puts "query: #{query}"
+        
+        collection.find( query ) do |res|
+          new_results = res.map do |item|
+            item.delete("_id")
+            item
           end
+          body { new_results.to_json }
         end
       end
     end

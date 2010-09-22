@@ -49,13 +49,11 @@ module GeoStore
         else
           center    = payload["gps"]["longitude"], payload["gps"]["latitude"]
           radius    = (payload["gps"]["accuracy"].to_f/6371)
-          query["environment.gps"] = {
-            "$within" => { "$center" => [center, radius] }
+          query["environment.gps"] = { 
+            "$within" => { "$center" => [center, radius] } 
           }  
         end
-        
-        puts "query: #{query}"
-        
+
         collection.find( query ) do |res|
           new_results = res.map do |item|
             item.delete("_id")

@@ -1,4 +1,3 @@
-require 'ruby-debug'
 module GeoStore
 
   class App < Sinatra::Base
@@ -40,34 +39,34 @@ module GeoStore
       EM.next_tick do
         query = {}
         query["ending_at"] = {"$gt" => (Time.now.to_i)}
-        query["params"] = payload["find"] if payload["find"]
+        query["data"] = payload["conditions"] if payload["conditions"]
 
-        if box = payload["box"]
+        if box = payload["bbox"]
           query["environment.gps"] = {
             "$within" => {"$box" => box}
           }
         else
           center    = payload["gps"]["longitude"], payload["gps"]["latitude"]
           radius    = (payload["gps"]["accuracy"].to_f/6371)
-          query["environment.gps"] = { 
-            "$within" => { "$center" => [center, radius] } 
-          }  
+          query["environment.gps"] = {
+            "$within" => { "$center" => [center, radius] }
+          }
         end
 
         collection.find( query ) do |res|
           new_results = res.map do |item|
-            item.delete("_id")
+            item["_id"] = item["_id"].to_s
             item
           end
           body { new_results.to_json }
         end
       end
     end
-    
-    def db 
+
+    def db
       @@db ||= EM::Mongo::Connection.new.db('db')
     end
-    
+
   end
 
 end

@@ -207,18 +207,35 @@ class Event < ActiveRecord::Base
         Event.transaction do
           new_group = EventGroup.create!
 
-          ( possible_neighbors + [self] ).each do |event|
-            logger.info "GROUP: Trying to Lock event with id #{event.id}"
-            event.lock!('FOR UPDATE NOWAIT')
-            logger.info "GROUP: Locked event with id #{event.id}"
+          logger.info "Trying to aquire Locks for Events"
+          puts "Trying to aquire Locks for Events"
+
+          events_for_group = Event.find(
+            ( possible_neighbors + [self] ).map(&:id),
+            :lock => 'FOR UPDATE NOWAIT'
+          )
+
+          logger.info "Successfully aquired Locks for Events"
+          puts "Successfully aquired Locks for Events"
+
+          events_for_group.each do |event|
             event.update_attributes(:event_group_id => new_group.id)
             logger.info "GROUP: Updated event with id #{event.id}"
+            puts "GROUP: Updated event with id #{event.id}"
           end
 
+          logger.info "Updated Events"
+          puts "Updated Events"
+
           logger.info "GROUP: #{new_group.events.map(&:id).inspect}"
+          puts "GROUP: #{new_group.events.map(&:id).inspect}"
+
+          self.reload
         end
       rescue ActiveRecord::StatementInvalid => ex
         logger.info "GROUP: Could not aqcuire lock"
+      rescue => ex
+        logger.warn "!!!!!!!!!!!!! #{ex.inspect}"
       end
     else
       logger.warn "!!! You really shouldn't be here"

@@ -23,12 +23,15 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   test "lonely catch event joins lonely throw event while polling" do
+    eg_1 = EventGroup.create
+    eg_2 = EventGroup.create
 
     throw_event = create_event_with_times(Time.now, 7.seconds.from_now, Throw)
     catch_event = create_event_with_times(Time.now, 7.seconds.from_now, Catch)
 
-    catch_event.update_attributes :event_group_id => nil
-    assert_nil catch_event.reload.event_group
+    catch_event.update_attributes :event_group_id => eg_1.id
+
+    assert_not_equal throw_event.event_group, catch_event.event_group
 
     get :show, :id => catch_event.uuid
     assert_response :success
@@ -44,8 +47,11 @@ class EventsControllerTest < ActionController::TestCase
     event_3 = create_event_with_times(Time.now, 7.seconds.from_now, Catch)
     event_4 = create_event_with_times(Time.now, 7.seconds.from_now, Throw)
 
-    event_1.update_attributes :event_group_id => 1
-    event_3.update_attributes :event_group_id => 2
+    eg_1 = EventGroup.create
+    eg_2 = EventGroup.create
+
+    event_1.update_attributes :event_group_id => eg_1.id
+    event_3.update_attributes :event_group_id => eg_2.id
 
     get :show, :id => event_1.uuid
     assert_response 409

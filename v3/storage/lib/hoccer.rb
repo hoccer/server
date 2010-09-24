@@ -5,15 +5,34 @@ module GeoStore
 
     @@db = nil
 
-    apost %r{/store} do
-      payload = JSON.parse(request.body.read)
-      puts payload.inspect
-      @@db ||= EM::Mongo::Connection.new.db('db')
-      collection = @@db.collection('test')
+    def authorized_request &block
       EM.next_tick do
+        db.collection('users').first("api_key" => params["apiKey"]) do |res|
+          ahalt 432 if res.nil?
+
+          signature = params.delete("signature")
+          uri       = env['REQUEST_URI'].gsub(/\&signature\=.+$/, "")
+
+          digestor = Digest::HMAC.new( res["shared_secret"], Digest::SHA1 )
+          computed_signature = digestor.base64digest(uri)
+
+          if signature == computed_signature
+            block.call
+          else
+            ahalt 401
+          end
+        end
+      end
+    end
+
+    apost %r{/store} do
+      authorized_request do
+        payload = JSON.parse(request.body.read)
         payload["lifetime"]  ||= 1800
         payload["ending_at"] = (Time.now.to_i + payload["lifetime"].abs)
-        result = collection.insert( payload )
+
+        puts payload.inspect
+        result = db.collection('test').insert( payload )
 
         response  = { :url => "/store/#{ result["_id"].to_s }" }
         ahalt 201, {'Content-Type' => 'application/json'}, response.to_json
@@ -31,12 +50,12 @@ module GeoStore
     end
 
     apost %r{/query} do
-      payload = JSON.parse(request.body.read)
+      authorized_request do
+        payload = JSON.parse(request.body.read)
 
-      puts payload.inspect
-      collection = db.collection('test')
+        puts payload.inspect
+        collection = db.collection('test')
 
-      EM.next_tick do
         query = {}
         query["ending_at"] = {"$gt" => (Time.now.to_i)}
         query["data"] = payload["conditions"] if payload["conditions"]

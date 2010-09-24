@@ -174,6 +174,12 @@ class Event < ActiveRecord::Base
     elsif expired? && 0 < number_of_seeders && 0 < number_of_peers
       :ready
     else
+      logger "ERROR: expired: #{expired?}"
+      logger "collisions: #{collisions?}"
+      logger "number of seeders: #{number_of_seeders}"
+      logger "number of peers: #{number_of_peers}"
+      logger "event: #{event.inspect}"
+      logger "event group: #{event.event_group.inspect}"
       :error
     end
 
@@ -208,7 +214,6 @@ class Event < ActiveRecord::Base
           new_group = EventGroup.create!
 
           logger.info "Trying to aquire Locks for Events"
-          puts "Trying to aquire Locks for Events"
 
           events_for_group = Event.find(
             ( possible_neighbors + [self] ).map(&:id),
@@ -216,19 +221,14 @@ class Event < ActiveRecord::Base
           )
 
           logger.info "Successfully aquired Locks for Events"
-          puts "Successfully aquired Locks for Events"
 
           events_for_group.each do |event|
             event.update_attributes(:event_group_id => new_group.id)
             logger.info "GROUP: Updated event with id #{event.id}"
-            puts "GROUP: Updated event with id #{event.id}"
           end
 
           logger.info "Updated Events"
-          puts "Updated Events"
-
           logger.info "GROUP: #{new_group.events.map(&:id).inspect}"
-          puts "GROUP: #{new_group.events.map(&:id).inspect}"
 
           self.reload
         end

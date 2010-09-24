@@ -104,6 +104,17 @@ module Hoccer
           :peers        => 0,
           :status_code  => 410
         }
+
+      when :error
+        logger "ERROR: Something went wrong in #current_state"
+        {
+          :state        => :error,
+          :message      => "An error occurred",
+          :uploads      => [],
+          :expires      => 0,
+          :peers        => 0,
+          :status_code  => 400
+        }
       end
 
       if upload

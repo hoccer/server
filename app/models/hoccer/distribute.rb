@@ -102,6 +102,7 @@ module Hoccer
         }
 
       when :error
+        logger "ERROR: Something went wrong in #current_state"
         {
           :state        => :error,
           :message      => "An error occurred",

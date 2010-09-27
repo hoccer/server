@@ -8,18 +8,21 @@ module GeoStore
     def authorized_request &block
       EM.next_tick do
         db.collection('users').first("api_key" => params["apiKey"]) do |res|
-          ahalt 432 if res.nil?
-
-          signature = params.delete("signature")
-          uri       = env['REQUEST_URI'].gsub(/\&signature\=.+$/, "")
-
-          digestor = Digest::HMAC.new( res["shared_secret"], Digest::SHA1 )
-          computed_signature = digestor.base64digest(uri)
-
-          if signature == computed_signature
-            block.call
-          else
+          if res.nil?
             ahalt 401
+          else
+
+            signature = params.delete("signature")
+            uri       = env['REQUEST_URI'].gsub(/\&signature\=.+$/, "")
+
+            digestor = Digest::HMAC.new( res["shared_secret"], Digest::SHA1 )
+            computed_signature = digestor.base64digest(uri)
+
+            if signature == computed_signature
+              block.call
+            else
+              ahalt 401
+            end
           end
         end
       end

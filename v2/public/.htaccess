@@ -1,0 +1,8 @@
+RewriteEngine on
+
+RewriteRule (___.*) http://hoccer.com/$1 [R=301,NE,L]
+
+RewriteCond %{REQUEST_METHOD} !HEAD [NC]
+RewriteCond %{HTTP_HOST} ^www.hoccer.com [NC]
+RewriteCond %{THE_REQUEST} !/(legacy|events|peers|uploads|pieces|error_reports).* [NC]
+RewriteRule (.*) http://hoccer.com/ [R=301,NE,L]

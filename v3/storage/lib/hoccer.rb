@@ -41,14 +41,14 @@ module GeoStore
       end
     end
 
-    delete %r{/store/([a-f0-9]{24,24}$)} do |uuid|
+    adelete %r{/store/([a-f0-9]{24,24}$)} do |uuid|
       authorized_request do
         collection = db.collection('data')
 
         if collection.remove( { :_id => BSON::ObjectId.from_string(uuid) } )
-          halt 200
+          ahalt 200
         else
-          halt 404
+          ahalt 404
         end
       end
     end

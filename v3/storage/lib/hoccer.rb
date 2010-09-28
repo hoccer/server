@@ -11,7 +11,6 @@ module GeoStore
           if res.nil?
             ahalt 401
           else
-
             signature = params.delete("signature")
             uri       = env['REQUEST_URI'].gsub(/\&signature\=.+$/, "")
 
@@ -35,7 +34,7 @@ module GeoStore
         payload["ending_at"] = (Time.now.to_i + payload["lifetime"].abs)
 
         puts payload.inspect
-        result = db.collection('test').insert( payload )
+        result = db.collection('data').insert( payload )
 
         response  = { :url => "/store/#{ result["_id"].to_s }" }
         ahalt 201, {'Content-Type' => 'application/json'}, response.to_json
@@ -43,7 +42,7 @@ module GeoStore
     end
 
     delete %r{/store/([a-f0-9]{24,24}$)} do |uuid|
-      collection = db.collection('test')
+      collection = db.collection('data')
 
       if collection.remove( { :_id => BSON::ObjectId.from_string(uuid) } )
         halt 200
@@ -57,7 +56,7 @@ module GeoStore
         payload = JSON.parse(request.body.read)
 
         puts payload.inspect
-        collection = db.collection('test')
+        collection = db.collection('data')
 
         query = {}
         query["ending_at"] = {"$gt" => (Time.now.to_i)}
@@ -86,7 +85,7 @@ module GeoStore
     end
 
     def db
-      @@db ||= EM::Mongo::Connection.new.db('db')
+      @@db ||= EM::Mongo::Connection.new.db('hoccer_v3')
     end
 
   end

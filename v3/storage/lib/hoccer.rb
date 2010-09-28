@@ -28,8 +28,8 @@ module GeoStore
       end
     end
 
-    apost %r{/store} do |account|
-      authorized_request do
+    apost %r{/store} do
+      authorized_request do |account|
         payload = JSON.parse(request.body.read)
         payload["lifetime"]   ||= 1800
         payload["ending_at"]  = (Time.now.to_i + payload["lifetime"].abs)

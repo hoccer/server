@@ -1,0 +1,12 @@
+<h1>Welcome to the Hoccer API</h1>
+
+blablabla
+
+<h2>Your Account</h2>
+
+<% if current_account %>
+  <%= render :partial => 'account' %>
+<% else %>
+  You're currently not signed in:
+  <%= link_to "Log in", new_account_session_path %>
+<% end %>

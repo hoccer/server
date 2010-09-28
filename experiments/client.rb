@@ -5,7 +5,7 @@ class Client
 
   def initialize lat=nil, long=nil, accuracy=nil
 
-    response = http_post "http://beta.hoccer.com/v3/clients", "{client:'ruby tester'}"
+    response = http_post "http://127.0.0.1/clients", '{"client" : "ruby tester"}'
     @uri = JSON.parse(response)[:uri]
 
     set_gps lat, long, accuracy if lat
@@ -30,7 +30,8 @@ class Client
 
   def http_get uri
     uri = URI.parse(uri)
-    Net::HTTP.start(uri.host) {|http|
+
+    Net::HTTP.start(uri.host, 9292) {|http|
       response = http.get uri.path
       raise NoOneSharedError if response.code == 410
       raise CollisionError if response.code == 409
@@ -40,14 +41,15 @@ class Client
 
   def http_put uri, payload
     uri = URI.parse(uri)
-    Net::HTTP.start(uri.host) {|http|
+    Net::HTTP.start(uri.host, 9292) {|http|
       return (http.request_put uri.path, payload).body
     }
   end
 
   def http_post uri, payload
     uri = URI.parse(uri)
-    Net::HTTP.start(uri.host) {|http|
+
+    Net::HTTP.start(uri.host, 9292) {|http|
       response = http.request_post uri.path, payload
       raise NoOneReceivedError if response.code == 410
       raise CollisionError if response.code == 409

@@ -1,0 +1,11 @@
+h1. Server Installation
+
+* Install >= Ruby 1.9.2
+* Install bundler via <code>gem install bundler</code>
+* Run <code>bundle install</code> to get all the dependencies installed
+
+For local development the use of RVM and Gemsets is recommended as bundler will recognize gemsets for installing the dependencies.
+
+h1. Tests
+
+Functional tests: <code>rake test</code>

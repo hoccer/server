@@ -7,7 +7,7 @@ module GeoStore
 
     def authorized_request &block
       EM.next_tick do
-        db.collection('users').first("api_key" => params["apiKey"]) do |res|
+        db.collection('accounts').first("api_key" => params["apiKey"]) do |res|
           if res.nil?
             ahalt 401
           else

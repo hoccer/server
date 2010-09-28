@@ -1,10 +1,10 @@
 var maps = {
-  
+
   initialize : function() {
     if (GBrowserIsCompatible()) {
       mapContainer = document.getElementById("map_canvas");
       map = new GMap2(mapContainer);
-      
+
       map.setCenter(new GLatLng(52.501077, 13.345116), 17);
       map.enableScrollWheelZoom();
 
@@ -17,7 +17,7 @@ var maps = {
 
     maps.setup_screen();
   },
-  
+
   setup_screen : function() {
     maps.setup_overlay();
 
@@ -48,7 +48,7 @@ var maps = {
     map.addControl(mapControl);
     map.addControl(new GLargeMapControl());
   },
-  
+
   setup_overlay : function() {
     map.clearOverlays();
 
@@ -67,7 +67,7 @@ var maps = {
     var overlay_x         = (340-zoomed_radius_xy)/2;
     var overlay_y         = (340-zoomed_radius_xy)/2;
 
-    logo = new GScreenOverlay('/images/radius.png',
+    logo = new GScreenOverlay('images/radius.png',
             new GScreenPoint(overlay_x, overlay_y, 'pixels', 'pixels'),  // screenXY
             new GScreenPoint(0, 0),  // overlayXY
             new GScreenSize(zoomed_radius_xy, zoomed_radius_xy)  // size on screen
@@ -75,17 +75,17 @@ var maps = {
     map.addOverlay(logo);
 
   },
-  
+
   getLongitude : function() {
     return map.getCenter().lng();
   },
-  
+
   getLatitude : function() {
     return map.getCenter().lat();
-  } 
-  
-  
-  
+  }
+
+
+
 }
 
 // Create new geocoding object

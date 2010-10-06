@@ -3,6 +3,10 @@ require 'action'
 
 module Hoccer
 
+  def self.db
+    @@db ||= EM::Mongo::Connection.new.db('hoccer_v3')
+  end
+
   class App < Sinatra::Base
     register Sinatra::Async
 
@@ -17,7 +21,7 @@ module Hoccer
       ].join("/")
     end
 
-    post "/clients" do
+    apost "/clients" do
       client = Client.create
       redirect "/clients/#{client.uuid}", 303
     end

@@ -14,20 +14,13 @@ module Hoccer
 
     class << self
 
-      def collection
-        Hoccer.db.collection('clients')
-      end
-
       def create options = {}
-        uuid = UUID.generate(:compact)
-        options = {:uuid => uuid}.merge( options )
+        client = self.new options
 
-        Client.collection.find( :uuid => options[:uuid]) do |res|
-          if res.empty?
-            Client.collection.insert( options )
-          else
-            raise ClientAlreadyExists
-          end
+        if @@pool[client.uuid].nil?
+          @@pool[client.uuid] = client
+        else
+          raise ClientAlreadyExists
         end
       end
 

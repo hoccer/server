@@ -2,6 +2,63 @@ module Hoccer
 
   class Client
 
+    def initialize options = {}
+      defaults = {
+        :uuid         => UUID.generate(:compact),
+        :dna          => { :client => "spikey" },
+        :environment  => {}
+      }
+
+      options = defaults.merge( options )
+
+      options.each do |key, value|
+        Client.send :attr_accessor, key
+        instance_variable_set("@#{key}", value)
+      end
+    end
+
+    def self.create options = {}
+      client = Client.new options
+      client.save
+      client
+    end
+
+    def self.collection
+      Hoccer.db.collection('clients')
+    end
+
+    def self.first options, &block
+      collection.first( options ) do |res|
+        if res
+          yield Client.new res
+        else
+          yield nil
+        end
+      end
+    end
+
+    def attributes
+      instance_variables.inject({}) do |result, name|
+        result[ name.to_s.delete("@") ] = instance_variable_get( name )
+        result
+      end
+    end
+
+    def save
+      puts attributes.inspect
+      Client.collection.insert( attributes )
+    end
+
+  end
+
+end
+
+
+__END__
+module Hoccer
+
+  class Client
+
     attr_accessor :uuid,
                   :request,
                   :environment,
@@ -14,11 +71,17 @@ module Hoccer
 
     class << self
 
-      def create options = {}
-        client = self.new options
+      def connection
+        Hoccer.db.connection('clients')
+      end
 
-        if @@pool[client.uuid].nil?
-          @@pool[client.uuid] = client
+      def create options = {}
+        options[:uuid] ||= UUID.generate(:compact)
+
+        connection.find(:uuid => options[:uuid]) do |res|
+          puts res.inspect
+          if res.empty?
+            connection.insert(
         else
           raise ClientAlreadyExists
         end

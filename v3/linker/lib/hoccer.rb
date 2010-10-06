@@ -3,6 +3,10 @@ require 'action'
 
 module Hoccer
 
+  def self.db
+    @@db ||= EM::Mongo::Connection.new.db('hoccer_v3')
+  end
+
   class App < Sinatra::Base
     register Sinatra::Async
 
@@ -17,17 +21,19 @@ module Hoccer
       ].join("/")
     end
 
-    post "/clients" do
+    apost "/clients" do
       client = Client.create
       redirect "/clients/#{client.uuid}", 303
     end
 
-    get %r{/clients/([a-f0-9]{32,32}$)} do |uuid|
-      if client = Client.find( uuid )
-        content_type :json
-        body { {:uri => "/clients/#{client.uuid}"}.to_json }
-      else
-        halt 410
+    aget %r{/clients/([a-f0-9]{32,32}$)} do |uuid|
+      Client.first( :uuid => uuid ) do |client|
+        if client
+          content_type :json
+          body { {:uri => "/clients/#{client.uuid}"}.to_json }
+        else
+          halt 410
+        end
       end
     end
 
@@ -41,24 +47,30 @@ module Hoccer
         halt 410
       end
 
-      if !environment.empty? && client = Client.find( uuid )
-        ahalt 200
-        EM.next_tick do
-          client.environment = environment
-          client.rebuild_groups
+      EM.next_tick do
+        Client.first( :uuid => uuid ) do |client|
+          if client && !environment.empty?
+            client.environment = environment
+            client.save
+            ahalt 200
+          else
+            ahalt 412
+          end
         end
-      else
-        halt 412
       end
     end
 
-    delete %r{/clients/([a-f0-9]{32,32})/environment} do |uuid|
-      if client = Client.find( uuid )
-        client.environment = {}
-        client.group_id = nil
-        halt 200
-      else
-        halt 412
+    adelete %r{/clients/([a-f0-9]{32,32})/environment} do |uuid|
+      EM.next_tick do
+        Client.first( :uuid => uuid ) do |client|
+          if client
+            client.environment = {}
+            client.save
+            ahalt 200
+          else
+            ahalt 412
+          end
+        end
       end
     end
 

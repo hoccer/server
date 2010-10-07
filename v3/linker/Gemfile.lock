@@ -1,3 +1,11 @@
+GIT
+  remote: git://github.com/hukl/em-mongo.git
+  revision: 9315ab3
+  specs:
+    em-mongo (0.2.12)
+      bson (>= 0.20.1)
+      eventmachine (>= 0.12.10)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -6,12 +14,10 @@ GEM
       rack (~> 1.1)
     async_sinatra (0.2.3)
       sinatra (>= 1.0)
-    bson (1.0.9)
+    bson (1.1)
+    bson_ext (1.1)
     columnize (0.3.1)
     daemons (1.1.0)
-    em-mongo (0.2.12)
-      bson (>= 0.20.1)
-      eventmachine (>= 0.12.10)
     eventmachine (0.12.10)
     linecache19 (0.5.11)
       ruby_core_source (>= 0.1.4)
@@ -44,7 +50,9 @@ PLATFORMS
 DEPENDENCIES
   async-rack
   async_sinatra (= 0.2.3)
-  em-mongo
+  bson (>= 1.1)
+  bson_ext (>= 1.1)
+  em-mongo!
   eventmachine
   rack-test
   ruby-debug19

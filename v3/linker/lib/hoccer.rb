@@ -44,7 +44,7 @@ module Hoccer
       rescue JSON::ParserError => e
         content_type :json
         body { {:error => "#{e.class} #{e.message}"}.to_json }
-        halt 410
+        ahalt 410
       end
 
       EM.next_tick do
@@ -74,15 +74,19 @@ module Hoccer
       end
     end
 
-    post %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action_name|
-      if client = Client.find( uuid )
-        payload = JSON.parse( request.body.read )
-        action  = (client.actions[action_name] = { :payload => payload })
+    apost %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action_name|
+      EM.next_tick do
+        Client.first( :uuid => uuid ) do |client|
+          if client
+            payload = JSON.parse( request.body.read )
+            action  = (client.actions[action_name] = { :payload => payload })
 
-        client.mode = :sender
-        redirect action_info_path( action ), 303
-      else
-        halt 412
+            client.mode = :sender
+            redirect action_info_path( action ), 303
+          else
+            ahalt 412
+          end
+        end
       end
     end
 

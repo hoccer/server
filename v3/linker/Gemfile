@@ -2,6 +2,8 @@ source "http://rubygems.org"
 
 #gem "eventmachine", "0.12.11", :git => "git://github.com/eventmachine/eventmachine.git"
 gem "eventmachine"
+gem "bson", ">= 1.1"
+gem "bson_ext", ">= 1.1"
 gem "sinatra"
 gem "async_sinatra", "0.2.3"
 gem 'async-rack'
@@ -9,4 +11,4 @@ gem 'rack-test'
 gem 'ruby-debug19'
 gem "thin"
 gem 'uuid'
-gem 'em-mongo'
+gem 'em-mongo', :git => 'git://github.com/hukl/em-mongo.git'

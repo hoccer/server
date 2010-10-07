@@ -46,7 +46,17 @@ module Hoccer
 
     def save
       puts attributes.inspect
-      Client.collection.insert( attributes )
+      if attributes["_id"]
+        Client.collection.update( {:_id => attributes["_id"]}, attributes )
+      else
+        Client.collection.insert( attributes )
+      end
+    end
+
+    def environment
+      Hoccer.db.collection("environments").first(:client_uuid => uuid) do |res|
+        return res
+      end
     end
 
   end

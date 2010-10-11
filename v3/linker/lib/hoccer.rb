@@ -10,17 +10,6 @@ module Hoccer
   class App < Sinatra::Base
     register Sinatra::Async
 
-    def action_info_path action
-      [
-        "",
-        "clients",
-        "#{action[:client_uuid]}",
-        "action",
-        "#{action[:name]}",
-        "#{action[:uuid]}"
-      ].join("/")
-    end
-
     apost "/clients" do
       client = Client.create
       redirect "/clients/#{client.uuid}", 303
@@ -50,8 +39,7 @@ module Hoccer
       EM.next_tick do
         Client.first( :uuid => uuid ) do |client|
           if client && !environment.empty?
-            client.environment = environment
-            client.save
+            client.update_environment( environment )
             ahalt 200
           else
             ahalt 412
@@ -79,10 +67,9 @@ module Hoccer
         Client.first( :uuid => uuid ) do |client|
           if client
             payload = JSON.parse( request.body.read )
-            action  = (client.actions[action_name] = { :payload => payload })
+            client.update_action( action_name, payload )
 
-            client.mode = :sender
-            redirect action_info_path( action ), 303
+            ahalt 303, {'Location' => "/clients/#{uuid}/action/#{action_name}"}, ""
           else
             ahalt 412
           end
@@ -91,33 +78,46 @@ module Hoccer
     end
 
     aget %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action|
-      if client = Client.find( uuid )
-        if client.all_in_group.size < 2
-          ahalt 204
-        end
 
-        client.request = self
+      Client.first( :uuid => uuid ) do |client|
+        if client
 
-        if client.actions[action].nil?
-          client.actions[action] = {}
-          client.mode = :receiver
-        end
+          client.request = self
 
-        EM::Timer.new(7) do
-          client.all_in_group.each do |client|
-            if client.request
-              client.request.status 204
-              client.request.body { {"message" => "timeout"}.to_json }
+          EM::Timer.new(7) do
+            client.each_in_group do |client|
+              if client.request
+                client.request.status 204
+                client.request.body { {"message" => "timeout"}.to_json }
+              end
+              #client.actions.delete( action )
             end
-            client.actions.delete( action )
+            ahalt 204
           end
+        else
+          ahalt 412
         end
 
-        client.verify_group( action )
-
-      else
-        halt 412
       end
+      #if client = Client.find( uuid )
+      #  if client.all_in_group.size < 2
+      #    ahalt 204
+      #  end
+
+      #  client.request = self
+
+      #  if client.actions[action].nil?
+      #    client.actions[action] = {}
+      #    client.mode = :receiver
+      #  end
+
+
+
+      #  client.verify_group( action )
+
+      #else
+      #  halt 412
+      #end
 
     end
 

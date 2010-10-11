@@ -2,6 +2,8 @@ module Hoccer
 
   class Client
 
+    @@requests = {}
+
     def initialize options = {}
       defaults = {
         :uuid         => UUID.generate(:compact),
@@ -37,11 +39,54 @@ module Hoccer
       end
     end
 
+    def request= request_object
+      @@requests[uuid] = request_object
+    end
+
+    def request
+      @@requests[uuid]
+    end
+
     def attributes
       instance_variables.inject({}) do |result, name|
         result[ name.to_s.delete("@") ] = instance_variable_get( name )
         result
       end
+    end
+
+    def update_environment environment
+      Hoccer.db.collection('environments').update(
+        {:client_uuid => uuid},
+        environment.merge(:client_uuid => uuid),
+        :upsert => true
+      )
+
+      rebuild_groups
+    end
+
+    def rebuild_groups
+      query = { :gps =>  {"$near" => [32.22, 88.74] , "$maxDistance" => 200.to_rad } }
+      Hoccer.db.collection('environments').find( query ) do |results|
+        group_id = rand(2**32)
+        results.each do |result|
+          Hoccer.db.collection('environments').update(
+            {:client_uuid => uuid}, {"$set" => {:group_id => group_id}}
+          )
+        end
+      end
+    end
+
+    def each_in_group &block
+      Client.collection.find do |results|
+        clients = results.map { |r| Client.new( r ) }
+        clients.each do |client|
+          yield client
+        end
+      end
+    end
+
+    def update_action action, payload
+
     end
 
     def save

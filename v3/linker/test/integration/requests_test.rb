@@ -2,10 +2,24 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 require 'helper'
 require 'test_client'
 require 'net/http'
+require 'mongo'
 
 class TestRequest < Test::Unit::TestCase
+  include Mongo
+
+  def setup
+    @db = Connection.new.db('hoccer_v3')
+    @db.collection('clients').remove
+  end
+
+  def teardown
+    @db.collection('clients').remove
+    @db.collection('environments').remove
+  end
 
   test "registering clients" do
+    db = Connection.new.db('hoccer_v3')
+
     client_1 = TestClient.new
     client_1.register
 
@@ -15,8 +29,8 @@ class TestRequest < Test::Unit::TestCase
     assert_not_nil client_1.uuid
     assert_not_nil client_2.uuid
     assert client_1.uuid != client_2.uuid
-    client_1.delete_environment
-    client_2.delete_environment
+
+    assert_equal 2, @db.collection('clients').find.to_a.size
   end
 
   test "updating the environment" do
@@ -27,20 +41,21 @@ class TestRequest < Test::Unit::TestCase
       :gps => { :latitude => 32.22, :longitude => 88.74 }
     })
 
+    assert_equal 1, @db.collection('environments').find.to_a.size
+
     assert_equal "200", response.header.code
     client.delete_environment
   end
 
-  #test "lonesome client tries to share" do
-  #  client = TestClient.create
-  #  client.update_environment({
-  #    :gps => { :latitude => 12.22, :longitude => 18.74 }
-  #  })
-  #  client.share( "pass", {:inline => "hello"} )
-  #  assert_equal "204", client.follow_redirect.header.code
+  test "lonesome client tries to share" do
+    client = TestClient.create
+    client.update_environment({
+      :gps => { :latitude => 12.22, :longitude => 18.74 }
+    })
+    client.share( "pass", {:inline => "hello"} )
 
-  #  client.delete_environment
-  #end
+    assert_equal "204", client.follow_redirect.header.code
+  end
 
   #test "lonesome client tries to receive" do
   #  client = TestClient.create

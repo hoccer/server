@@ -79,46 +79,52 @@ module Hoccer
 
     aget %r{/clients/([a-f0-9]{32,32})/action/(\w+)} do |uuid, action|
 
-      Client.first( :uuid => uuid ) do |client|
-        if client
+      Client.first( :uuid => uuid ) do |requesting_client|
+        if requesting_client
 
-          client.request = self
+          if requesting_client.action.nil?
+            requesting_client.update_action action
+          end
+
+          requesting_client.request = self
 
           EM::Timer.new(7) do
             client.each_in_group do |client|
               if client.request
                 client.request.status 204
                 client.request.body { {"message" => "timeout"}.to_json }
+                client.request = nil
               end
               #client.actions.delete( action )
             end
             ahalt 204
+          end
+
+          Client.collection.find(
+            :group_id => requesting_client.group_id,
+            :action   => requesting_client.action
+          ) do |res|
+            clients = res.map{ |r| Client.new( r ) }
+            sender    = clients.select { |c| c.mode == :sender }
+            receiver  = clients.select { |c| c.mode != :sender }
+
+            if 0 < sender.size && 0 < receiver.size
+              Client.requests_for_clients(clients).each do |request|
+                request.status 200
+                request.body { sender.map(&:payload).to_json }
+              end
+            else
+              Client.requests_for_clients(clients).each do |request|
+                request.status 204
+                request.body { }
+              end
+            end
           end
         else
           ahalt 412
         end
 
       end
-      #if client = Client.find( uuid )
-      #  if client.all_in_group.size < 2
-      #    ahalt 204
-      #  end
-
-      #  client.request = self
-
-      #  if client.actions[action].nil?
-      #    client.actions[action] = {}
-      #    client.mode = :receiver
-      #  end
-
-
-
-      #  client.verify_group( action )
-
-      #else
-      #  halt 412
-      #end
-
     end
 
   end

@@ -57,86 +57,86 @@ class TestRequest < Test::Unit::TestCase
     assert_equal "204", client.follow_redirect.header.code
   end
 
-  #test "lonesome client tries to receive" do
-  #  client = TestClient.create
-  #  client.update_environment({
-  #    :gps => { :latitude => 52.22, :longitude => 28.74 }
-  #  })
+  ##test "lonesome client tries to receive" do
+  ##  client = TestClient.create
+  ##  client.update_environment({
+  ##    :gps => { :latitude => 52.22, :longitude => 28.74 }
+  ##  })
 
-  #  assert_equal "204", client.receive( "pass" ).header.code
+  ##  assert_equal "204", client.receive( "pass" ).header.code
 
-  #  client.delete_environment
-  #end
+  ##  client.delete_environment
+  ##end
 
-  #test "two clients one share but no receive action" do
-  #  client_1 = TestClient.create
-  #  client_2 = TestClient.create
+  ##test "two clients one share but no receive action" do
+  ##  client_1 = TestClient.create
+  ##  client_2 = TestClient.create
 
-  #  client_1.update_environment({
-  #    :gps => { :latitude => 12.22, :longitude => 18.74 }
-  #  })
+  ##  client_1.update_environment({
+  ##    :gps => { :latitude => 12.22, :longitude => 18.74 }
+  ##  })
 
-  #  client_2.update_environment({
-  #    :gps => { :latitude => 12.22, :longitude => 18.74 }
-  #  })
+  ##  client_2.update_environment({
+  ##    :gps => { :latitude => 12.22, :longitude => 18.74 }
+  ##  })
 
-  #  client_1.share( "pass", {:inline => "foobar"} )
+  ##  client_1.share( "pass", {:inline => "foobar"} )
 
-  #  start_time = Time.now
-  #  response = client_1.follow_redirect
-  #  time_taken = Time.now - start_time
+  ##  start_time = Time.now
+  ##  response = client_1.follow_redirect
+  ##  time_taken = Time.now - start_time
 
-  #  assert time_taken >= 7, "Should timeout after 7 seconds"
-  #  assert_equal "204", response.header.code
+  ##  assert time_taken >= 7, "Should timeout after 7 seconds"
+  ##  assert_equal "204", response.header.code
 
-  #  client_1.delete_environment
-  #  client_2.delete_environment
-  #end
+  ##  client_1.delete_environment
+  ##  client_2.delete_environment
+  ##end
 
-  #test "two clients one receive but no share action" do
-  #  client_1 = TestClient.create
-  #  client_2 = TestClient.create
+  ##test "two clients one receive but no share action" do
+  ##  client_1 = TestClient.create
+  ##  client_2 = TestClient.create
 
-  #  client_1.update_environment({
-  #    :gps => { :latitude => 12.22, :longitude => 18.74 }
-  #  })
+  ##  client_1.update_environment({
+  ##    :gps => { :latitude => 12.22, :longitude => 18.74 }
+  ##  })
 
-  #  client_2.update_environment({
-  #    :gps => { :latitude => 12.22, :longitude => 18.74 }
-  #  })
+  ##  client_2.update_environment({
+  ##    :gps => { :latitude => 12.22, :longitude => 18.74 }
+  ##  })
 
-  #  start_time = Time.now
-  #  response = client_1.receive("pass")
-  #  time_taken = Time.now - start_time
+  ##  start_time = Time.now
+  ##  response = client_1.receive("pass")
+  ##  time_taken = Time.now - start_time
 
-  #  assert time_taken >= 7, "Should timeout after 7 seconds"
-  #  assert_equal "204", response.header.code
+  ##  assert time_taken >= 7, "Should timeout after 7 seconds"
+  ##  assert_equal "204", response.header.code
 
-  #  client_1.delete_environment
-  #  client_2.delete_environment
-  #end
+  ##  client_1.delete_environment
+  ##  client_2.delete_environment
+  ##end
 
-  #test "two clients sharing and then receiving successfully" do
-  #  client_1 = TestClient.create
-  #  client_2 = TestClient.create
+  ##test "two clients sharing and then receiving successfully" do
+  ##  client_1 = TestClient.create
+  ##  client_2 = TestClient.create
 
-  #  client_1.update_environment({
-  #    :gps => { :latitude => 12.22, :longitude => 18.74 }
-  #  })
+  ##  client_1.update_environment({
+  ##    :gps => { :latitude => 12.22, :longitude => 18.74 }
+  ##  })
 
-  #  client_2.update_environment({
-  #    :gps => { :latitude => 12.22, :longitude => 18.74 }
-  #  })
+  ##  client_2.update_environment({
+  ##    :gps => { :latitude => 12.22, :longitude => 18.74 }
+  ##  })
 
-  #  client_1.share( "pass", {:inline => "foobar"} )
-  #  assert_equal "204", client_1.follow_redirect.header.code
+  ##  client_1.share( "pass", {:inline => "foobar"} )
+  ##  assert_equal "200", client_1.follow_redirect.header.code
 
-  #  expected = "[{\"inline\":\"foobar\"}]"
-  #  assert_equal expected, client_2.receive( "pass" ).body
+  ##  expected = "[{\"inline\":\"foobar\"}]"
+  ##  assert_equal expected, client_2.receive( "pass" ).body
 
-  #  client_1.delete_environment
-  #  client_2.delete_environment
-  #end
+  ##  client_1.delete_environment
+  ##  client_2.delete_environment
+  ##end
 
   #test "two clients receiving and then sharing successfully" do
   #  client_1 = TestClient.create

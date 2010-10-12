@@ -8,7 +8,11 @@ module Hoccer
       defaults = {
         :uuid         => UUID.generate(:compact),
         :dna          => { :client => "spikey" },
-        :environment  => {}
+        :environment  => {},
+        :action       => nil,
+        :payload      => {},
+        :mode         => nil,
+        :group_id     => nil
       }
 
       options = defaults.merge( options )
@@ -35,6 +39,22 @@ module Hoccer
           yield Client.new res
         else
           yield nil
+        end
+      end
+    end
+
+    def self.each_with_request
+      clients = @@requests.select do |client_uuid, request|
+        request
+      end
+
+      puts "!!!! #{clients.inspect}"
+      query = { :uuid => {"$in" => clients.map {|c| c[0] }} }
+
+      Client.collection.find(query) do |res|
+        puts "pppppppppp #{res.inspect}"
+        res.map { |r| Client.new(r)}.each do |client|
+          yield client
         end
       end
     end
@@ -85,8 +105,18 @@ module Hoccer
       end
     end
 
-    def update_action action, payload
+    def update_action action, payload = nil
+      @action = action.to_s
+      @payload = payload
 
+      if payload
+        @mode = :sender
+      else
+        @mode = :receiver
+      end
+
+      puts attributes
+      save
     end
 
     def save
@@ -102,6 +132,18 @@ module Hoccer
       Hoccer.db.collection("environments").first(:client_uuid => uuid) do |res|
         return res
       end
+    end
+
+    def clientalize mongo_result
+      if mongo_result.is_a?( Array )
+        mongo_result.map { |r| Client.new( r ) }
+      elsif mongo_result.is_a?( String )
+        Client.new( mongo_result )
+      end
+    end
+
+    def self.requests_for_clients clients
+      clients.map { |c| @@requests[c.uuid] }
     end
 
   end

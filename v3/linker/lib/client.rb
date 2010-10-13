@@ -74,23 +74,25 @@ module Hoccer
       end
     end
 
-    def update_environment environment
-      Hoccer.db.collection('environments').update(
-        {:client_uuid => uuid},
-        environment.merge(:client_uuid => uuid),
-        :upsert => true
-      )
-
+    def update_environment environment_params
+      self.environment = environment_params
+      self.save
       rebuild_groups
     end
 
     def rebuild_groups
-      query = { :gps =>  {"$near" => [32.22, 88.74] , "$maxDistance" => 200.to_rad } }
-      Hoccer.db.collection('environments').find( query ) do |results|
+      puts attributes.inspect
+      lat   = environment["gps"]["latitude"]
+      long  = environment["gps"]["longitude"]
+
+      query = { "environment.gps" =>  {"$near" => [lat, long] , "$maxDistance" => 200.to_rad } }
+      Hoccer.db.collection('clients').find( query ) do |results|
+
+        puts "!!!! #{results}"
         group_id = rand(2**32)
         results.each do |result|
-          Hoccer.db.collection('environments').update(
-            {:client_uuid => uuid}, {"$set" => {:group_id => group_id}}
+          Hoccer.db.collection('clients').update(
+            {:uuid => uuid}, {"$set" => {:group_id => group_id}}
           )
         end
       end

@@ -57,41 +57,42 @@ class TestRequest < Test::Unit::TestCase
     assert_equal "204", client.follow_redirect.header.code
   end
 
-  ##test "lonesome client tries to receive" do
-  ##  client = TestClient.create
-  ##  client.update_environment({
-  ##    :gps => { :latitude => 52.22, :longitude => 28.74 }
-  ##  })
+  test "lonesome client tries to receive" do
+    client = TestClient.create
+    client.update_environment({
+      :gps => { :latitude => 52.22, :longitude => 28.74 }
+    })
 
-  ##  assert_equal "204", client.receive( "pass" ).header.code
+    assert_equal "204", client.receive( "pass" ).header.code
+  end
 
-  ##  client.delete_environment
-  ##end
+  test "two clients one share but no receive action" do
+    client_1 = TestClient.create
+    client_2 = TestClient.create
 
-  ##test "two clients one share but no receive action" do
-  ##  client_1 = TestClient.create
-  ##  client_2 = TestClient.create
+    client_1.update_environment({
+      :gps => { :latitude => 12.22, :longitude => 18.74 }
+    })
 
-  ##  client_1.update_environment({
-  ##    :gps => { :latitude => 12.22, :longitude => 18.74 }
-  ##  })
+    client_2.update_environment({
+      :gps => { :latitude => 12.22, :longitude => 18.74 }
+    })
 
-  ##  client_2.update_environment({
-  ##    :gps => { :latitude => 12.22, :longitude => 18.74 }
-  ##  })
 
-  ##  client_1.share( "pass", {:inline => "foobar"} )
+    puts @db.collection('clients').find.to_a
 
-  ##  start_time = Time.now
-  ##  response = client_1.follow_redirect
-  ##  time_taken = Time.now - start_time
+    client_1.share( "pass", {:inline => "foobar"} )
 
-  ##  assert time_taken >= 7, "Should timeout after 7 seconds"
-  ##  assert_equal "204", response.header.code
+    start_time = Time.now
+    response = client_1.follow_redirect
+    time_taken = Time.now - start_time
 
-  ##  client_1.delete_environment
-  ##  client_2.delete_environment
-  ##end
+    assert time_taken >= 7, "Should timeout after 7 seconds"
+    assert_equal "204", response.header.code
+
+    client_1.delete_environment
+    client_2.delete_environment
+  end
 
   ##test "two clients one receive but no share action" do
   ##  client_1 = TestClient.create

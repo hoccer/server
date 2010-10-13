@@ -12,3 +12,4 @@ gem 'ruby-debug19'
 gem "thin"
 gem 'uuid'
 gem 'em-mongo', :git => 'git://github.com/hukl/em-mongo.git'
+gem 'mongo'

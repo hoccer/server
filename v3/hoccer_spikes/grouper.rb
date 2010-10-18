@@ -29,7 +29,7 @@ get %r{/clients/([a-f0-9]{32,32})/group} do |uuid|
   client       = Environment.where(:client_uuid => uuid).first
   all_in_group = Environment
     .where(:group_id => client.group_id)
-    .only(:client_uuid)
+    .only(:client_uuid, :group_id)
     .all
 
   all_in_group.to_json

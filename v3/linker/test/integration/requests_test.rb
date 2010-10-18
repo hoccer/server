@@ -113,14 +113,23 @@ class TestRequest < Test::Unit::TestCase
       :gps => { :latitude => 12.22, :longitude => 18.74 }
     })
 
-    client_1.share( "pass", {:inline => "foobar"} )
-    assert_equal "204", client_1.follow_redirect.header.code
+    t1 = Thread.new do
+      client_1.share( "pass", {:inline => "foobar"} )
+      client_1.follow_redirect_unthreadded
+    end
+
+    sleep(0.1)
+
+    t2 = Thread.new do
+      client_2.receive( "pass" )
+    end
+
+    client_1_response = t1.value
+    client_2_response = t2.value
 
     expected = "[{\"inline\":\"foobar\"}]"
-    assert_equal expected, client_2.receive( "pass" ).body
+    assert_equal expected, client_2_response.body
 
-    client_1.delete_environment
-    client_2.delete_environment
   end
 
   test "two clients receiving and then sharing successfully" do
@@ -135,16 +144,13 @@ class TestRequest < Test::Unit::TestCase
       :gps => { :latitude => 12.22, :longitude => 18.74 }
     })
 
-    expected = "[{\"inline\":\"foobar\"}]"
-  #  assert_equal expected, client_2.receive( "pass" ).body
-
     t1 = Thread.new do
       client_2.receive_unthreaded("pass")
     end
 
     t2 = Thread.new do
       client_1.share("pass", {:inline => "foobar"})
-      client_1.follow_redirect_unthreadded
+      client_1.
     end
 
     client_2_response = t2.value
@@ -153,8 +159,12 @@ class TestRequest < Test::Unit::TestCase
     assert_equal "200", client_1_response.header.code
     assert_equal "200", client_2_response.header.code
 
-    expected = "[{\"inline\":\"foobar\"}]"
-    assert_equal expected, client_2_response.body
+    expected_2 = "{\"receiver\":1}"
+    assert_equal expected_2, client_2_response.body
+
+    expexted_1 = "[{\"inline\":\"foobar\"}]"
+    assert_equal expexted_1, client_1_response.body
+    client_1_response.body
 
     client_1.delete_environment
     client_2.delete_environment

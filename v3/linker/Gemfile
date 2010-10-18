@@ -9,5 +9,5 @@ gem 'rack-test'
 gem 'ruby-debug19'
 gem "thin"
 gem 'uuid'
-gem 'bson_ext'
-gem 'em-mongo'
+gem 'bson_ext', '>= 1.1'
+gem 'em-mongo', '>= 0.2.13'

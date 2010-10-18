@@ -75,7 +75,7 @@ module Hoccer
 
     def all_in_group
       @@pool.values.select do |client|
-        !client.group_id.nil? &&  client.group_id == self.group_id
+        !client.group_id.nil? && client.group_id == self.group_id
       end
     end
 
@@ -116,11 +116,14 @@ module Hoccer
     end
 
     def verify_group action
+
       clients   = all_in_group.select { |c| c.sender? && c.actions[action] }
       receiver  = all_in_group.select { |c| c.receiver? && c.actions[action] }
 
       if clients.size >= 1 && receiver.size >= 1
         all_in_group.each do |client|
+
+          puts client.request.class
           if client.request
             puts "Y A Y"
 
@@ -128,7 +131,12 @@ module Hoccer
               client.actions[action][:payload]
             end
 
-            client.request.body { data_list.to_json }
+            if client.mode = :sender
+              client.request.body { {:receiver => 1 }.to_json }
+            else
+              client.request.body { data_list.to_json }
+            end
+
             client.request = nil
           end
         end

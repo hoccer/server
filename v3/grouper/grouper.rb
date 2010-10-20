@@ -26,8 +26,10 @@ module Grouper
     put %r{/clients/(.+)/environment} do |uuid|
       request_body  = request.body.read
       environment   = JSON.parse( request_body )
+      
+      environment = ensure_indexable(environment)
+      
       environment.merge!( :client_uuid => uuid )
-    
       Environment.create( environment )
       
       "OK"
@@ -37,6 +39,17 @@ module Grouper
       client       = Environment.where(:client_uuid => uuid).first
       client.group.to_json
     end
+    
+    private
+    def ensure_indexable environment
+      gps = environment[:gps]
+      
+      location = { :longitude => gps[:longitude], :latitude => gps[:latitude]}
+      environment[:gps] = location.merge(gps)
+      environment
+    end
+    
+    
     
   end
 end

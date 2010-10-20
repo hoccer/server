@@ -14,23 +14,23 @@ class Environment
   end
 
   def update_groups
-    # client = Environment.where(:client_uuid => self["client_uuid"]).first
-    #     puts "client #{client.inspect}"
-    # near_by = self.class
-    #    .find( { :gps.near => [13, 52] } )
-    #    .all
-       
     near_by = Environment.near( :gps => gps )   
 
     puts "updating group_id"
+    group_id = rand(1000000) 
     near_by.each do |e|
-      e[:group_id] = 12
+      e[:group_id] = group_id
       e.save
     end
     
     reload
   end
 
-
+  def group
+    Environment
+      .where(:group_id => group_id)
+      .only(:client_uuid, :group_id)
+      .all
+  end
 
 end

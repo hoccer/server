@@ -6,7 +6,7 @@ GEM
       rack (~> 1.1)
     async_sinatra (0.2.3)
       sinatra (>= 1.0)
-    bson (1.1)
+    bson (1.1.1)
     bson_ext (1.1)
     columnize (0.3.1)
     daemons (1.1.0)

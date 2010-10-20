@@ -4,10 +4,15 @@ require 'sinatra'
 require 'mongoid'
 require 'environment'
 
+class Numeric
+  def to_rad
+    self * (Math::PI / 180)
+  end
+end
+
 set :run
 
 get "/" do
-  "Robert muss twittern"
 end
 
 get %r{/clients/([a-f0-9]{32,32}$)} do |uuid|
@@ -21,17 +26,11 @@ put %r{/clients/([a-f0-9]{32,32})/environment} do |uuid|
   environment.merge!( :client_uuid => uuid )
 
   Environment.create( environment )
+  
   "OK"
 end
 
 get %r{/clients/([a-f0-9]{32,32})/group} do |uuid|
-
   client       = Environment.where(:client_uuid => uuid).first
-  all_in_group = Environment
-    .where(:group_id => client.group_id)
-    .only(:client_uuid, :group_id)
-    .all
-
-  all_in_group.to_json
-
+  client.group.to_json
 end

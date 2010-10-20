@@ -49,7 +49,7 @@ module Hoccer
       end
     end
 
-    aget %r{#{CLIENTS}$} do |uuid|
+    aget %r{/clients/(.+$)} do |uuid|
       em_request( "/clients/#{uuid}", nil, nil ) do |response|
         if response[:status] == 200
           body { response[:content] }

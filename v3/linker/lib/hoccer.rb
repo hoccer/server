@@ -92,32 +92,34 @@ module Hoccer
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
-      @@action_store[uuid] ||= { :action => action_name, :mode => :receiver }
-      @@action_store[uuid][:request] = self
+      begin
+        @@action_store[uuid] ||= { :action => action_name, :mode => :receiver }
+        @@action_store[uuid][:request] = self
 
-      em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
-        r = JSON.parse(response[:content])
-        clients = r.inject([]) do |result, environment|
-          client = @@action_store[ environment["client_uuid"] ]
-          result << client unless client.nil?
-          result
-        end
-
-        EM::Timer.new(7) do
-          clients.each do |client|
-            if client[:request]
-              client[:request].status 201
-              client[:request].body { {"message" => "timeout"}.to_json }
-            end
-            client[:action]   = nil
-            client[:request]  = nil
+        em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
+          r = JSON.parse(response[:content])
+          clients = r.inject([]) do |result, environment|
+            client = @@action_store[ environment["client_uuid"] ]
+            result << client unless client.nil?
+            result
           end
-        end
 
-        verify_group clients
+          EM::Timer.new(7) do
+            clients.each do |client|
+              if client[:request]
+                client[:request].status 201
+                client[:request].body { {"message" => "timeout"}.to_json }
+              end
+              client[:action]   = nil
+              client[:request]  = nil
+            end
+          end
+
+          verify_group clients
+        end
+      rescue => e
+        puts e
       end
-    rescue => e
-      puts e
     end  
   end
 

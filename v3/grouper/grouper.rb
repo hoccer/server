@@ -36,20 +36,8 @@ module Grouper
     end
     
     get %r{/clients/(.+)/group} do |uuid|
-      client       = Environment.where(:client_uuid => uuid).first
+      client       = Environment.newest
       client.group.to_json
     end
-    
-    private
-    def ensure_indexable environment
-      gps = environment["gps"]
-      
-      location = { "longitude" => gps["longitude"], "latitude" => gps["latitude"]}
-      environment["gps"] = location.merge(gps)
-      environment
-    end
-    
-    
-    
   end
 end

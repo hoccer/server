@@ -13,6 +13,7 @@ class ExhibitTest < Test::Unit::TestCase
       :gps => {
         :longitude => (@gps[0] + (rand/50 * operand)),
         :latitude  => (@gps[1] + (rand/50 * operand)),
+        :timestamp => Time.now.to_f,
         :accuracy  => 100.0
       }
     }
@@ -38,26 +39,49 @@ class ExhibitTest < Test::Unit::TestCase
     assert_equal a.group.count, 2, "should have grouped environments"   
     
     assert_equal a[:group_id], b[:group_id], "group ids should match"
-
-    b.group.each do |element|
-      puts element.inspect
-      assert_equal 1, a.group.where(:client_uuid => element[:client_uuid]).count
-    end
-    
     assert_equal b.group, a.group
+    
+    assert JSON.parse(a.group.to_json)
   end  
   
   test 'not grouping clients' do
     location = new_location
-    location.merge!(:client_id => 1)
+    location.merge!(:client_uuid => 1)
     a  = Environment.create(location)
     
     location2 = new_location
-    location2.merge!(:client_id => 2)
+    location2.merge!(:client_uuid => 2)
     b = Environment.create(location2)
     
     assert_not_equal a["group_id"], b["group_id"]    
   end  
+  
+  test 'lonley group' do
+    location = new_location
+    location.merge!(:client_uuid => 1)
+    a  = Environment.create(location)
+    
+    assert_equal a.group.count, 1, "should have at least self"
+  end
+  
+  test 'get newest client update' do
+     location = new_location
+     location.merge!(:client_uuid => 1)
+     Environment.create(location)
+     
+     location = new_location
+     location.merge!(:client_uuid => 1)
+     Environment.create(location)
+      
+     location = new_location
+     location.merge!(:client_uuid => 1)
+     newest_added = Environment.create(location) 
+     
+     newest_find = Environment.newest 1
+     
+     assert_equal newest_added, newest_find, "should find last added environment"
+  end
+  
   
   
 end

@@ -1,15 +1,19 @@
 require 'client'
 require 'action'
+require 'sinatra/reloader' 
 
-
+CLIENTS = "/clients/([A-Z0-9\-]{36,36})"
 
 module Hoccer
-  CLIENTS = "/clients/([A-Z0-9\-]{36,36})"
   # CLIENTS = "/clients/(.+)"
   
   class App < Sinatra::Base
     register Sinatra::Async
-
+    
+    configure(:development) do
+      register Sinatra::Reloader
+    end
+    
     @@server        = "localhost"
     @@port          = 4567
     @@action_store  = {}
@@ -38,7 +42,7 @@ module Hoccer
       if sender.size >= 1 && receiver.size >= 1
         clients.each do |client|
           if client.request
-            puts "Y A Y"
+            puts "Y A Y A"
 
             data_list = sender.map { |s| s[:payload] }
 

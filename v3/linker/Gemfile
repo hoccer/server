@@ -3,6 +3,7 @@ source "http://rubygems.org"
 #gem "eventmachine", "0.12.11", :git => "git://github.com/eventmachine/eventmachine.git"
 gem "eventmachine"
 gem "sinatra"
+gem "sinatra-reloader"
 gem "async_sinatra", "0.2.3"
 gem 'async-rack'
 gem 'rack-test'

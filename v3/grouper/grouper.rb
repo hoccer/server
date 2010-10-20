@@ -13,7 +13,7 @@ end
 set :run
 
 module Grouper
-  class App
+  class App < Sinatra::Base
   
     get "/" do
     end

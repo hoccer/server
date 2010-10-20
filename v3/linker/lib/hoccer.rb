@@ -5,7 +5,7 @@ require 'action'
 
 module Hoccer
   # CLIENTS = "/clients/([A-Z0-9\-]{36,36})"
-  CLIENTS "/clients/(.+)"
+  CLIENTS = "/clients/(.+)"
   
   class App < Sinatra::Base
     register Sinatra::Async
@@ -60,7 +60,7 @@ module Hoccer
       end
     end
     
-    aput %r{#{CLIENTS}/environment} do |uuid|
+    aput %r{/clients/(.+)/environment} do |uuid|
       em_request( "/clients/#{uuid}/environment", "PUT", request.body.read ) do |response|
         status 201
         body { "Created" }

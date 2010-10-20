@@ -10,21 +10,16 @@ class Numeric
   end
 end
 
-set :run
-
 module Grouper
   class App < Sinatra::Base
   
     get "/" do
+      "Hallo"
     end
     
-    get %r{/clients/(.+)$} do |uuid|
-      environment = Environment.where(:client_uuid => uuid).first
-      environment ? environment.to_json : 404
-    end
-    
-    put %r{/clients/(.+)/environment} do |uuid|
+    put %r{/clients/(.{36,36})/environment} do |uuid|
       request_body  = request.body.read
+      puts request_body
       environment   = JSON.parse( request_body )
             
       environment.merge!( :client_uuid => uuid )
@@ -33,9 +28,16 @@ module Grouper
       "OK"
     end
     
-    get %r{/clients/(.+)/group} do |uuid|
-      client       = Environment.newest
+    get %r{/clients/(.{36,36})/group} do |uuid|
+      client       = Environment.newest uuid
       client.group.to_json
     end
+    
+    get %r{/clients/(.+$)} do |uuid|
+       environment = Environment.where(:client_uuid => uuid).first
+       environment ? environment.to_json : 404
+     end
+    
+    
   end
 end

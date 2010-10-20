@@ -6,8 +6,9 @@ GEM
       rack (~> 1.1)
     async_sinatra (0.2.3)
       sinatra (>= 1.0)
+    backports (1.18.2)
     bson (1.1.1)
-    bson_ext (1.1)
+    bson_ext (1.1.1)
     columnize (0.3.1)
     daemons (1.1.0)
     em-mongo (0.2.13)
@@ -17,8 +18,10 @@ GEM
     linecache19 (0.5.11)
       ruby_core_source (>= 0.1.4)
     macaddr (1.0.0)
+    monkey-lib (0.5.4)
+      backports
     rack (1.2.1)
-    rack-test (0.5.4)
+    rack-test (0.5.6)
       rack (>= 1.0)
     ruby-debug-base19 (0.11.24)
       columnize (>= 0.3.1)
@@ -32,6 +35,16 @@ GEM
       archive-tar-minitar (>= 0.5.2)
     sinatra (1.0)
       rack (>= 1.0)
+    sinatra-advanced-routes (0.5.1)
+      monkey-lib (~> 0.5.0)
+      sinatra (~> 1.0)
+      sinatra-sugar (~> 0.5.0)
+    sinatra-reloader (0.5.0)
+      sinatra (~> 1.0)
+      sinatra-advanced-routes (~> 0.5.0)
+    sinatra-sugar (0.5.0)
+      monkey-lib (~> 0.5.0)
+      sinatra (~> 1.0)
     thin (1.2.7)
       daemons (>= 1.0.9)
       eventmachine (>= 0.12.6)
@@ -51,5 +64,6 @@ DEPENDENCIES
   rack-test
   ruby-debug19
   sinatra
+  sinatra-reloader
   thin
   uuid

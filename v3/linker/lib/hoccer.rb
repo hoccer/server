@@ -4,7 +4,8 @@ require 'action'
 
 
 module Hoccer
-  CLIENTS = "/clients/()[A-Z0-9\-]{36,36})"
+  # CLIENTS = "/clients/([A-Z0-9\-]{36,36})"
+  CLIENTS "/clients/(.+)"
   
   class App < Sinatra::Base
     register Sinatra::Async

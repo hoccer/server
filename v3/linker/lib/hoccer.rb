@@ -4,8 +4,8 @@ require 'action'
 
 
 module Hoccer
-  # CLIENTS = "/clients/([A-Z0-9\-]{36,36})"
-  CLIENTS = "/clients/(.+)"
+  CLIENTS = "/clients/([A-Z0-9\-]{36,36})"
+  # CLIENTS = "/clients/(.+)"
   
   class App < Sinatra::Base
     register Sinatra::Async
@@ -116,8 +116,9 @@ module Hoccer
 
         verify_group clients
       end
-    end
-
+    rescue => e
+      puts e
+    end  
   end
 
 end

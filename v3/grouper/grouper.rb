@@ -26,9 +26,7 @@ module Grouper
     put %r{/clients/(.+)/environment} do |uuid|
       request_body  = request.body.read
       environment   = JSON.parse( request_body )
-      
-      environment = ensure_indexable(environment)
-      
+            
       environment.merge!( :client_uuid => uuid )
       Environment.create( environment )
       

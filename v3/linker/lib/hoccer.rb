@@ -49,13 +49,13 @@ module Hoccer
       end
     end
 
-    aget %r{/clients/(.+$)} do |uuid|
+    aget %r{/clients/([A-Z0-9\-]+$)} do |uuid|
       em_request( "/clients/#{uuid}", nil, nil ) do |response|
         if response[:status] == 200
           body { response[:content] }
         else
           status 404
-          body { {:error => "Not Found"}.to_json }
+          body { {:error => "Client with uuid #{uuid} was not found"}.to_json }
         end
       end
     end

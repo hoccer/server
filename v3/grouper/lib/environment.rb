@@ -21,7 +21,7 @@ class Environment
   def group
     Environment
       .where(:group_id => group_id)
-      .only(:client_uuid, :group_id)
+      .only(:client_uuid, :group_id) || []
   end
   
   private

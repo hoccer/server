@@ -44,7 +44,7 @@ module Grouper
     def ensure_indexable environment
       gps = environment["gps"]
       
-      location = { :longitude => gps["longitude"], :latitude => gps["latitude"]}
+      location = { "longitude" => gps["longitude"], "latitude" => gps["latitude"]}
       environment["gps"] = location.merge(gps)
       environment
     end

@@ -1,8 +1,11 @@
 require 'client'
 require 'action'
 
-module Hoccer
 
+
+module Hoccer
+  CLIENTS = "/clients/()[A-Z0-9\-]{36,36})"
+  
   class App < Sinatra::Base
     register Sinatra::Async
 
@@ -10,7 +13,7 @@ module Hoccer
     @@port          = 4567
     @@action_store  = {}
     @@requests      = {}
-
+    
     def em_request path, method, content, &block
       http = EM::Protocols::HttpClient.request(
         :host => @@server,
@@ -45,7 +48,7 @@ module Hoccer
       end
     end
 
-    aget %r{/clients/([a-f0-9]{32,32}$)} do |uuid|
+    aget %r{#{CLIENTS}$} do |uuid|
       em_request( "/clients/#{uuid}", nil, nil ) do |response|
         if response[:status] == 200
           body { response[:content] }
@@ -55,19 +58,19 @@ module Hoccer
         end
       end
     end
-
-    aput %r{/clients/([a-f0-9]{32,32})/environment} do |uuid|
+    
+    aput %r{#{CLIENTS}/environment} do |uuid|
       em_request( "/clients/#{uuid}/environment", "PUT", request.body.read ) do |response|
         status 201
         body { "Created" }
       end
     end
 
-    delete %r{/clients/([a-f0-9]{32,32})/environment} do |uuid|
+    delete %r{#{CLIENTS}/environment} do |uuid|
 
     end
 
-    apost %r{/clients/([a-f0-9]{32,32})/action/([\w-]+)} do |uuid, action_name|
+    apost %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
       request_body  = request.body.read
       payload       = JSON.parse( request_body )
 
@@ -87,7 +90,7 @@ module Hoccer
       end
     end
 
-    aget %r{/clients/([a-f0-9]{32,32})/action/([\w-]+)} do |uuid, action_name|
+    aget %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
       @@action_store[uuid] ||= { :action => action_name, :mode => :receiver }
       @@action_store[uuid][:request] = self
 

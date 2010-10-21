@@ -45,8 +45,6 @@ module Hoccer
       if sender.size >= 1 && receiver.size >= 1
         clients.each do |client|
           if client[:request]
-            puts "Y A Y A"
-
             data_list = sender.map { |s| s[:payload] }
 
             client[:request].body { data_list.to_json }
@@ -76,8 +74,10 @@ module Hoccer
       end
     end
 
-    delete %r{#{CLIENTS}/environment} do |uuid|
-
+    adelete %r{#{CLIENTS}/environment} do |uuid|
+      em_request("/clients/#{uuid}/delete", "DELETE", nil) do |response|
+        status 200
+      end
     end
 
     apost %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
@@ -103,10 +103,8 @@ module Hoccer
             end
 
             verify_group clients
-            ahalt 302, {"Location" => "http://#{env["HTTP_HOST"]}/clients/#{uuid}/action/#{action_name}"}
+          #++  ahalt 302, {"Location" => "http://#{env["HTTP_HOST"]}/clients/#{uuid}/action/#{action_name}"}
           end
-          puts "redirect to http://#{env["HTTP_HOST"]}/clients/#{uuid}/action/#{action_name}"
-
         else
           status 404
           body { {:error => "Not Found"}.to_json }
@@ -126,18 +124,22 @@ module Hoccer
             result << client unless client.nil?
             result
           end
-
-          verify_group clients
           
-          EM::Timer.new(7) do
-            clients.each do |client|
-              if client[:request]
-                client[:request].status 201
-                client[:request].body { {"message" => "timeout"}.to_json }
+          if clients.size > 1
+            verify_group clients
+            EM::Timer.new(7) do
+              clients.each do |client|
+                if client[:request]
+                  client[:request].status 204
+                  client[:request].body { {"message" => "timeout"}.to_json }
+                end
+                client[:action]   = nil
+                client[:request]  = nil
               end
-              client[:action]   = nil
-              client[:request]  = nil
             end
+          else
+            status 204
+            body { {"message" => "timeout"}.to_json }
           end
         end
       rescue => e

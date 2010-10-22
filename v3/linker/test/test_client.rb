@@ -30,8 +30,7 @@ class TestClient
   end
 
   def share mode, data
-    response = post(action_path(mode), data.to_json)
-    @redirect_location = response.header['Location']
+    response = put(action_path(mode), data.to_json)
     response
   end
 

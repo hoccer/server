@@ -13,21 +13,6 @@ class TestRequest < Test::Unit::TestCase
     coll.remove
   end
   
-  
-  test "registering clients" do
-    client_1 = TestClient.new
-    client_1.register
-
-    client_2 = TestClient.new
-    client_2.register
-
-    assert_not_nil client_1.uuid
-    assert_not_nil client_2.uuid
-    assert client_1.uuid != client_2.uuid
-    client_1.delete_environment
-    client_2.delete_environment
-  end
-
   test "updating the environment" do
     client = TestClient.create
     assert_not_nil client.uuid

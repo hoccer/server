@@ -1,5 +1,6 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 require 'helper'
+require 'uuid'
 require 'lib/environment'
 
 class ExhibitTest < Test::Unit::TestCase
@@ -15,7 +16,8 @@ class ExhibitTest < Test::Unit::TestCase
         :latitude  => (@gps[1] + (rand/50 * operand)),
         :timestamp => Time.now.to_f,
         :accuracy  => 100.0
-      }
+      },
+      :client_uuid => UUID.generate
     }
   end
 
@@ -25,12 +27,10 @@ class ExhibitTest < Test::Unit::TestCase
 
   test 'grouping two clients' do
     location = new_location
-    location.merge!(:client_uuid => 1)
 
     a  = Environment.create(location)
     assert a[:group_id], "should have a group id"
 
-    location.merge!(:client_uuid => 2)
     b = Environment.create(location)
 
     a.reload
@@ -46,11 +46,9 @@ class ExhibitTest < Test::Unit::TestCase
 
   test 'not grouping clients' do
     location = new_location
-    location.merge!(:client_uuid => 1)
     a  = Environment.create(location)
 
     location2 = new_location
-    location2.merge!(:client_uuid => 2)
     b = Environment.create(location2)
 
     assert_not_equal a["group_id"], b["group_id"]
@@ -58,7 +56,6 @@ class ExhibitTest < Test::Unit::TestCase
 
   test 'lonley group' do
     location = new_location
-    location.merge!(:client_uuid => 1)
     a  = Environment.create(location)
 
     assert_equal a.group.count, 1, "should have at least self"
@@ -66,22 +63,12 @@ class ExhibitTest < Test::Unit::TestCase
 
   test 'get newest client update' do
      location = new_location
-     location.merge!(:client_uuid => 1)
      Environment.create(location)
-
-     location = new_location
-     location.merge!(:client_uuid => 1)
      Environment.create(location)
-
-     location = new_location
-     location.merge!(:client_uuid => 1)
      newest_added = Environment.create(location)
 
-     newest_find = Environment.newest 1
+     newest_find = Environment.newest( location[:client_uuid] )
 
      assert_equal newest_added, newest_find, "should find last added environment"
   end
-
-
-
 end

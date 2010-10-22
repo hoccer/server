@@ -26,7 +26,10 @@ class Environment
 
   private
   def ensure_indexable
-    location = { "longitude" => self[:gps]["longitude"], "latitude" => self[:gps]["latitude"]}
+    location = {
+      "longitude" => self[:gps]["longitude"],
+      "latitude"  => self[:gps]["latitude"]
+    }
     gps = location.merge(self[:gps])
   end
 

@@ -1,11 +1,19 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 require 'helper'
 require 'test_client'
+require 'mongo'
 require 'net/http'
 require 'lib/hoccer'
 
 class TestRequest < Test::Unit::TestCase
 
+  def setup 
+    db = Mongo::Connection.new.db('hoccer_development')
+    coll = db.collection('environments')
+    coll.remove
+  end
+  
+  
   test "registering clients" do
     client_1 = TestClient.new
     client_1.register

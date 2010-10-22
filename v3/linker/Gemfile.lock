@@ -18,6 +18,8 @@ GEM
     linecache19 (0.5.11)
       ruby_core_source (>= 0.1.4)
     macaddr (1.0.0)
+    mongo (1.0.9)
+      bson (>= 1.0.5)
     monkey-lib (0.5.4)
       backports
     rack (1.2.1)
@@ -61,6 +63,7 @@ DEPENDENCIES
   bson_ext (>= 1.1)
   em-mongo (>= 0.2.13)
   eventmachine
+  mongo
   rack-test
   ruby-debug19
   sinatra

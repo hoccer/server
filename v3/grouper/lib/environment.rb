@@ -1,5 +1,11 @@
 require 'mongoid'
 
+class Numeric
+  def to_rad
+    (self * (Math::PI / 180) / 1000)
+  end
+end
+
 class Environment
 
   include Mongoid::Document
@@ -22,6 +28,19 @@ class Environment
     Environment
       .where(:group_id => group_id)
       .only(:client_uuid, :group_id) || []
+  end
+
+  def nearby
+    query = [
+      self.gps["longitude"],
+      self.gps["latitude"],
+      self.gps["accuracy"].to_rad
+    ]
+
+    Environment
+      .where({"client_uuid" => {"$ne" => self.client_uuid}})
+      .near( :gps => query )
+      .each.to_a
   end
 
   private

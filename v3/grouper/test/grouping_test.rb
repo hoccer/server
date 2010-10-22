@@ -1,5 +1,6 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 require 'helper'
+require 'ruby-debug'
 require 'uuid'
 require 'lib/environment'
 
@@ -21,8 +22,39 @@ class ExhibitTest < Test::Unit::TestCase
     }
   end
 
+  def new_environmnent options = {}
+    default_options = {
+      :longitude  => 13.420,
+      :latitude   => 52.522,
+      :timestamp  => Time.now.to_f,
+      :accuracy   => 120.0
+    }
+
+    options = default_options.merge( options )
+
+    { :client_uuid => UUID.generate, :gps => options }
+  end
+
   def teardown
     Environment.delete_all
+  end
+
+  test 'distance calculation' do
+    env_1 = Environment.create(
+      new_environmnent( :longitude => 13.420, :latitude => 52.522 )
+    )
+
+    env_2 = Environment.create(
+      new_environmnent( :longitude => 13.422, :latitude => 52.522 )
+    )
+
+    env_3 = Environment.create(
+      new_environmnent( :longitude => 13.424, :latitude => 52.522 )
+    )
+
+    assert_equal env_2, env_1.nearby.first
+    assert_equal 2, env_2.nearby.size
+    assert_equal env_2, env_3.nearby.first
   end
 
   test 'grouping two clients' do

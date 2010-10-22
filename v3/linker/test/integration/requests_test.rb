@@ -28,7 +28,7 @@ class TestRequest < Test::Unit::TestCase
       :gps => { :latitude => 32.22, :longitude => 88.74 }
     })
 
-    assert_equal "200", response.header.code
+    assert_equal "201", response.header.code
     client.delete_environment
   end
 

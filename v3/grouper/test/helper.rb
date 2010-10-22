@@ -46,11 +46,4 @@ class Test::Unit::TestCase
     end
   end
 
-  def with_events &blk
-    EM.run do
-      blk.call
-      EM.stop
-    end
-  end
-
 end

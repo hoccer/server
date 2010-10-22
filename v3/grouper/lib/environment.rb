@@ -13,8 +13,8 @@ class Environment
     config.master = Mongo::Connection.new.db(name)
     config.persist_in_safe_mode = true
   end
-  
-  def self.newest uuid 
+
+  def self.newest uuid
     Environment.where(:client_uuid => uuid).desc(:created_at).last
   end
 
@@ -23,26 +23,29 @@ class Environment
       .where(:group_id => group_id)
       .only(:client_uuid, :group_id) || []
   end
-  
+
   private
   def ensure_indexable
-    location = { "longitude" => self[:gps]["longitude"], "latitude" => self[:gps]["latitude"]}
+    location = {
+      "longitude" => self[:gps]["longitude"],
+      "latitude"  => self[:gps]["latitude"]
+    }
     gps = location.merge(self[:gps])
   end
-  
+
   def add_creation_time
     self[:created_at] = Time.now.to_f
   end
 
   def update_groups
-    near_by = Environment.near( :gps => gps )   
+    near_by = Environment.near( :gps => gps )
 
-    group_id = rand(1000000) 
+    group_id = rand(1000000)
     near_by.each do |e|
       e[:group_id] = group_id
       e.save
     end
-    
+
     reload
   end
 end

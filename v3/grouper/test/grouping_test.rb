@@ -58,22 +58,25 @@ class ExhibitTest < Test::Unit::TestCase
   end
 
   test 'grouping two clients' do
-    location = new_location
 
-    a  = Environment.create(location)
-    assert a[:group_id], "should have a group id"
+    env_1 = Environment.create(
+      new_environmnent( :longitude => 13.420, :latitude => 52.522 )
+    )
 
-    b = Environment.create(location)
+    env_2 = Environment.create(
+      new_environmnent( :longitude => 13.420, :latitude => 52.522 )
+    )
 
-    a.reload
+    assert env_1.reload[:group_id], "should have a group id"
+    assert env_2.reload[:group_id], "should have a group id"
 
-    assert_equal b.group.count, 2, "should have grouped environments"
-    assert_equal a.group.count, 2, "should have grouped environments"
+    assert_equal env_1.group.count, 2, "should have grouped environments"
+    assert_equal env_2.group.count, 2, "should have grouped environments"
 
-    assert_equal a[:group_id], b[:group_id], "group ids should match"
-    assert_equal b.group, a.group
+    assert_equal env_1[:group_id], env_2[:group_id], "group ids should match"
+    assert_equal env_2.group, env_1.group
 
-    assert JSON.parse(a.group.to_json)
+    assert JSON.parse(env_1.group.to_json)
   end
 
   test 'not grouping clients' do

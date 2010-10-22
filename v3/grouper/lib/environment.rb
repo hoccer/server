@@ -21,7 +21,7 @@ class Environment
   end
 
   def self.newest uuid
-    Environment.where(:client_uuid => uuid).desc(:created_at).last
+    Environment.where(:client_uuid => uuid).desc(:created_at).first
   end
 
   def group
@@ -32,9 +32,9 @@ class Environment
 
   def nearby
     query = [
-      self.gps["longitude"],
-      self.gps["latitude"],
-      self.gps["accuracy"].to_rad
+      ( self.gps[:longitude] || self.gps["longitude"] ),
+      ( self.gps[:latitude]  || self.gps["latitude"] ),
+      ( self.gps[:accuracy]  || self.gps["accuracy"] ).to_rad
     ]
 
     Environment
@@ -57,10 +57,10 @@ class Environment
   end
 
   def update_groups
-    near_by = Environment.near( :gps => gps )
+    relevant_envs = self.nearby + [self]
 
     group_id = rand(1000000)
-    near_by.each do |e|
+    relevant_envs.each do |e|
       e[:group_id] = group_id
       e.save
     end

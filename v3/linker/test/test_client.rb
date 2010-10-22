@@ -61,7 +61,8 @@ class TestClient
     end
   end
 
-  def follow_redirect_unthreadded
+  def follow_redirect_unthreaded
+    puts @redirect_location
     if @redirect_location
       Net::HTTP.start(@server, @port) {|http|
         http.get( @redirect_location )

@@ -92,8 +92,6 @@ module Hoccer
             :mode     => :sender,
             :payload  => payload
           }
-
-          body { @@action_store.to_json }
           
           em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
             r = JSON.parse(response[:content])
@@ -103,8 +101,8 @@ module Hoccer
               result
             end
 
-            verify_group clients
-          #++  ahalt 302, {"Location" => "http://#{env["HTTP_HOST"]}/clients/#{uuid}/action/#{action_name}"}
+            # verify_group clients
+            ahalt 302, {"Location" => "http://#{env["HTTP_HOST"]}/clients/#{uuid}/action/#{action_name}"}, []
           end
         else
           status 404

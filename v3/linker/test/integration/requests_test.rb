@@ -45,8 +45,8 @@ class TestRequest < Test::Unit::TestCase
     client.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74 }
     })
-    client.share( "pass", {:inline => "hello"} )
-    assert_equal "204", client.follow_redirect.header.code
+    response = client.share( "pass", {:inline => "hello"} )
+    assert_equal "204", client.follow_redirect_unthreaded.header.code
 
     client.delete_environment
   end

@@ -113,39 +113,44 @@ module Hoccer
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
-      begin
-        @@action_store[uuid] ||= { :action => action_name, :mode => :receiver }
-        @@action_store[uuid][:request] = self
+      @@action_store[uuid] ||= { :action => action_name, :mode => :receiver }
+      @@action_store[uuid][:request] = self
 
-        em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
-          r = JSON.parse(response[:content])
-          clients = r.inject([]) do |result, environment|
-            client = @@action_store[ environment["client_uuid"] ]
-            result << client unless client.nil?
-            result
-          end
-          
-          if clients.size > 1
-            verify_group clients
-            EM::Timer.new(7) do
-              clients.each do |client|
-                if client[:request]
-                  client[:request].status 204
-                  client[:request].body { {"message" => "timeout"}.to_json }
-                end
-                client[:action]   = nil
-                client[:request]  = nil
-              end
-            end
-          else
-            status 204
-            body { {"message" => "timeout"}.to_json }
+      em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
+        r = JSON.parse(response[:content])
+        clients = r.inject([]) do |result, environment|
+          client = @@action_store[ environment["client_uuid"] ]
+          result << client unless client.nil?
+          result
+        end
+        
+        if clients.size < 2
+          send_no_content self
+          return
+        end
+        
+        EM::Timer.new(7) do
+          clients.each do |client|
+            send_no_content client[:request]
+
+            client[:action]   = nil
+            client[:request]  = nil
           end
         end
-      rescue => e
-        puts e
+
+        verify_group clients
       end
-    end  
+    end 
+    
+    private 
+    def send_no_content request 
+      if request
+        request.status 204
+        request.body { {"message" => "timeout"}.to_json }
+      end
+    end
+    
+     
   end
 
 end

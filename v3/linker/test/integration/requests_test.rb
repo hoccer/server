@@ -131,8 +131,7 @@ class TestRequest < Test::Unit::TestCase
     assert_equal expected, client_2_response.body
 
   end
-end
-__END__
+
 
   test "two clients receiving and then sharing successfully" do
     client_1 = TestClient.create
@@ -152,9 +151,9 @@ __END__
 
     t2 = Thread.new do
       client_1.share("pass", {:inline => "foobar"})
-      client_1.
+      # client_1.
     end
-
+    
     client_2_response = t2.value
     client_1_response = t1.value
 

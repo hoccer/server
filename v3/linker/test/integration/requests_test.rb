@@ -131,6 +131,8 @@ class TestRequest < Test::Unit::TestCase
     assert_equal expected, client_2_response.body
 
   end
+end
+__END__
 
   test "two clients receiving and then sharing successfully" do
     client_1 = TestClient.create
@@ -169,5 +171,4 @@ class TestRequest < Test::Unit::TestCase
     client_1.delete_environment
     client_2.delete_environment
   end
-
 end

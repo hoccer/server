@@ -2,7 +2,7 @@ require 'client'
 require 'action'
 require 'sinatra/reloader' 
 
-CLIENTS = "/clients/([A-Z0-9\-]{36,36})"
+CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
 
 module Hoccer
   # CLIENTS = "/clients/(.+)"
@@ -54,7 +54,7 @@ module Hoccer
       end
     end
 
-    aget %r{/clients/([A-Z0-9\-]+$)} do |uuid|
+    aget %r{#{CLIENTS}$} do |uuid|
       em_request( "/clients/#{uuid}", nil, nil ) do |response|
         if response[:status] == 200
           body { response[:content] }
@@ -77,6 +77,7 @@ module Hoccer
     adelete %r{#{CLIENTS}/environment} do |uuid|
       em_request("/clients/#{uuid}/delete", "DELETE", nil) do |response|
         status 200
+        body {"deleted"}
       end
     end
 
@@ -91,8 +92,6 @@ module Hoccer
             :mode     => :sender,
             :payload  => payload
           }
-
-          body { @@action_store.to_json }
           
           em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
             r = JSON.parse(response[:content])
@@ -103,7 +102,7 @@ module Hoccer
             end
 
             verify_group clients
-          #++  ahalt 302, {"Location" => "http://#{env["HTTP_HOST"]}/clients/#{uuid}/action/#{action_name}"}
+            ahalt 302, {"Location" => "http://#{env["HTTP_HOST"]}/clients/#{uuid}/action/#{action_name}"}, []
           end
         else
           status 404
@@ -113,39 +112,42 @@ module Hoccer
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
-      begin
-        @@action_store[uuid] ||= { :action => action_name, :mode => :receiver }
-        @@action_store[uuid][:request] = self
+      @@action_store[uuid] ||= { :action => action_name, :mode => :receiver }
+      @@action_store[uuid][:request] = self
 
-        em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
-          r = JSON.parse(response[:content])
-          clients = r.inject([]) do |result, environment|
-            client = @@action_store[ environment["client_uuid"] ]
-            result << client unless client.nil?
-            result
-          end
-          
-          if clients.size > 1
-            verify_group clients
-            EM::Timer.new(7) do
-              clients.each do |client|
-                if client[:request]
-                  client[:request].status 204
-                  client[:request].body { {"message" => "timeout"}.to_json }
-                end
-                client[:action]   = nil
-                client[:request]  = nil
-              end
-            end
-          else
-            status 204
-            body { {"message" => "timeout"}.to_json }
-          end
+      em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
+        group = JSON.parse(response[:content])
+        clients = group.inject([]) do |result, environment|
+          client = @@action_store[ environment["client_uuid"] ]
+          result << client unless client.nil?
+          result
         end
-      rescue => e
-        puts e
+        
+        if group.size < 2
+          send_no_content self
+        else
+          EM::Timer.new(7) do
+            clients.each do |client|
+              send_no_content client[:request]
+
+              client[:action]   = nil
+              client[:request]  = nil
+            end
+          end
+          verify_group clients
+        end
       end
-    end  
+    end 
+    
+    private 
+    def send_no_content request 
+      if request
+        request.status 204
+        request.body { {"message" => "timeout"}.to_json }
+      end
+    end
+    
+     
   end
 
 end

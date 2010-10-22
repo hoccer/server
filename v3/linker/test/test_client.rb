@@ -1,16 +1,14 @@
 class TestClient
 
-  UUID = /[a-f0-9]{32,32}/
-
   attr_accessor :uuid
 
   def self.create
     client = self.new
-    client.register
     client
   end
 
   def initialize
+    @uuid = UUID.generate
     @server = "127.0.0.1"
     @port   = 9292
   end
@@ -25,10 +23,6 @@ class TestClient
 
   def action_path mode
     "/clients/#{@uuid}/action/#{mode}"
-  end
-
-  def register
-    @uuid = post("/clients").header['Location'].match(UUID)[0]
   end
 
   def update_environment data
@@ -57,29 +51,26 @@ class TestClient
   end
 
   def follow_redirect
-    if @redirect_location
-      t = Thread.new do
-        Net::HTTP.start(@server, @port) {|http|
-          http.get( @redirect_location )
-        }
-      end
-      t.value
+    t = Thread.new do
+        follow_redirect_unthreaded
     end
+    t.value
   end
 
-  def follow_redirect_unthreadded
+  def follow_redirect_unthreaded
     if @redirect_location
-      Net::HTTP.start(@server, @port) {|http|
-        http.get( @redirect_location )
+      url = URI.parse @redirect_location
+      Net::HTTP.start(url.host, url.port) {|http|
+        http.get( url.path )
       }
     end
   end
 
   def delete_environment
-    Net::HTTP.start(@server, @port) {|http|
-      req = Net::HTTP::Delete.new(environment_path)
+    req = Net::HTTP::Delete.new(environment_path)
+    Net::HTTP.start(@server, @port) do |http|
       response = http.request(req)
-    }
+    end
   end
 
   def request method, path, data = ""

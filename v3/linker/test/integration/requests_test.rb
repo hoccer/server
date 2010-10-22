@@ -1,24 +1,25 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 require 'helper'
 require 'test_client'
+require 'mongo'
 require 'net/http'
+require 'lib/hoccer'
 
 class TestRequest < Test::Unit::TestCase
 
-  test "registering clients" do
-    client_1 = TestClient.new
-    client_1.register
-
-    client_2 = TestClient.new
-    client_2.register
-
-    assert_not_nil client_1.uuid
-    assert_not_nil client_2.uuid
-    assert client_1.uuid != client_2.uuid
-    client_1.delete_environment
-    client_2.delete_environment
+  def setup 
+    db = Mongo::Connection.new.db('hoccer_development')
+    coll = db.collection('environments')
+    coll.remove
   end
-
+  
+  test "create unique uuids in test client" do
+    client1 = TestClient.create
+    client2 = TestClient.create
+    
+    assert_not_equal client1.uuid, client2.uuid
+  end
+  
   test "updating the environment" do
     client = TestClient.create
     assert_not_nil client.uuid
@@ -27,17 +28,17 @@ class TestRequest < Test::Unit::TestCase
       :gps => { :latitude => 32.22, :longitude => 88.74 }
     })
 
-    assert_equal "200", response.header.code
+    assert_equal "201", response.header.code
     client.delete_environment
   end
 
   test "lonesome client tries to share" do
     client = TestClient.create
     client.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
-    client.share( "pass", {:inline => "hello"} )
-    assert_equal "204", client.follow_redirect.header.code
+    response = client.share( "one-to-one", {:inline => "hello"} )
+    assert_equal "204", client.follow_redirect_unthreaded.header.code
 
     client.delete_environment
   end
@@ -45,10 +46,10 @@ class TestRequest < Test::Unit::TestCase
   test "lonesome client tries to receive" do
     client = TestClient.create
     client.update_environment({
-      :gps => { :latitude => 52.22, :longitude => 28.74 }
+      :gps => { :latitude => 52.22, :longitude => 28.74, :accuracy => 100 }
     })
 
-    assert_equal "204", client.receive( "pass" ).header.code
+    assert_equal "204", client.receive( "one-to-one" ).header.code
 
     client.delete_environment
   end
@@ -58,14 +59,14 @@ class TestRequest < Test::Unit::TestCase
     client_2 = TestClient.create
 
     client_1.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
     client_2.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
-    client_1.share( "pass", {:inline => "foobar"} )
+    client_1.share( "one-to-one", {:inline => "foobar"} )
 
     start_time = Time.now
     response = client_1.follow_redirect
@@ -83,15 +84,15 @@ class TestRequest < Test::Unit::TestCase
     client_2 = TestClient.create
 
     client_1.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
     client_2.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
     start_time = Time.now
-    response = client_1.receive("pass")
+    response = client_1.receive("one-to-one")
     time_taken = Time.now - start_time
 
     assert time_taken >= 7, "Should timeout after 7 seconds"
@@ -114,14 +115,14 @@ class TestRequest < Test::Unit::TestCase
     })
 
     t1 = Thread.new do
-      client_1.share( "pass", {:inline => "foobar"} )
-      client_1.follow_redirect_unthreadded
+      client_1.share( "one-to-one", {:inline => "foobar"} )
+      client_1.follow_redirect_unthreaded
     end
 
     sleep(0.1)
 
     t2 = Thread.new do
-      client_2.receive( "pass" )
+      client_2.receive( "one-to-one" )
     end
 
     client_1_response = t1.value
@@ -131,8 +132,7 @@ class TestRequest < Test::Unit::TestCase
     assert_equal expected, client_2_response.body
 
   end
-end
-__END__
+
 
   test "two clients receiving and then sharing successfully" do
     client_1 = TestClient.create
@@ -147,14 +147,14 @@ __END__
     })
 
     t1 = Thread.new do
-      client_2.receive_unthreaded("pass")
+      client_2.receive_unthreaded("one-to-one")
     end
-
+    sleep(1)
     t2 = Thread.new do
-      client_1.share("pass", {:inline => "foobar"})
-      client_1.
+      client_1.share("one-to-one", {:inline => "foobar"})
+      client_1.follow_redirect_unthreaded
     end
-
+    
     client_2_response = t2.value
     client_1_response = t1.value
 

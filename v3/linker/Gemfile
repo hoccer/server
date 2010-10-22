@@ -12,3 +12,4 @@ gem "thin"
 gem 'uuid'
 gem 'bson_ext', '>= 1.1'
 gem 'em-mongo', '>= 0.2.13'
+gem 'mongo'

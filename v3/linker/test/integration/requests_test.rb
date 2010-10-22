@@ -37,7 +37,7 @@ class TestRequest < Test::Unit::TestCase
     client.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
-    response = client.share( "pass", {:inline => "hello"} )
+    response = client.share( "one-to-one", {:inline => "hello"} )
     assert_equal "204", client.follow_redirect_unthreaded.header.code
 
     client.delete_environment
@@ -49,7 +49,7 @@ class TestRequest < Test::Unit::TestCase
       :gps => { :latitude => 52.22, :longitude => 28.74, :accuracy => 100 }
     })
 
-    assert_equal "204", client.receive( "pass" ).header.code
+    assert_equal "204", client.receive( "one-to-one" ).header.code
 
     client.delete_environment
   end
@@ -66,7 +66,7 @@ class TestRequest < Test::Unit::TestCase
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
-    client_1.share( "pass", {:inline => "foobar"} )
+    client_1.share( "one-to-one", {:inline => "foobar"} )
 
     start_time = Time.now
     response = client_1.follow_redirect
@@ -92,7 +92,7 @@ class TestRequest < Test::Unit::TestCase
     })
 
     start_time = Time.now
-    response = client_1.receive("pass")
+    response = client_1.receive("one-to-one")
     time_taken = Time.now - start_time
 
     assert time_taken >= 7, "Should timeout after 7 seconds"
@@ -115,14 +115,14 @@ class TestRequest < Test::Unit::TestCase
     })
 
     t1 = Thread.new do
-      client_1.share( "pass", {:inline => "foobar"} )
+      client_1.share( "one-to-one", {:inline => "foobar"} )
       client_1.follow_redirect_unthreaded
     end
 
     sleep(0.1)
 
     t2 = Thread.new do
-      client_2.receive( "pass" )
+      client_2.receive( "one-to-one" )
     end
 
     client_1_response = t1.value
@@ -147,11 +147,11 @@ class TestRequest < Test::Unit::TestCase
     })
 
     t1 = Thread.new do
-      client_2.receive_unthreaded("pass")
+      client_2.receive_unthreaded("one-to-one")
     end
     sleep(1)
     t2 = Thread.new do
-      client_1.share("pass", {:inline => "foobar"})
+      client_1.share("one-to-one", {:inline => "foobar"})
       client_1.follow_redirect_unthreaded
     end
     

@@ -51,21 +51,17 @@ class TestClient
   end
 
   def follow_redirect
-    if @redirect_location
-      t = Thread.new do
-        Net::HTTP.start(@server, @port) {|http|
-          http.get( @redirect_location )
-        }
-      end
-      t.value
+    t = Thread.new do
+        follow_redirect_unthreaded
     end
+    t.value
   end
 
   def follow_redirect_unthreaded
-    puts @redirect_location
     if @redirect_location
-      Net::HTTP.start(@server, @port) {|http|
-        http.get( @redirect_location )
+      url = URI.parse @redirect_location
+      Net::HTTP.start(url.host, url.port) {|http|
+        http.get( url.path )
       }
     end
   end

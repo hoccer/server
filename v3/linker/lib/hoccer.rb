@@ -1,5 +1,3 @@
-require 'client'
-require 'action'
 require 'sinatra/reloader' 
 
 CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
@@ -81,60 +79,56 @@ module Hoccer
       end
     end
 
-    apost %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
+    aput %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
       request_body  = request.body.read
       payload       = JSON.parse( request_body )
 
-      em_request( "/clients/#{uuid}", nil, nil ) do |response|
-        if response[:status] == 200
-          @@action_store[uuid] = {
-            :action   => action_name,
-            :mode     => :sender,
-            :payload  => payload
-          }
-          
-          em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
-            r = JSON.parse(response[:content])
-            clients = r.inject([]) do |result, environment|
-              client = @@action_store[ environment["client_uuid"] ]
-              result << client unless client.nil?
-              result
-            end
+      @@action_store[uuid] = {
+        :action   => action_name,
+        :mode     => :sender,
+        :payload  => payload,
+        :request  => self
+      }
+      
+      em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
+        group = JSON.parse(response[:content])
+        actions = actions_in group
 
-            verify_group clients
-            ahalt 302, {"Location" => "http://#{env["HTTP_HOST"]}/clients/#{uuid}/action/#{action_name}"}, []
-          end
+        if group.size < 2
+          send_no_content self
         else
-          status 404
-          body { {:error => "Not Found"}.to_json }
+          EM::Timer.new(2) do
+            actions.each do |action|
+              send_no_content action[:request]
+
+              action[:action]   = nil
+              action[:request]  = nil
+            end
+          end
+          verify_group actions
         end
       end
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
-      @@action_store[uuid] ||= { :action => action_name, :mode => :receiver }
-      @@action_store[uuid][:request] = self
+      @@action_store[uuid] = { :action => action_name, :mode => :receiver, :request => self }
 
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
         group = JSON.parse(response[:content])
-        clients = group.inject([]) do |result, environment|
-          client = @@action_store[ environment["client_uuid"] ]
-          result << client unless client.nil?
-          result
-        end
+        actions = actions_in group
         
         if group.size < 2
           send_no_content self
         else
-          EM::Timer.new(7) do
-            clients.each do |client|
-              send_no_content client[:request]
+          EM::Timer.new(2) do
+            actions.each do |action|
+              send_no_content action[:request]
 
-              client[:action]   = nil
-              client[:request]  = nil
+              action[:action]   = nil
+              action[:request]  = nil
             end
           end
-          verify_group clients
+          verify_group actions
         end
       end
     end 
@@ -145,6 +139,15 @@ module Hoccer
         request.status 204
         request.body { {"message" => "timeout"}.to_json }
       end
+    end
+    
+    def actions_in group 
+      actions = group.inject([]) do |result, environment|
+        action = @@action_store[ environment["client_uuid"] ]
+        result << action unless action.nil?
+        result
+      end
+      actions
     end
     
      

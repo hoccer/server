@@ -3,7 +3,6 @@ require 'helper'
 require 'test_client'
 require 'mongo'
 require 'net/http'
-require 'lib/hoccer'
 
 class TestRequest < Test::Unit::TestCase
 
@@ -38,7 +37,7 @@ class TestRequest < Test::Unit::TestCase
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
     response = client.share( "one-to-one", {:inline => "hello"} )
-    assert_equal "204", client.follow_redirect_unthreaded.header.code
+    assert_equal "204", response.header.code
 
     client.delete_environment
   end
@@ -66,13 +65,11 @@ class TestRequest < Test::Unit::TestCase
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
-    client_1.share( "one-to-one", {:inline => "foobar"} )
-
     start_time = Time.now
-    response = client_1.follow_redirect
+    response = client_1.share( "one-to-one", {:inline => "foobar"} )
     time_taken = Time.now - start_time
 
-    assert time_taken >= 7, "Should timeout after 7 seconds"
+    assert time_taken >= 2, "Should timeout after 7 seconds"
     assert_equal "204", response.header.code
 
     client_1.delete_environment
@@ -95,7 +92,7 @@ class TestRequest < Test::Unit::TestCase
     response = client_1.receive("one-to-one")
     time_taken = Time.now - start_time
 
-    assert time_taken >= 7, "Should timeout after 7 seconds"
+    assert time_taken >= 2, "Should timeout after 7 seconds"
     assert_equal "204", response.header.code
 
     client_1.delete_environment
@@ -116,7 +113,6 @@ class TestRequest < Test::Unit::TestCase
 
     t1 = Thread.new do
       client_1.share( "one-to-one", {:inline => "foobar"} )
-      client_1.follow_redirect_unthreaded
     end
 
     sleep(0.1)
@@ -152,7 +148,6 @@ class TestRequest < Test::Unit::TestCase
     sleep(1)
     t2 = Thread.new do
       client_1.share("one-to-one", {:inline => "foobar"})
-      client_1.follow_redirect_unthreaded
     end
     
     client_2_response = t2.value
@@ -161,7 +156,7 @@ class TestRequest < Test::Unit::TestCase
     assert_equal "200", client_1_response.header.code
     assert_equal "200", client_2_response.header.code
 
-    expected_2 = "{\"receiver\":1}"
+    expected_2 = "[{\"inline\":\"foobar\"}]"
     assert_equal expected_2, client_2_response.body
 
     expexted_1 = "[{\"inline\":\"foobar\"}]"

@@ -116,14 +116,14 @@ module Hoccer
       @@action_store[uuid][:request] = self
 
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
-        r = JSON.parse(response[:content])
+        group = JSON.parse(response[:content])
         clients = r.inject([]) do |result, environment|
           client = @@action_store[ environment["client_uuid"] ]
           result << client unless client.nil?
           result
         end
         
-        if clients.size < 2
+        if group.size < 2
           send_no_content self
         else
           EM::Timer.new(7) do

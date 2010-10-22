@@ -13,6 +13,13 @@ class TestRequest < Test::Unit::TestCase
     coll.remove
   end
   
+  test "create unique uuids in test client" do
+    client1 = TestClient.create
+    client2 = TestClient.create
+    
+    assert_not_equal client1.uuid, client2.uuid
+  end
+  
   test "updating the environment" do
     client = TestClient.create
     assert_not_nil client.uuid
@@ -28,7 +35,7 @@ class TestRequest < Test::Unit::TestCase
   test "lonesome client tries to share" do
     client = TestClient.create
     client.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
     response = client.share( "pass", {:inline => "hello"} )
     assert_equal "204", client.follow_redirect_unthreaded.header.code
@@ -39,7 +46,7 @@ class TestRequest < Test::Unit::TestCase
   test "lonesome client tries to receive" do
     client = TestClient.create
     client.update_environment({
-      :gps => { :latitude => 52.22, :longitude => 28.74 }
+      :gps => { :latitude => 52.22, :longitude => 28.74, :accuracy => 100 }
     })
 
     assert_equal "204", client.receive( "pass" ).header.code
@@ -52,11 +59,11 @@ class TestRequest < Test::Unit::TestCase
     client_2 = TestClient.create
 
     client_1.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
     client_2.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
     client_1.share( "pass", {:inline => "foobar"} )
@@ -77,11 +84,11 @@ class TestRequest < Test::Unit::TestCase
     client_2 = TestClient.create
 
     client_1.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
     client_2.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
     start_time = Time.now

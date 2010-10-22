@@ -2,7 +2,7 @@ require 'client'
 require 'action'
 require 'sinatra/reloader' 
 
-CLIENTS = "/clients/([A-Z0-9\-]{36,36})"
+CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
 
 module Hoccer
   # CLIENTS = "/clients/(.+)"
@@ -54,7 +54,7 @@ module Hoccer
       end
     end
 
-    aget %r{/clients/([A-Z0-9\-]+$)} do |uuid|
+    aget %r{#{CLIENTS}$} do |uuid|
       em_request( "/clients/#{uuid}", nil, nil ) do |response|
         if response[:status] == 200
           body { response[:content] }
@@ -77,6 +77,7 @@ module Hoccer
     adelete %r{#{CLIENTS}/environment} do |uuid|
       em_request("/clients/#{uuid}/delete", "DELETE", nil) do |response|
         status 200
+        body {"deleted"}
       end
     end
 
@@ -126,19 +127,17 @@ module Hoccer
         
         if clients.size < 2
           send_no_content self
-          return
-        end
-        
-        EM::Timer.new(7) do
-          clients.each do |client|
-            send_no_content client[:request]
+        else
+          EM::Timer.new(7) do
+            clients.each do |client|
+              send_no_content client[:request]
 
-            client[:action]   = nil
-            client[:request]  = nil
+              client[:action]   = nil
+              client[:request]  = nil
+            end
           end
+          verify_group clients
         end
-
-        verify_group clients
       end
     end 
     

@@ -2,6 +2,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 require 'helper'
 require 'test_client'
 require 'net/http'
+require 'lib/hoccer'
 
 class TestRequest < Test::Unit::TestCase
 

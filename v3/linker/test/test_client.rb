@@ -1,16 +1,14 @@
 class TestClient
 
-  UUID = /[a-f0-9]{32,32}/
-
   attr_accessor :uuid
 
   def self.create
     client = self.new
-    client.register
     client
   end
 
   def initialize
+    @uuid = UUID.generate
     @server = "127.0.0.1"
     @port   = 9292
   end
@@ -25,10 +23,6 @@ class TestClient
 
   def action_path mode
     "/clients/#{@uuid}/action/#{mode}"
-  end
-
-  def register
-    @uuid = post("/clients").header['Location'].match(UUID)[0]
   end
 
   def update_environment data
@@ -76,10 +70,10 @@ class TestClient
   end
 
   def delete_environment
-    Net::HTTP.start(@server, @port) {|http|
-      req = Net::HTTP::Delete.new(environment_path)
+    req = Net::HTTP::Delete.new(environment_path)
+    Net::HTTP.start(@server, @port) do |http|
       response = http.request(req)
-    }
+    end
   end
 
   def request method, path, data = ""

@@ -26,7 +26,7 @@ class Environment
 
   def group
     Environment
-      .where(:group_id => group_id)
+      .where(:group_id => self[:group_id])
       .only(:client_uuid, :group_id) || []
   end
 
@@ -45,11 +45,15 @@ class Environment
 
   private
   def ensure_indexable
+    begin
     location = {
       "longitude" => self[:gps]["longitude"],
       "latitude"  => self[:gps]["latitude"]
     }
     gps = location.merge(self[:gps])
+    rescue
+      self[:gps]
+    end
   end
 
   def add_creation_time
@@ -58,11 +62,19 @@ class Environment
 
   def update_groups
     relevant_envs = self.nearby + [self]
+    grouped_envs  = relevant_envs.inject([]) do |result, element|
+      element.group.each do |group_env|
+        unless result.include?( group_env )
+          result << group_env
+        end
+      end
+      result
+    end
 
-    group_id = rand(1000000)
-    relevant_envs.each do |e|
-      e[:group_id] = group_id
-      e.save
+    new_group_id = rand(Time.now.to_i)
+    ( grouped_envs | relevant_envs ).each do |foobar|
+      foobar[:group_id] = new_group_id
+      foobar.save
     end
 
     reload

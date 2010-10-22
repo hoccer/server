@@ -101,7 +101,7 @@ module Hoccer
               result
             end
 
-            # verify_group clients
+            verify_group clients
             ahalt 302, {"Location" => "http://#{env["HTTP_HOST"]}/clients/#{uuid}/action/#{action_name}"}, []
           end
         else
@@ -117,7 +117,7 @@ module Hoccer
 
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
         group = JSON.parse(response[:content])
-        clients = r.inject([]) do |result, environment|
+        clients = group.inject([]) do |result, environment|
           client = @@action_store[ environment["client_uuid"] ]
           result << client unless client.nil?
           result

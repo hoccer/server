@@ -116,7 +116,7 @@ class TestRequest < Test::Unit::TestCase
 
     t1 = Thread.new do
       client_1.share( "pass", {:inline => "foobar"} )
-      client_1.follow_redirect_unthreadded
+      client_1.follow_redirect_unthreaded
     end
 
     sleep(0.1)
@@ -149,10 +149,10 @@ class TestRequest < Test::Unit::TestCase
     t1 = Thread.new do
       client_2.receive_unthreaded("pass")
     end
-
+    sleep(1)
     t2 = Thread.new do
       client_1.share("pass", {:inline => "foobar"})
-      # client_1.
+      client_1.follow_redirect_unthreaded
     end
     
     client_2_response = t2.value

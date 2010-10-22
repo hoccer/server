@@ -1,5 +1,3 @@
-require 'client'
-require 'action'
 require 'sinatra/reloader' 
 
 CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"

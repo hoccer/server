@@ -3,7 +3,6 @@ require 'helper'
 require 'test_client'
 require 'mongo'
 require 'net/http'
-require 'lib/hoccer'
 
 class TestRequest < Test::Unit::TestCase
 

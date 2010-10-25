@@ -10,8 +10,9 @@ class Environment
 
   include Mongoid::Document
 
-  before_save :ensure_indexable, :add_creation_time
-  after_create :update_groups
+  before_create :ensure_indexable
+  before_save   :add_creation_time
+  after_create  :update_groups
 
   Mongoid.configure do |config|
     name = "hoccer_development"
@@ -46,13 +47,14 @@ class Environment
   private
   def ensure_indexable
     begin
-    location = {
-      "longitude" => self[:gps]["longitude"],
-      "latitude"  => self[:gps]["latitude"]
-    }
-    gps = location.merge(self[:gps])
-    rescue
-      self[:gps]
+      location = {
+        "longitude" => ( self.gps["longitude"] || self.gps[:longitude] ),
+        "latitude"  => ( self.gps["latitude"]  || self.gps[:latitude] )
+      }
+      self.gps = location.merge(self.gps)
+    rescue => e
+      puts "!!!!!!! Panic: #{e}"
+      self.gps
     end
   end
 

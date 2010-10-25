@@ -132,4 +132,17 @@ class ExhibitTest < Test::Unit::TestCase
 
      assert_equal newest_added, newest_find, "should find last added environment"
   end
+
+  test 'reordering of longitude and latitude' do
+    env_1 = Environment.create(
+      :gps => {
+        :latitude  => 52.522,
+        :longitude => 13.420,
+        :accuracy  => 100
+      },
+      :client_uuid => "fooobar"
+    )
+
+    assert_equal "longitude", env_1.gps.keys[0]
+  end
 end

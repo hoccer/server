@@ -166,4 +166,34 @@ class TestRequest < Test::Unit::TestCase
     client_1.delete_environment
     client_2.delete_environment
   end
+  
+  test "two clients with different modes do not pair" do
+    client_1 = TestClient.create
+    client_2 = TestClient.create
+
+    client_1.update_environment({
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
+    })
+
+    client_2.update_environment({
+      :gps => { :latitude => 12.22, :longitude => 18.74,:accuracy => 100 }
+    })
+
+    t1 = Thread.new do
+      client_2.receive_unthreaded("one-to-one")
+    end
+    sleep(1)
+    t2 = Thread.new do
+      client_1.share("one-to-many", {:inline => "foobar"})
+    end
+    
+    client_2_response = t2.value
+    client_1_response = t1.value
+
+    assert_equal "204", client_1_response.header.code
+    assert_equal "204", client_2_response.header.code
+
+    client_1.delete_environment
+    client_2.delete_environment
+  end
 end

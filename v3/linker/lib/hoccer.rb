@@ -96,6 +96,7 @@ module Hoccer
           group = {}
         end  
         actions = actions_in group
+        actions_with_mode = actions.select {|action| action[:action] == action_name}
 
         if group.size < 2
           send_no_content self
@@ -108,7 +109,7 @@ module Hoccer
               action[:request]  = nil
             end
           end
-          verify_group actions
+          verify_group actions_with_mode
         end
       end
     end
@@ -124,6 +125,7 @@ module Hoccer
           group = {}
         end          
         actions = actions_in group
+        actions_with_mode = actions.select {|action| action[:action] == action_name}
       
         if group.size < 2
           send_no_content self
@@ -136,7 +138,7 @@ module Hoccer
               action[:request]  = nil
             end
           end
-          verify_group actions
+          verify_group actions_with_mode
         end  
         
       end

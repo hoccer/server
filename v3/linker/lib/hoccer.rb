@@ -91,7 +91,12 @@ module Hoccer
       }
       
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
-        group = JSON.parse(response[:content])
+        begin
+          group = JSON.parse(response[:content]) 
+        rescue => e
+          puts e
+          group = {}
+        end  
         actions = actions_in group
 
         if group.size < 2
@@ -114,9 +119,14 @@ module Hoccer
       @@action_store[uuid] = { :action => action_name, :mode => :receiver, :request => self }
 
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
-        group = JSON.parse(response[:content])
+        begin
+          group = JSON.parse(response[:content])
+        rescue => e
+          puts e
+          group = {}
+        end          
         actions = actions_in group
-        
+      
         if group.size < 2
           send_no_content self
         else
@@ -129,7 +139,8 @@ module Hoccer
             end
           end
           verify_group actions
-        end
+        end  
+        
       end
     end 
     

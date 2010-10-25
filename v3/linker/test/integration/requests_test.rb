@@ -24,7 +24,7 @@ class TestRequest < Test::Unit::TestCase
     assert_not_nil client.uuid
 
     response = client.update_environment({
-      :gps => { :latitude => 32.22, :longitude => 88.74 }
+      :gps => { :latitude => 32.22, :longitude => 88.74, :accuracy => 100 }
     })
 
     assert_equal "201", response.header.code
@@ -104,11 +104,11 @@ class TestRequest < Test::Unit::TestCase
     client_2 = TestClient.create
 
     client_1.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
     client_2.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100}
     })
 
     t1 = Thread.new do
@@ -135,11 +135,11 @@ class TestRequest < Test::Unit::TestCase
     client_2 = TestClient.create
 
     client_1.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
     client_2.update_environment({
-      :gps => { :latitude => 12.22, :longitude => 18.74 }
+      :gps => { :latitude => 12.22, :longitude => 18.74,:accuracy => 100 }
     })
 
     t1 = Thread.new do

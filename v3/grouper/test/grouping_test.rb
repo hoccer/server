@@ -16,7 +16,7 @@ class ExhibitTest < Test::Unit::TestCase
         :longitude => (@gps[0] + (rand/50 * operand)),
         :latitude  => (@gps[1] + (rand/50 * operand)),
         :timestamp => Time.now.to_f,
-        :accuracy  => 100.0
+        :accuracy  => 100
       },
       :client_uuid => UUID.generate
     }

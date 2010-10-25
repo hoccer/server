@@ -27,8 +27,6 @@ module Hoccer
       )
 
       http.callback do |response|
-        puts response[:status]
-        puts response[:headers]
         block.call( response )
       end
     end

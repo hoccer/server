@@ -4,7 +4,6 @@ require 'logger'
 CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
 
 module Hoccer
-  # CLIENTS = "/clients/(.+)"
   
   class App < Sinatra::Base
     register Sinatra::Async
@@ -120,7 +119,7 @@ module Hoccer
           puts e
           group = {}
         end          
-        actions = actions_in group
+        actions = actions_in_group group
         actions_with_mode = actions.select {|action| action[:mode] == action_name}
       
         if group.size < 2
@@ -142,7 +141,7 @@ module Hoccer
       end
     end
     
-    def actions_in group 
+    def actions_in_group group 
       actions = group.inject([]) do |result, environment|
         action = @@action_store[ environment["client_uuid"] ]
         result << action unless action.nil?

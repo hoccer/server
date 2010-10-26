@@ -1,0 +1,32 @@
+class Logger
+  
+  def self.successful_transfer share_id, receive_id, mode
+    self.write({ :share_id => share_id, :receive_id => receive_id, 
+            :mode => mode, :type => 'successful_transfer' })
+  end
+  
+  def self.failed_share client_id, mode
+    write( { :type => "failed_share", :share_id => client_id, :mode => mode } )
+  end
+  
+  def self.failed_receive client_id, mode 
+    write( { :type => "failed_receive", :receive_id => client_id, :mode => mode } )
+  end
+  
+  def self.failed_action uuid, action 
+    if action[:type] == :sender 
+      failed_share uuid, action[:mode]
+    else
+      failed_receive uuid, action[:mode]
+    end
+  end
+  
+  def self.write doc  
+    doc[:timestamp] = Time.now        
+    db.collection('linccer_stats').insert(doc)
+  end
+  
+  def self.db
+    @@db ||= EM::Mongo::Connection.new.db('hoccer_development')
+  end
+end

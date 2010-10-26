@@ -1,4 +1,5 @@
 require 'sinatra/reloader' 
+require 'logger'
 
 CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
 
@@ -32,8 +33,8 @@ module Hoccer
     end
 
     def verify_group clients
-      sender   = clients.select { |c| c[:mode] == :sender }
-      receiver = clients.select { |c| c[:mode] == :receiver }
+      sender   = clients.select { |c| c[:type] == :sender }
+      receiver = clients.select { |c| c[:type] == :receiver }
       
       puts "sender   #{sender.count}"
       puts "receiver #{receiver.count}"
@@ -82,8 +83,8 @@ module Hoccer
       payload       = JSON.parse( request_body )
 
       @@action_store[uuid] = {
-        :action   => action_name,
-        :mode     => :sender,
+        :mode   => action_name,
+        :type     => :sender,
         :payload  => payload,
         :request  => self
       }
@@ -96,26 +97,20 @@ module Hoccer
           group = {}
         end  
         actions = actions_in group
-        actions_with_mode = actions.select {|action| action[:action] == action_name}
+        actions_with_mode = actions.select {|action| action[:mode] == action_name}
 
         if group.size < 2
           send_no_content self
         else
-          EM::Timer.new(2) do
-            actions.each do |action|
-              send_no_content action[:request]
-
-              action[:action]   = nil
-              action[:request]  = nil
-            end
-          end
+          timeout_action_after_delay uuid, 2
+          
           verify_group actions_with_mode
         end
       end
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
-      @@action_store[uuid] = { :action => action_name, :mode => :receiver, :request => self }
+      @@action_store[uuid] = { :mode => action_name, :type => :receiver, :request => self }
 
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
         begin
@@ -125,19 +120,13 @@ module Hoccer
           group = {}
         end          
         actions = actions_in group
-        actions_with_mode = actions.select {|action| action[:action] == action_name}
+        actions_with_mode = actions.select {|action| action[:mode] == action_name}
       
         if group.size < 2
           send_no_content self
         else
-          EM::Timer.new(2) do
-            actions.each do |action|
-              send_no_content action[:request]
-
-              action[:action]   = nil
-              action[:request]  = nil
-            end
-          end
+          timeout_action_after_delay uuid, 2
+          
           verify_group actions_with_mode
         end  
         
@@ -161,7 +150,18 @@ module Hoccer
       actions
     end
     
-     
+    def timeout_action_after_delay uuid, seconds 
+      EM::Timer.new(seconds) do
+        action = @@action_store[uuid]
+        Logger.failed_action uuid, action
+        
+        send_no_content action[:request]
+        action[:mode]   = nil
+        action[:request]  = nil
+      end
+    end
+    
+    
   end
 
 end

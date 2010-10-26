@@ -42,6 +42,7 @@ module Hoccer
       if sender.size >= 1 && receiver.size >= 1
         clients.each do |client|
           if client[:request]
+            Logger.successful_actions clients
             data_list = sender.map { |s| s[:payload] }
 
             client[:request].body { data_list.to_json }
@@ -83,10 +84,11 @@ module Hoccer
       payload       = JSON.parse( request_body )
 
       @@action_store[uuid] = {
-        :mode   => action_name,
+        :mode     => action_name,
         :type     => :sender,
         :payload  => payload,
-        :request  => self
+        :request  => self,
+        :uuid    => uuid
       }
       
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
@@ -97,20 +99,19 @@ module Hoccer
           group = {}
         end  
         actions = actions_in group
-        actions_with_mode = actions.select {|action| action[:mode] == action_name}
+        actions_with_mode = actions.select { |action| action[:mode] == action_name }
 
         if group.size < 2
           send_no_content self
         else
           timeout_action_after_delay uuid, 2
-          
           verify_group actions_with_mode
         end
       end
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
-      @@action_store[uuid] = { :mode => action_name, :type => :receiver, :request => self }
+      @@action_store[uuid] = { :mode => action_name, :type => :receiver, :request => self, :uuid => uuid }
 
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
         begin

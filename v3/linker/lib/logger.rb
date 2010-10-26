@@ -1,5 +1,4 @@
-class Logger
-  
+class Logger  
   def self.successful_transfer share_id, receive_id, mode
     self.write({ :share_id => share_id, :receive_id => receive_id, 
             :mode => mode, :type => 'successful_transfer' })
@@ -11,6 +10,14 @@ class Logger
   
   def self.failed_receive client_id, mode 
     write( { :type => "failed_receive", :receive_id => client_id, :mode => mode } )
+  end
+  
+  def self.successful_actions actions 
+    sender, receiver = actions.partition { |action| action[:type] == :sender }
+    sender_id = sender.map { |s| s[:uuid] }
+    receiver_id = receiver.map { |r| r[:uuid] }
+    
+    successful_transfer sender_id, receiver_id, actions.first[:mode]
   end
   
   def self.failed_action uuid, action 

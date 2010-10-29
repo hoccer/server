@@ -17,9 +17,18 @@ module Hoccer
     
     def invalidate uuid 
       action = self[uuid]
-
       send_no_content action
       self[uuid] = nil
+    end
+    
+    def actions_in_group group, mode 
+      actions = group.inject([]) do |result, environment|
+        action = self[ environment["client_uuid"] ]
+        result << action unless action.nil?
+        result
+      end
+      
+      actions.select {|action| action[:mode] == mode}
     end
     
     private
@@ -34,9 +43,7 @@ module Hoccer
     end
       
   end
-  
-  
-  
+
   class App < Sinatra::Base
     register Sinatra::Async
     
@@ -129,7 +136,7 @@ module Hoccer
         if group.size < 2
           @@action_store.invalidate uuid
         else          
-          verify_group (actions_in_group group, action_name)
+          verify_group @@action_store.actions_in_group(group, action_name)
         end
       end
     end
@@ -144,24 +151,13 @@ module Hoccer
         if group.size < 2
           @@action_store.invalidate uuid
         else          
-          verify_group (actions_in_group group, action_name)
+          verify_group @@action_store.actions_in_group(group, action_name)
         end  
         
       end
     end 
     
     private 
-    
-    private
-    def actions_in_group group, mode 
-      actions = group.inject([]) do |result, environment|
-        action = @@action_store[ environment["client_uuid"] ]
-        result << action unless action.nil?
-        result
-      end
-      
-      actions.select {|action| action[:mode] == mode}
-    end
     
     def parse_group json_string
       begin
@@ -173,7 +169,6 @@ module Hoccer
       
       group
     end
-    
   end
 
 end

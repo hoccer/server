@@ -79,8 +79,7 @@ module Hoccer
     end
 
     aput %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
-      request_body  = request.body.read
-      payload       = JSON.parse( request_body )
+      payload       = JSON.parse( request.body.read )
 
       @@action_store[uuid] = {
         :mode     => action_name,
@@ -93,14 +92,12 @@ module Hoccer
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
         group = parse_group response[:content] 
         
-        actions = actions_in_group group
-        actions_with_mode = actions.select { |action| action[:mode] == action_name }
-
         if group.size < 2
           send_no_content self
         else
           timeout_action_after_delay uuid, 2
-          verify_group actions_with_mode
+         
+          verify_group(actions_in_group group, action_name)
         end
       end
     end
@@ -111,15 +108,12 @@ module Hoccer
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
         group = parse_group response[:content] 
         
-        actions = actions_in_group group
-        actions_with_mode = actions.select {|action| action[:mode] == action_name}
-      
         if group.size < 2
           send_no_content self
         else
           timeout_action_after_delay uuid, 2
           
-          verify_group actions_with_mode
+          verify_group (actions_in_group group, action_name)
         end  
         
       end
@@ -134,13 +128,14 @@ module Hoccer
     end
     
     private
-    def actions_in_group group 
+    def actions_in_group group, mode 
       actions = group.inject([]) do |result, environment|
         action = @@action_store[ environment["client_uuid"] ]
         result << action unless action.nil?
         result
       end
-      actions
+      
+      actions.select {|action| action[:mode] == mode}
     end
     
     def timeout_action_after_delay uuid, seconds 
@@ -149,8 +144,8 @@ module Hoccer
         Logger.failed_action uuid, action
         
         send_no_content action[:request]
-        action[:mode]   = nil
-        action[:request]  = nil
+        
+        @@action_store[uuid] = nil
       end
     end
     

@@ -4,6 +4,38 @@ require 'logger'
 CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
 
 module Hoccer
+  class ActionStore < Hash
+    
+    def hold_action_for_seconds action, seconds 
+      uuid = action[:uuid]
+      self[uuid] = action
+      
+      EM::Timer.new(seconds) do
+        invalidate uuid
+      end
+    end
+    
+    def invalidate uuid 
+      action = self[uuid]
+
+      send_no_content action
+      self[uuid] = nil
+    end
+    
+    private
+    def send_no_content action 
+      if action && action[:request]
+        Logger.failed_action action
+        
+        request = action[:request]
+        request.status 204
+        request.body { {"message" => "timeout"}.to_json }
+      end
+    end
+      
+  end
+  
+  
   
   class App < Sinatra::Base
     register Sinatra::Async
@@ -14,7 +46,7 @@ module Hoccer
     
     @@server        = "localhost"
     @@port          = 4567
-    @@action_store  = {}
+    @@action_store  = ActionStore.new
     @@requests      = {}
     
     def em_request path, method, content, &block
@@ -81,7 +113,7 @@ module Hoccer
     aput %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
       payload       = JSON.parse( request.body.read )
 
-      @@action_store[uuid] = {
+      action= {
         :mode     => action_name,
         :type     => :sender,
         :payload  => payload,
@@ -89,30 +121,29 @@ module Hoccer
         :uuid    => uuid
       }
       
+      @@action_store.hold_action_for_seconds action, 2
+      
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
         group = parse_group response[:content] 
         
         if group.size < 2
-          send_no_content self
-        else
-          timeout_action_after_delay uuid, 2
-         
-          verify_group(actions_in_group group, action_name)
+          @@action_store.invalidate uuid
+        else          
+          verify_group (actions_in_group group, action_name)
         end
       end
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
-      @@action_store[uuid] = { :mode => action_name, :type => :receiver, :request => self, :uuid => uuid }
+      action = { :mode => action_name, :type => :receiver, :request => self, :uuid => uuid }
+      @@action_store.hold_action_for_seconds action, 2
 
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
         group = parse_group response[:content] 
         
         if group.size < 2
-          send_no_content self
-        else
-          timeout_action_after_delay uuid, 2
-          
+          @@action_store.invalidate uuid
+        else          
           verify_group (actions_in_group group, action_name)
         end  
         
@@ -120,12 +151,6 @@ module Hoccer
     end 
     
     private 
-    def send_no_content request 
-      if request
-        request.status 204
-        request.body { {"message" => "timeout"}.to_json }
-      end
-    end
     
     private
     def actions_in_group group, mode 
@@ -136,17 +161,6 @@ module Hoccer
       end
       
       actions.select {|action| action[:mode] == mode}
-    end
-    
-    def timeout_action_after_delay uuid, seconds 
-      EM::Timer.new(seconds) do
-        action = @@action_store[uuid]
-        Logger.failed_action uuid, action
-        
-        send_no_content action[:request]
-        
-        @@action_store[uuid] = nil
-      end
     end
     
     def parse_group json_string

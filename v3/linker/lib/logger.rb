@@ -20,11 +20,11 @@ class Logger
     successful_transfer sender_id, receiver_id, actions.first[:mode]
   end
   
-  def self.failed_action uuid, action 
+  def self.failed_action action 
     if action[:type] == :sender 
-      failed_share uuid, action[:mode]
+      failed_share action[:uuid], action[:mode]
     else
-      failed_receive uuid, action[:mode]
+      failed_receive action[:uuid], action[:mode]
     end
   end
   

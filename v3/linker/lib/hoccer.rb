@@ -97,7 +97,7 @@ module Hoccer
           puts e
           group = {}
         end  
-        actions = actions_in group
+        actions = actions_in_group group
         actions_with_mode = actions.select { |action| action[:mode] == action_name }
 
         if group.size < 2

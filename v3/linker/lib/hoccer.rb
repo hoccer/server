@@ -91,12 +91,8 @@ module Hoccer
       }
       
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
-        begin
-          group = JSON.parse(response[:content]) 
-        rescue => e
-          puts e
-          group = {}
-        end  
+        group = parse_group response[:content] 
+        
         actions = actions_in_group group
         actions_with_mode = actions.select { |action| action[:mode] == action_name }
 
@@ -113,12 +109,8 @@ module Hoccer
       @@action_store[uuid] = { :mode => action_name, :type => :receiver, :request => self, :uuid => uuid }
 
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
-        begin
-          group = JSON.parse(response[:content])
-        rescue => e
-          puts e
-          group = {}
-        end          
+        group = parse_group response[:content] 
+        
         actions = actions_in_group group
         actions_with_mode = actions.select {|action| action[:mode] == action_name}
       
@@ -141,6 +133,7 @@ module Hoccer
       end
     end
     
+    private
     def actions_in_group group 
       actions = group.inject([]) do |result, environment|
         action = @@action_store[ environment["client_uuid"] ]
@@ -161,6 +154,16 @@ module Hoccer
       end
     end
     
+    def parse_group json_string
+      begin
+        group = JSON.parse json_string
+      rescue => e
+        puts e
+        group = {}
+      end
+      
+      group
+    end
     
   end
 

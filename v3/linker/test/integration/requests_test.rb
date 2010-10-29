@@ -196,4 +196,66 @@ class TestRequest < Test::Unit::TestCase
     client_1.delete_environment
     client_2.delete_environment
   end
+  
+  test "sending and receiving in both directions" do
+     client_1 = TestClient.create
+      client_2 = TestClient.create
+
+      client_1.update_environment({
+        :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
+      })
+
+      client_2.update_environment({
+        :gps => { :latitude => 12.22, :longitude => 18.74,:accuracy => 100 }
+      })
+
+      t1 = Thread.new do
+        client_2.receive_unthreaded("one-to-one")
+      end
+      sleep(1)
+      t2 = Thread.new do
+        client_1.share("one-to-one", {:inline => "foobar"})
+      end
+
+      client_2_response = t2.value
+      client_1_response = t1.value
+
+      assert_equal "200", client_1_response.header.code
+      assert_equal "200", client_2_response.header.code
+
+      expected_2 = "[{\"inline\":\"foobar\"}]"
+      assert_equal expected_2, client_2_response.body
+
+      expexted_1 = "[{\"inline\":\"foobar\"}]"
+      assert_equal expexted_1, client_1_response.body
+      client_1_response.body
+
+      sleep(2)
+
+      t1 = Thread.new do
+        client_1.share("one-to-one", {:inline => "buubaa"})
+      end
+      sleep(1)
+      t2 = Thread.new do
+        client_2.receive_unthreaded("one-to-one")
+      end
+
+      client_2_response = t2.value
+      client_1_response = t1.value
+      
+      assert_equal "200", client_1_response.header.code
+      assert_equal "200", client_2_response.header.code
+
+      expected_2 = "[{\"inline\":\"buubaa\"}]"
+      assert_equal expected_2, client_2_response.body
+
+      expexted_1 = "[{\"inline\":\"buubaa\"}]"
+      assert_equal expexted_1, client_1_response.body
+      client_1_response.body
+      
+      client_1.delete_environment
+      client_2.delete_environment
+  end
+  
+  
 end

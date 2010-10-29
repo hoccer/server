@@ -16,6 +16,10 @@ class ActionStore < Hash
     self[uuid] = nil
   end
   
+  def send uuid, content
+    
+  end
+  
   def actions_in_group group, mode 
     actions = group.inject([]) do |result, environment|
       action = self[ environment["client_uuid"] ]

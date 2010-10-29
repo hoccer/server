@@ -16,7 +16,6 @@ module Hoccer
     @@server        = "localhost"
     @@port          = 4567
     @@action_store  = ActionStore.new
-    @@requests      = {}
     
     def em_request path, method, content, &block
       http = EM::Protocols::HttpClient.request(
@@ -105,6 +104,7 @@ module Hoccer
 
     aget %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
       action = { :mode => action_name, :type => :receiver, :request => self, :uuid => uuid }
+      
       @@action_store.hold_action_for_seconds action, 2
 
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
@@ -119,7 +119,7 @@ module Hoccer
       end
     end 
     
-    private 
+    private
     
     def parse_group json_string
       begin

@@ -3,7 +3,7 @@ require 'logger'
 require 'action_store'
 
 CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
-
+            
 module Hoccer
 
   class App < Sinatra::Base

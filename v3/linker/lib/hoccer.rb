@@ -42,6 +42,7 @@ module Hoccer
         clients.each do |client|
           @@action_store.conflict client[:uuid]
         end
+        return
       end
       
       if sender.size == 1 && receiver.size == 1 && (group.size == 2 || reevaluate)
@@ -51,7 +52,15 @@ module Hoccer
         clients.each do |client|
           @@action_store.send client[:uuid], data_list
         end
+        return
       end
+      
+      unless reevaluate 
+        EM::Timer.new(1) do
+          verify_one_to_one clients, group, true
+        end
+      end
+      
     end
 
     aget %r{#{CLIENTS}$} do |uuid|

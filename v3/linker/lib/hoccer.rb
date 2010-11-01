@@ -3,9 +3,9 @@ require 'logger'
 require 'action_store'
 
 CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
-            
+                           
 module Hoccer
-
+  
   class App < Sinatra::Base
     register Sinatra::Async
     
@@ -31,22 +31,25 @@ module Hoccer
       end
     end
 
-    def verify_group clients
+    def verify_one_to_one clients, group, reevaluate = false
       sender   = clients.select { |c| c[:type] == :sender }
       receiver = clients.select { |c| c[:type] == :receiver }
       
       puts "sender   #{sender.count}"
       puts "receiver #{receiver.count}"
       
-      if sender.size >= 1 && receiver.size >= 1
+      if sender.size > 1 || receiver.size > 1
         clients.each do |client|
-          if client[:request]
-            Logger.successful_actions clients
-            data_list = sender.map { |s| s[:payload] }
-
-            client[:request].body { data_list.to_json }
-            client[:request] = nil
-          end
+          @@action_store.conflict client[:uuid]
+        end
+      end
+      
+      if sender.size == 1 && receiver.size == 1 && (group.size == 2 || reevaluate)
+        data_list = sender.map { |s| s[:payload] }
+        Logger.successful_actions clients        
+        
+        clients.each do |client|
+          @@action_store.send client[:uuid], data_list
         end
       end
     end
@@ -97,7 +100,7 @@ module Hoccer
         if group.size < 2
           @@action_store.invalidate uuid
         else          
-          verify_group @@action_store.actions_in_group(group, action_name)
+          verify_one_to_one @@action_store.actions_in_group(group, action_name), group  
         end
       end
     end
@@ -109,13 +112,7 @@ module Hoccer
 
       em_request( "/clients/#{uuid}/group", nil, request.body.read ) do |response|
         group = parse_group response[:content] 
-        
-        if group.size < 2
-          @@action_store.invalidate uuid
-        else          
-          verify_group @@action_store.actions_in_group(group, action_name)
-        end  
-        
+        verify_one_to_one @@action_store.actions_in_group(group, action_name), group  
       end
     end 
     

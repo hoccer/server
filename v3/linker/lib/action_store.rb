@@ -16,8 +16,22 @@ class ActionStore < Hash
     self[uuid] = nil
   end
   
+  def conflict uuid 
+    action = self[uuid]
+    if action && action[:request]
+      action[:request].status 409
+      action[:request].body { {"message" => "conflict"}.to_json }
+    end
+    self[uuid] = nil
+  end
+  
   def send uuid, content
-    
+    action = self[uuid]
+    if action && action[:request]
+      action[:request].status 200
+      action[:request].body content.to_json
+    end
+    self[uuid] = nil
   end
   
   def actions_in_group group, mode 

@@ -51,9 +51,9 @@ module Hoccer
     end
 
     aput %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
-      payload       = JSON.parse( request.body.read )
-
-      action = { 
+      payload = JSON.parse( request.body.read )
+      
+      action  = { 
         :mode     => action_name,
         :type     => :sender,
         :payload  => payload,

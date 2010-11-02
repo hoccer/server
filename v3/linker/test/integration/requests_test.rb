@@ -92,7 +92,7 @@ class TestRequest < Test::Unit::TestCase
     response = client_1.receive("one-to-one")
     time_taken = Time.now - start_time
 
-    assert time_taken >= 2, "Should timeout after 7 seconds"
+    assert time_taken >= 2, "Should timeout after 2 seconds"
     assert_equal "204", response.header.code
 
     client_1.delete_environment

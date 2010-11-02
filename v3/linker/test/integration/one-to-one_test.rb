@@ -4,7 +4,7 @@ require 'test_client'
 require 'mongo'
 require 'net/http'
 
-class TestRequest < Test::Unit::TestCase
+class TestOneToOne < Test::Unit::TestCase
 
   def setup 
     db = Mongo::Connection.new.db('hoccer_development')

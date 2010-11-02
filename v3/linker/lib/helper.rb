@@ -25,11 +25,10 @@ def method_missing symbol, *args, &block
     when :em_post
       em_request "POST", *args, &block
     when :em_put
-      puts args.inspect             
       em_request "PUT", *args, &block
     end
   else
-    super symbol, args
+    super symbol, args, &block
   end
   
 end

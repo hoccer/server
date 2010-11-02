@@ -14,7 +14,7 @@ module Hoccer
         group = parse_group response[:content] 
       
         if group.size < 2
-          @action_store.invalidate action[:uuid]
+          @action_store.invalidate uuid
         else          
           verify group  
         end

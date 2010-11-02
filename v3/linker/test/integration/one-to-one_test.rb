@@ -37,6 +37,29 @@ class TestRequest < Test::Unit::TestCase
     client_2.delete_environment
   end
 
+  test 'three in group - two sender - one receiver' do
+    client_1 = create_client
+    client_2 = create_client
+    client_3 = create_client
+  
+    t2 = Thread.new { client_2.share("one-to-one", { :inline => "barbaz"}) }
+    t1 = Thread.new { client_1.share("one-to-one", { :inline => "foobar" }) } 
+    t3 = Thread.new { sleep(1); client_3.receive_unthreaded("one-to-one") }
+                                
+    client_3_response = t3.value
+    client_2_response = t2.value
+    client_1_response = t1.value
+    
+    assert_equal "409", client_1_response.header.code
+    assert_equal "409", client_2_response.header.code
+    
+    assert_equal "204", client_3_response.header.code
+                               
+    client_1.delete_environment
+    client_2.delete_environment
+    client_3.delete_environment
+  end
+  
   test 'three in group - one sender - two receiver' do
     client_1 = create_client
     client_2 = create_client
@@ -59,6 +82,7 @@ class TestRequest < Test::Unit::TestCase
     client_2.delete_environment
     client_3.delete_environment
   end
+  
   
   test 'three in group - one sender - one receiver' do
       client_1 = create_client

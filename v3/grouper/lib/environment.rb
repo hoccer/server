@@ -39,7 +39,7 @@ class Environment
   def nearby_bssids
     Environment.any_of(
       *self.bssids.map { |bssid| {:bssids => bssid} }
-    )
+    ).to_a
   end
 
   def nearby

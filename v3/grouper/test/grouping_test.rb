@@ -76,7 +76,6 @@ class ExhibitTest < Test::Unit::TestCase
       new_environmnent( :longitude => 13.424, :latitude => 52.522, :accuracy => 35 )
     )
      
-    puts env_1.nearby.inspect
     assert_equal 2, env_1.nearby.size
     assert env_1.nearby.include? env_1
     assert env_1.nearby.include? env_2
@@ -143,12 +142,12 @@ class ExhibitTest < Test::Unit::TestCase
     )
 
     environment_2 = environment_2.merge(
-      :bssids => ["10:1a:b2:be:1e:c9", "00:00:00:00:00:02"]
+      :bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:02"]
     )
 
     env_1 = Environment.create environment_1
     env_2 = Environment.create environment_2
 
-    assert_equal 1, env_2.nearby.size
+    assert_equal 2, env_2.nearby_bssids.size
   end
 end

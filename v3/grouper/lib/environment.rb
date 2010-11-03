@@ -1,5 +1,7 @@
 require 'mongoid'
 
+EARTH_RADIUS = 1000 * 6371
+
 class Numeric
   def to_rad
     (self * (Math::PI / 180) / 1000)
@@ -43,14 +45,19 @@ class Environment
   def nearby
     lon = ( self.gps[:longitude] || self.gps["longitude"] )
     lat = ( self.gps[:latitude]  || self.gps["latitude"] )
-    acc = ( self.gps[:accuracy]  || self.gps["accuracy"] ).to_rad
+    acc = ( self.gps[:accuracy]  || self.gps["accuracy"] )
 
     results = Environment.db.command({
       "geoNear"     => "environments",
       "near"        => [lon.to_f, lat.to_f],
-      "maxDistance" => 0.00078480615288
+      "maxDistance" => 0.00078480615288,
+      "spherical" => true 
     })["results"]
-
+    
+    results.select! do |result|
+      (result["dis"] * EARTH_RADIUS) < ((result["obj"]["gps"]["accuracy"] + acc) * 2)
+    end
+    
     results.map do |result|
       Mongoid::Factory.build(Environment, result["obj"])
     end

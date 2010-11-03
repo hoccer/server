@@ -73,8 +73,9 @@ class TestOneToMany < Test::Unit::TestCase
     client_3 = create_client
   
     t1 = Thread.new { client_1.share("one-to-many", { :inline => "foobar" }) }
-    sleep(2)
+    sleep(1)
     t3 = Thread.new { client_3.receive_unthreaded("one-to-many") }
+    sleep(1)
     t2 = Thread.new { client_2.share("one-to-many", { :inline => "barbaz"}) }
            
     client_3_response = t3.value

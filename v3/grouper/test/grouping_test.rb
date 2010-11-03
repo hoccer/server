@@ -1,4 +1,5 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__)))
 require 'helper'
 require 'ruby-debug'
 require 'uuid'
@@ -39,24 +40,6 @@ class ExhibitTest < Test::Unit::TestCase
     Environment.delete_all
   end
 
-  test 'distance calculation' do
-    env_1 = Environment.create(
-      new_environmnent( :longitude => 13.420, :latitude => 52.522 )
-    )
-
-    env_2 = Environment.create(
-      new_environmnent( :longitude => 13.422, :latitude => 52.522 )
-    )
-
-    env_3 = Environment.create(
-      new_environmnent( :longitude => 13.424, :latitude => 52.522 )
-    )
-
-    assert_equal env_2, env_1.nearby.first
-    assert_equal 2, env_2.nearby.size
-    assert_equal env_2, env_3.nearby.first
-  end
-
   test 'grouping two clients' do
 
     env_1 = Environment.create(
@@ -82,25 +65,26 @@ class ExhibitTest < Test::Unit::TestCase
   test 'chain grouping 3 clients' do
 
     env_1 = Environment.create(
-      new_environmnent( :longitude => 13.420, :latitude => 52.522 )
+      new_environmnent( :longitude => 13.420, :latitude => 52.522, :accuracy => 35 )
     )
 
     env_2 = Environment.create(
-      new_environmnent( :longitude => 13.421, :latitude => 52.522 )
+      new_environmnent( :longitude => 13.422, :latitude => 52.522, :accuracy => 35 )
     )
 
     env_3 = Environment.create(
-      new_environmnent( :longitude => 13.424, :latitude => 52.522 )
+      new_environmnent( :longitude => 13.424, :latitude => 52.522, :accuracy => 35 )
     )
-
-    assert_equal env_2, env_1.nearby
-    assert_equal 2, env_2.nearby.size
-    assert_equal env_2, env_3.nearby.first
+     
+    puts env_1.nearby.inspect
+    assert_equal 2, env_1.nearby.size
+    assert env_1.nearby.include? env_1
+    assert env_1.nearby.include? env_2
 
     env_1.reload
     env_2.reload
     env_3.reload
-
+     
     assert_equal 3, env_1.group.count
     assert_equal 3, env_2.group.count
     assert_equal 3, env_3.group.count

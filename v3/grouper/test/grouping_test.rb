@@ -150,4 +150,32 @@ class ExhibitTest < Test::Unit::TestCase
 
     assert_equal 2, env_2.nearby_bssids.size
   end
+  
+  test 'pairing via bssids and gps' do
+    env_1 = Environment.create(
+      new_environmnent( :longitude => 13.420, :latitude => 52.522, :accuracy => 35 )
+    )
+
+    env_2 = Environment.create(
+      new_environmnent( :longitude => 13.422, 
+                        :latitude => 52.522, 
+                        :accuracy => 35
+      ).merge( {:bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:01"] })
+    )
+    
+    
+    env_3 = Environment.create(
+      new_environmnent( :longitude => 13.0,
+                         :latitude  => 52.0,
+                         :accuracy  => 100
+      ).merge( { :bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:02"] })
+    )
+    
+    [ env_1, env_2, env_3 ].each { |env| env.reload }
+    
+    assert_equal 3, env_1.group.count
+    assert_equal 3, env_2.group.count
+    assert_equal 3, env_3.group.count    
+  end
+  
 end

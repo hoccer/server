@@ -37,6 +37,8 @@ class Environment
   end
 
   def nearby_bssids
+    return [] unless self.bssids 
+    
     Environment.any_of(
       *self.bssids.map { |bssid| {:bssids => bssid} }
     ).to_a
@@ -82,7 +84,8 @@ class Environment
   end
 
   def update_groups
-    relevant_envs = self.nearby + [self]
+    relevant_envs = self.nearby + self.nearby_bssids
+    
     grouped_envs  = relevant_envs.inject([]) do |result, element|
       element.group.each do |group_env|
         unless result.include?( group_env )

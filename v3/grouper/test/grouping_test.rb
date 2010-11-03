@@ -86,14 +86,14 @@ class ExhibitTest < Test::Unit::TestCase
     )
 
     env_2 = Environment.create(
-      new_environmnent( :longitude => 13.422, :latitude => 52.522 )
+      new_environmnent( :longitude => 13.421, :latitude => 52.522 )
     )
 
     env_3 = Environment.create(
       new_environmnent( :longitude => 13.424, :latitude => 52.522 )
     )
 
-    assert_equal env_2, env_1.nearby.first
+    assert_equal env_2, env_1.nearby
     assert_equal 2, env_2.nearby.size
     assert_equal env_2, env_3.nearby.first
 
@@ -144,5 +144,27 @@ class ExhibitTest < Test::Unit::TestCase
     )
 
     assert_equal "longitude", env_1.gps.keys[0]
+  end
+
+  test 'pairing via bssids' do
+    environment_1 = new_location
+    environment_1 = environment_1.merge(
+      :bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:01"]
+    )
+
+    environment_2 = new_environmnent(
+      :longitude => 13.0,
+      :latitude  => 52.0,
+      :accuracy  => 100
+    )
+
+    environment_2 = environment_2.merge(
+      :bssids => ["10:1a:b2:be:1e:c9", "00:00:00:00:00:02"]
+    )
+
+    env_1 = Environment.create environment_1
+    env_2 = Environment.create environment_2
+
+    assert_equal 1, env_2.nearby.size
   end
 end

@@ -10,6 +10,9 @@ class Environment
 
   include Mongoid::Document
 
+  field :gps,     :type => Hash
+  field :bssids,  :type => Array
+
   before_create :ensure_indexable
   before_save   :add_creation_time
   after_create  :update_groups
@@ -31,17 +34,26 @@ class Environment
       .only(:client_uuid, :group_id) || []
   end
 
-  def nearby
-    query = [
-      ( self.gps[:longitude] || self.gps["longitude"] ),
-      ( self.gps[:latitude]  || self.gps["latitude"] ),
-      ( self.gps[:accuracy]  || self.gps["accuracy"] ).to_rad
-    ]
+  def nearby_bssids
+    Environment.any_of(
+      *self.bssids.map { |bssid| {:bssids => bssid} }
+    )
+  end
 
-    Environment
-      .where({"client_uuid" => {"$ne" => self.client_uuid}})
-      .near( :gps => query )
-      .each.to_a
+  def nearby
+    lon = ( self.gps[:longitude] || self.gps["longitude"] )
+    lat = ( self.gps[:latitude]  || self.gps["latitude"] )
+    acc = ( self.gps[:accuracy]  || self.gps["accuracy"] ).to_rad
+
+    results = Environment.db.command({
+      "geoNear"     => "environments",
+      "near"        => [lon.to_f, lat.to_f],
+      "maxDistance" => 0.00078480615288
+    })["results"]
+
+    results.map do |result|
+      Mongoid::Factory.build(Environment, result["obj"])
+    end
   end
 
   private

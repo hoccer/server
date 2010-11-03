@@ -16,7 +16,7 @@ class Environment
   field :bssids,  :type => Array
 
   before_create :ensure_indexable
-  before_save   :add_creation_time
+  before_create :add_creation_time
   after_create  :update_groups
 
   Mongoid.configure do |config|

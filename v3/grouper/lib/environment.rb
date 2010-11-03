@@ -45,6 +45,8 @@ class Environment
   end
 
   def nearby
+    return [] unless self.gps
+    
     lon = ( self.gps[:longitude] || self.gps["longitude"] )
     lat = ( self.gps[:latitude]  || self.gps["latitude"] )
     acc = ( self.gps[:accuracy]  || self.gps["accuracy"] )
@@ -67,6 +69,8 @@ class Environment
 
   private
   def ensure_indexable
+    return nil unless self.gps
+    
     begin
       location = {
         "longitude" => ( self.gps["longitude"] || self.gps[:longitude] ),

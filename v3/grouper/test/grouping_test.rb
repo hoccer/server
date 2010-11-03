@@ -165,10 +165,7 @@ class ExhibitTest < Test::Unit::TestCase
     
     
     env_3 = Environment.create(
-      new_environmnent( :longitude => 13.0,
-                         :latitude  => 52.0,
-                         :accuracy  => 100
-      ).merge( { :bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:02"] })
+      { :bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:02"] }
     )
     
     [ env_1, env_2, env_3 ].each { |env| env.reload }

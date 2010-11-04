@@ -37,8 +37,8 @@ class Environment
   end
 
   def nearby_bssids
-    return [] unless self.bssids 
-    
+    return [] unless self.bssids
+
     Environment.any_of(
       *self.bssids.map { |bssid| {:bssids => bssid} }
     ).to_a
@@ -46,7 +46,7 @@ class Environment
 
   def nearby
     return [] unless self.gps
-    
+
     lon = ( self.gps[:longitude] || self.gps["longitude"] )
     lat = ( self.gps[:latitude]  || self.gps["latitude"] )
     acc = ( self.gps[:accuracy]  || self.gps["accuracy"] )
@@ -55,13 +55,13 @@ class Environment
       "geoNear"     => "environments",
       "near"        => [lon.to_f, lat.to_f],
       "maxDistance" => 0.00078480615288,
-      "spherical" => true 
+      "spherical" => true
     })["results"]
-    
+
     results.select! do |result|
       (result["dis"] * EARTH_RADIUS) < ((result["obj"]["gps"]["accuracy"] + acc) * 2)
     end
-    
+
     results.map do |result|
       Mongoid::Factory.build(Environment, result["obj"])
     end
@@ -70,7 +70,7 @@ class Environment
   private
   def ensure_indexable
     return nil unless self.gps
-    
+
     begin
       location = {
         "longitude" => ( self.gps["longitude"] || self.gps[:longitude] ),
@@ -89,7 +89,7 @@ class Environment
 
   def update_groups
     relevant_envs = self.nearby + self.nearby_bssids
-    
+
     grouped_envs  = relevant_envs.inject([]) do |result, element|
       element.group.each do |group_env|
         unless result.include?( group_env )

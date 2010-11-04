@@ -190,4 +190,46 @@ class ExhibitTest < Test::Unit::TestCase
     assert_equal 2, Environment.last.nearby.size
   end
 
+  test "no peers found if too far away and different bssids" do
+    create_env_with_locations(
+      32.1,
+      10.5,
+      ["00:00:00:00:00:01", "00:00:00:00:00:02"]
+    )
+    create_env_with_locations(
+      12.1,
+      40.5,
+      ["00:00:00:00:00:03", "00:00:00:00:00:04"]
+    )
+    create_env_with_locations(
+      32.1,
+      20.5,
+      ["00:00:00:00:00:05", "00:00:00:00:00:06"]
+    )
+
+    assert_equal 1, Environment.first.nearby.size
+    assert_equal 1, Environment.last.nearby.size
+  end
+
+  test "find peers in range or bssids" do
+    create_env_with_locations(
+      32.1,
+      10.5,
+      ["00:00:00:00:00:01", "00:00:00:00:00:02"]
+    )
+    create_env_with_locations(
+      32.1,
+      10.5,
+      ["00:00:00:00:00:03", "00:00:00:00:00:04"]
+    )
+    create_env_with_locations(
+      22.1,
+      20.5,
+      ["00:00:00:00:00:01", "00:00:00:00:00:05"]
+    )
+
+    assert_equal 3, Environment.last.group.size
+
+  end
+
 end

@@ -46,4 +46,17 @@ class Test::Unit::TestCase
     end
   end
 
+  def create_env_with_locations lon, lat, bssids
+    options = {
+      :gps => {
+        :longitude => lon,
+        :latitude  => lat,
+        :accuracy  => 100
+      },
+      :client_uuid => UUID.generate
+    }.merge( :bssids => bssids )
+
+    Environment.create( options )
+  end
+
 end

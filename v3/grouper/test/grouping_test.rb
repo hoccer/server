@@ -175,4 +175,19 @@ class ExhibitTest < Test::Unit::TestCase
     assert_equal 3, env_3.group.count
   end
 
+  test "find nearby events with multiple matching bssids" do
+    create_env_with_locations(
+      32.1,
+      10.5,
+      ["00:00:00:00:00:01", "00:00:00:00:00:02"]
+    )
+    create_env_with_locations(
+      10.0,
+      51.5,
+      ["00:00:00:00:00:01", "00:00:00:00:00:02"]
+    )
+
+    assert_equal 2, Environment.last.nearby.size
+  end
+
 end

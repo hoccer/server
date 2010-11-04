@@ -44,7 +44,7 @@ class Environment
     ).to_a
   end
 
-  def nearby
+  def nearby_gps
     return [] unless self.gps
 
     lon = ( self.gps[:longitude] || self.gps["longitude"] )
@@ -65,6 +65,10 @@ class Environment
     results.map do |result|
       Mongoid::Factory.build(Environment, result["obj"])
     end
+  end
+
+  def nearby
+    nearby_gps | nearby_bssids
   end
 
   private
@@ -88,7 +92,7 @@ class Environment
   end
 
   def update_groups
-    relevant_envs = self.nearby + self.nearby_bssids
+    relevant_envs = self.nearby | self.nearby_bssids
 
     grouped_envs  = relevant_envs.inject([]) do |result, element|
       element.group.each do |group_env|

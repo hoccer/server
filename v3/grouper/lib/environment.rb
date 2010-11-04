@@ -14,6 +14,7 @@ class Environment
 
   field :gps,     :type => Hash
   field :bssids,  :type => Array
+  field :network, :type => Hash
 
   before_create :ensure_indexable
   before_create :add_creation_time
@@ -45,11 +46,12 @@ class Environment
   end
 
   def nearby_gps
-    return [] unless self.gps
+    gps = best_location
+    return [] unless gps
 
-    lon = ( self.gps[:longitude] || self.gps["longitude"] )
-    lat = ( self.gps[:latitude]  || self.gps["latitude"] )
-    acc = ( self.gps[:accuracy]  || self.gps["accuracy"] )
+    lon = ( gps[:longitude] || gps["longitude"] )
+    lat = ( gps[:latitude]  || gps["latitude"] )
+    acc = ( gps[:accuracy]  || gps["accuracy"] )
 
     results = Environment.db.command({
       "geoNear"     => "environments",
@@ -66,7 +68,7 @@ class Environment
       Mongoid::Factory.build(Environment, result["obj"])
     end
   end
-
+  
   def nearby
     nearby_gps | nearby_bssids
   end
@@ -110,5 +112,16 @@ class Environment
     end
 
     reload
+  end
+  
+  def best_location
+    if gps && !network 
+      return gps
+    end
+    
+    if !gps && network
+      return network
+    end
+    
   end
 end

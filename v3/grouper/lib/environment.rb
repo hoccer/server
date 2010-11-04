@@ -115,13 +115,16 @@ class Environment
   end
   
   def best_location
-    if gps && !network 
-      return gps
+    if !gps && !network
+      nil
+    elsif gps && !network 
+      gps
+    elsif !gps && network
+      network
+    elsif network[:timestamp] < gps[:timestamp]
+      network
+    else
+      gps
     end
-    
-    if !gps && network
-      return network
-    end
-    
   end
 end

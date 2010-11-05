@@ -1,22 +1,22 @@
 
 class ActionStore < Hash
-  
-  def hold_action_for_seconds action, seconds 
+
+  def hold_action_for_seconds action, seconds
     uuid = action[:uuid]
     self[uuid] = action
-    
+
     EM::Timer.new(seconds) do
       invalidate uuid
     end
   end
-  
-  def invalidate uuid 
+
+  def invalidate uuid
     action = self[uuid]
     send_no_content action
     self[uuid] = nil
   end
-  
-  def conflict uuid 
+
+  def conflict uuid
     action = self[uuid]
     if action && action[:request]
       action[:request].status 409
@@ -24,7 +24,7 @@ class ActionStore < Hash
     end
     self[uuid] = nil
   end
-  
+
   def send uuid, content
     action = self[uuid]
     if action && action[:request]
@@ -33,25 +33,25 @@ class ActionStore < Hash
     end
     self[uuid] = nil
   end
-  
-  def actions_in_group group, mode 
+
+  def actions_in_group group, mode
     actions = group.inject([]) do |result, environment|
       action = self[ environment["client_uuid"] ]
       result << action unless action.nil?
       result
     end
-    
+
     actions.select {|action| action[:mode] == mode}
   end
-  
+
   private
-  def send_no_content action 
+  def send_no_content action
     if action && action[:request]
       Logger.failed_action action
-      
+
       request = action[:request]
       request.status 204
       request.body { {"message" => "timeout"}.to_json }
     end
-  end 
+  end
 end

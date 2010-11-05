@@ -16,8 +16,8 @@ def em_request method, path, content, &block
 end
 
 def method_missing symbol, *args, &block
-  if [:em_get, :em_post, :em_delete, :em_put].include? symbol    
-    case symbol 
+  if [:em_get, :em_post, :em_delete, :em_put].include? symbol
+    case symbol
     when :em_get
       em_request "GET", args[0], nil, &block
     when :em_delete
@@ -30,5 +30,5 @@ def method_missing symbol, *args, &block
   else
     super symbol, args, &block
   end
-  
+
 end

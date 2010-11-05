@@ -6,19 +6,19 @@ require 'net/http'
 
 class TestRequest < Test::Unit::TestCase
 
-  def setup 
+  def setup
     db = Mongo::Connection.new.db('hoccer_development')
     coll = db.collection('environments')
     coll.remove
   end
-  
+
   test "create unique uuids in test client" do
     client1 = TestClient.create
     client2 = TestClient.create
-    
+
     assert_not_equal client1.uuid, client2.uuid
   end
-  
+
   test "updating the environment" do
     client = TestClient.create
     assert_not_nil client.uuid
@@ -58,9 +58,9 @@ class TestRequest < Test::Unit::TestCase
     client_1.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
-    
+
     client_2 = TestClient.create
-    
+
     client_2.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
@@ -149,7 +149,7 @@ class TestRequest < Test::Unit::TestCase
     t2 = Thread.new do
       client_1.share("one-to-one", {:inline => "foobar"})
     end
-    
+
     client_2_response = t2.value
     client_1_response = t1.value
 
@@ -166,14 +166,14 @@ class TestRequest < Test::Unit::TestCase
     client_1.delete_environment
     client_2.delete_environment
   end
-  
+
   test "two clients with different modes do not pair" do
     client_1 = create_client
     client_2 = create_client
 
     t1 = Thread.new { client_2.receive_unthreaded("one-to-one") }
     t2 = Thread.new { client_1.share("one-to-many", {:inline => "foobar"}) }
-    
+
     client_2_response = t2.value
     client_1_response = t1.value
 
@@ -183,14 +183,14 @@ class TestRequest < Test::Unit::TestCase
     client_1.delete_environment
     client_2.delete_environment
   end
-  
+
   test "sending and receiving in both directions" do
       client_1 = create_client
       client_2 = create_client
 
       t1 = Thread.new { client_2.receive_unthreaded("one-to-one") }
       t2 = Thread.new { client_1.share("one-to-one", {:inline => "foobar"}) }
-    
+
       client_2_response = t2.value
       client_1_response = t1.value
 
@@ -211,7 +211,7 @@ class TestRequest < Test::Unit::TestCase
 
       client_2_response = t2.value
       client_1_response = t1.value
-      
+
       assert_equal "200", client_1_response.header.code
       assert_equal "200", client_2_response.header.code
 
@@ -221,7 +221,7 @@ class TestRequest < Test::Unit::TestCase
       expexted_1 = "[{\"inline\":\"buubaa\"}]"
       assert_equal expexted_1, client_1_response.body
       client_1_response.body
-      
+
       client_1.delete_environment
       client_2.delete_environment
   end

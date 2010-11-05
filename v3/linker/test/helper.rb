@@ -57,14 +57,14 @@ class Test::Unit::TestCase
       EM.stop
     end
   end
-  
 
-  def create_client 
+
+  def create_client
     client = TestClient.create
     client.update_environment({
         :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
-    
+
     client
   end
 

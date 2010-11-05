@@ -1,28 +1,28 @@
-require 'sinatra/reloader' 
+require 'sinatra/reloader'
 require 'logger'
 require 'action_store'
 require 'events'
 require 'helper'
 
 CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
-  
-module Hoccer  
+
+module Hoccer
   class App < Sinatra::Base
     register Sinatra::Async
-    
+
     configure(:development) do
       register Sinatra::Reloader
     end
-    
+
     @@action_store  = ActionStore.new
     @@evaluators    = {}
-     
-    def initialize 
+
+    def initialize
        super
        @@evaluators['one-to-one'] = OneToOne.new @@action_store
        @@evaluators['one-to-many'] = OneToMany.new @@action_store
     end
-         
+
      aget %r{#{CLIENTS}$} do |uuid|
       em_get( "/clients/#{uuid}" ) do |response|
         if response[:status] == 200
@@ -33,7 +33,7 @@ module Hoccer
         end
       end
     end
-    
+
     aput %r{#{CLIENTS}/environment} do |uuid|
       request_body = request.body.read
       puts "put body: #{request_body}"
@@ -52,23 +52,23 @@ module Hoccer
 
     aput %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
       payload = JSON.parse( request.body.read )
-      
-      action  = { 
+
+      action  = {
         :mode     => action_name,
         :type     => :sender,
         :payload  => payload,
         :request  => self,
         :uuid    => uuid
       }
-      
+
       @@evaluators[action_name].add action
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
       action = { :mode => action_name, :type => :receiver, :request => self, :uuid => uuid }
-      
+
       @@evaluators[action_name].add action
-    end 
+    end
   end
 
 end

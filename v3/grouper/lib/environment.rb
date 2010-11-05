@@ -57,7 +57,8 @@ class Environment
       "geoNear"     => "environments",
       "near"        => [lon.to_f, lat.to_f],
       "maxDistance" => 0.00078480615288,
-      "spherical" => true
+      "spherical" => true,
+      "query" => { "created_at" => {"$gt" => Time.now.to_f - 120}}
     })["results"]
 
     results.select! do |result|

@@ -60,13 +60,34 @@ class Test::Unit::TestCase
 
 
   def create_client
-    client = TestClient.create
+    client = LinccerClient.new :host => "127.0.0.1", :port => 9292
     client.update_environment({
         :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
     client
   end
+  
+  def threaded_receive client, mode
+    Thread.new(Thread.current) { |parent|
+      begin
+        client.receive(mode)
+      rescue => e
+        puts e
+        #parent.raise e
+      end
+    }
+  end
 
+  def threaded_share client, mode, content
+    Thread.new(Thread.current) { |parent|
+      begin
+        client.share(mode, content)
+      rescue => e
+        puts e
+        # parent.raise e
+      end
+    }
+  end
 
 end

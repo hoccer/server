@@ -1,3 +1,9 @@
+GIT
+  remote: git@github.com:hoccer/ruby-api.git
+  revision: c1ed1ab65e3b676cd0bd61933a60c2dc75e33132
+  specs:
+    hoccer-api (1.0.0)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -63,6 +69,7 @@ DEPENDENCIES
   bson_ext (>= 1.1)
   em-mongo (>= 0.2.13)
   eventmachine
+  hoccer-api!
   mongo
   rack-test
   ruby-debug19

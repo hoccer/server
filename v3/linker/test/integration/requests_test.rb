@@ -1,6 +1,6 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 require 'helper'
-require 'test_client'
+require 'linccer_client'
 require 'mongo'
 require 'net/http'
 
@@ -13,53 +13,53 @@ class TestRequest < Test::Unit::TestCase
   end
 
   test "create unique uuids in test client" do
-    client1 = TestClient.create
-    client2 = TestClient.create
+    client1 = LinccerClient.new {}
+    client2 = LinccerClient.create
 
     assert_not_equal client1.uuid, client2.uuid
   end
 
   test "updating the environment" do
-    client = TestClient.create
+    client = LinccerClient.create
     assert_not_nil client.uuid
 
     response = client.update_environment({
       :gps => { :latitude => 32.22, :longitude => 88.74, :accuracy => 100 }
     })
 
-    assert_equal "201", response.header.code
+    assert response
     client.delete_environment
   end
 
   test "lonesome client tries to share" do
-    client = TestClient.create
+    client = LinccerClient.create
     client.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
     response = client.share( "one-to-one", {:inline => "hello"} )
-    assert_equal "204", response.header.code
+    assert_nil response
 
     client.delete_environment
   end
 
   test "lonesome client tries to receive" do
-    client = TestClient.create
+    client = LinccerClient.create
     client.update_environment({
       :gps => { :latitude => 52.22, :longitude => 28.74, :accuracy => 100 }
     })
 
-    assert_equal "204", client.receive( "one-to-one" ).header.code
+    assert_nil client.receive( "one-to-one" )
 
     client.delete_environment
   end
 
   test "two clients one share but no receive action" do
-    client_1 = TestClient.create
+    client_1 = LinccerClient.create
     client_1.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
-    client_2 = TestClient.create
+    client_2 = LinccerClient.create
 
     client_2.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
@@ -70,15 +70,15 @@ class TestRequest < Test::Unit::TestCase
     time_taken = Time.now - start_time
 
     assert time_taken >= 2, "Should timeout after 7 seconds"
-    assert_equal "204", response.header.code
+    assert_nil response
 
     client_1.delete_environment
     client_2.delete_environment
   end
 
   test "two clients one receive but no share action" do
-    client_1 = TestClient.create
-    client_2 = TestClient.create
+    client_1 = LinccerClient.create
+    client_2 = LinccerClient.create
 
     client_1.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
@@ -93,15 +93,15 @@ class TestRequest < Test::Unit::TestCase
     time_taken = Time.now - start_time
 
     assert time_taken >= 2, "Should timeout after 2 seconds"
-    assert_equal "204", response.header.code
+    assert_nil response
 
     client_1.delete_environment
     client_2.delete_environment
   end
 
   test "two clients sharing and then receiving successfully" do
-    client_1 = TestClient.create
-    client_2 = TestClient.create
+    client_1 = LinccerClient.create
+    client_2 = LinccerClient.create
 
     client_1.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
@@ -124,15 +124,15 @@ class TestRequest < Test::Unit::TestCase
     client_1_response = t1.value
     client_2_response = t2.value
 
-    expected = "[{\"inline\":\"foobar\"}]"
-    assert_equal expected, client_2_response.body
+    expected = [ { "inline" => "foobar"} ]
+    assert_equal expected, client_2_response
 
   end
 
 
   test "two clients receiving and then sharing successfully" do
-    client_1 = TestClient.create
-    client_2 = TestClient.create
+    client_1 = LinccerClient.create
+    client_2 = LinccerClient.create
 
     client_1.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
@@ -143,7 +143,7 @@ class TestRequest < Test::Unit::TestCase
     })
 
     t1 = Thread.new do
-      client_2.receive_unthreaded("one-to-one")
+      client_2.receive("one-to-one")
     end
     sleep(1)
     t2 = Thread.new do
@@ -153,15 +153,14 @@ class TestRequest < Test::Unit::TestCase
     client_2_response = t2.value
     client_1_response = t1.value
 
-    assert_equal "200", client_1_response.header.code
-    assert_equal "200", client_2_response.header.code
+    assert client_1_response
+    assert client_2_response
 
-    expected_2 = "[{\"inline\":\"foobar\"}]"
-    assert_equal expected_2, client_2_response.body
+    expected_2 = [{ "inline" => "foobar"}]
+    assert_equal expected_2, client_2_response
 
-    expexted_1 = "[{\"inline\":\"foobar\"}]"
-    assert_equal expexted_1, client_1_response.body
-    client_1_response.body
+    expexted_1 = [{"inline" => "foobar"}]
+    assert_equal expexted_1, client_1_response
 
     client_1.delete_environment
     client_2.delete_environment
@@ -171,14 +170,14 @@ class TestRequest < Test::Unit::TestCase
     client_1 = create_client
     client_2 = create_client
 
-    t1 = Thread.new { client_2.receive_unthreaded("one-to-one") }
+    t1 = Thread.new { client_2.receive("one-to-one") }
     t2 = Thread.new { client_1.share("one-to-many", {:inline => "foobar"}) }
 
     client_2_response = t2.value
     client_1_response = t1.value
 
-    assert_equal "204", client_1_response.header.code
-    assert_equal "204", client_2_response.header.code
+    assert_nil client_1_response
+    assert_nil client_2_response
 
     client_1.delete_environment
     client_2.delete_environment
@@ -188,39 +187,37 @@ class TestRequest < Test::Unit::TestCase
       client_1 = create_client
       client_2 = create_client
 
-      t1 = Thread.new { client_2.receive_unthreaded("one-to-one") }
+      t1 = Thread.new { client_2.receive("one-to-one") }
       t2 = Thread.new { client_1.share("one-to-one", {:inline => "foobar"}) }
 
       client_2_response = t2.value
       client_1_response = t1.value
 
-      assert_equal "200", client_1_response.header.code
-      assert_equal "200", client_2_response.header.code
+      assert client_1_response
+      assert client_2_response
 
-      expected_2 = "[{\"inline\":\"foobar\"}]"
-      assert_equal expected_2, client_2_response.body
+      expected_2 =  [ { "inline" => "foobar"} ]
+      assert_equal expected_2, client_2_response
 
-      expexted_1 = "[{\"inline\":\"foobar\"}]"
-      assert_equal expexted_1, client_1_response.body
-      client_1_response.body
+      expexted_1 = [{"inline" =>"foobar"}]
+      assert_equal expexted_1, client_1_response
 
       sleep(2)
 
       t1 = Thread.new { client_1.share("one-to-one", {:inline => "buubaa"}) }
-      t2 = Thread.new { client_2.receive_unthreaded("one-to-one") }
+      t2 = Thread.new { client_2.receive("one-to-one") }
 
       client_2_response = t2.value
       client_1_response = t1.value
 
-      assert_equal "200", client_1_response.header.code
-      assert_equal "200", client_2_response.header.code
+      assert client_1_response
+      assert client_2_response
 
-      expected_2 = "[{\"inline\":\"buubaa\"}]"
-      assert_equal expected_2, client_2_response.body
+      expected_2 = [{"inline" => "buubaa"}]
+      assert_equal expected_2, client_2_response
 
-      expexted_1 = "[{\"inline\":\"buubaa\"}]"
-      assert_equal expexted_1, client_1_response.body
-      client_1_response.body
+      expexted_1 = [{"inline" => "buubaa"}]
+      assert_equal expexted_1, client_1_response
 
       client_1.delete_environment
       client_2.delete_environment

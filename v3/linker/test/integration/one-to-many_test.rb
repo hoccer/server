@@ -18,7 +18,7 @@ class TestOneToMany < Test::Unit::TestCase
 
     start_time = Time.now
     t1 = Thread.new { client_1.share("one-to-many", { :inline => "foobar" }) }
-    t2 = Thread.new { client_2.receive_unthreaded("one-to-many") }
+    t2 = Thread.new { client_2.receive("one-to-many") }
 
     client_2_response = t2.value
     client_1_response = t1.value
@@ -26,13 +26,13 @@ class TestOneToMany < Test::Unit::TestCase
     duration = Time.now - start_time
 
     assert duration < 0.1, "two clients in group should pair immediatly, but it took #{duration}"
-    assert_equal "200", client_1_response.header.code
-    assert_equal "200", client_2_response.header.code
+    assert client_1_response
+    assert client_2_response
 
-    expected = "[{\"inline\":\"foobar\"}]"
+    expected = [{"inline" => "foobar"}]
 
-    assert_equal expected, client_1_response.body
-    assert_equal expected, client_2_response.body
+    assert_equal expected, client_1_response
+    assert_equal expected, client_2_response
 
     client_1.delete_environment
     client_2.delete_environment
@@ -44,23 +44,23 @@ class TestOneToMany < Test::Unit::TestCase
     client_3 = create_client
 
     t1 = Thread.new { client_1.share("one-to-many", { :inline => "foobar" }) }
-    t2 = Thread.new { client_2.receive_unthreaded("one-to-many") }
+    t2 = Thread.new { client_2.receive("one-to-many") }
     sleep(2)
-    t3 = Thread.new { client_3.receive_unthreaded("one-to-many") }
+    t3 = Thread.new { client_3.receive("one-to-many") }
 
     client_3_response = t3.value
     client_2_response = t2.value
     client_1_response = t1.value
 
-    assert_equal "200", client_1_response.header.code
-    assert_equal "200", client_2_response.header.code
-    assert_equal "200", client_3_response.header.code
+    assert client_1
+    assert client_2
+    assert client_3
 
-    expected = "[{\"inline\":\"foobar\"}]"
+    expected = [ { "inline" => "foobar" } ]
 
-    assert_equal expected, client_1_response.body
-    assert_equal expected, client_2_response.body
-    assert_equal expected, client_3_response.body
+    assert_equal expected, client_1_response
+    assert_equal expected, client_2_response
+    assert_equal expected, client_3_response
 
     client_1.delete_environment
     client_2.delete_environment
@@ -71,25 +71,45 @@ class TestOneToMany < Test::Unit::TestCase
     client_1 = create_client
     client_2 = create_client
     client_3 = create_client
-
-    t1 = Thread.new { client_1.share("one-to-many", { :inline => "foobar" }) }
-    sleep(1)
-    t3 = Thread.new { client_3.receive_unthreaded("one-to-many") }
-    sleep(1)
-    t2 = Thread.new { client_2.share("one-to-many", { :inline => "barbaz"}) }
-
-    client_3_response = t3.value
-    client_2_response = t2.value
-    client_1_response = t1.value
-
-    assert_equal "409", client_1_response.header.code
-    assert_equal "409", client_2_response.header.code
-    assert_equal "409", client_3_response.header.code
+    
+    begin
+      t1 = threaded_share(client_1, "one-to-many", { :inline => "foobar" }) 
+      sleep(1)
+      t3 = threaded_receive(client_3, "one-to-many")
+      sleep(1)
+      t2 = threaded_share(client_2, "one-to-many", { :inline => "barbaz"})
+    
+      client_3_response = t3.value
+      client_2_response = t2.value
+      client_1_response = t1.value
+    rescue => e
+      puts e
+    end
 
     client_1.delete_environment
     client_2.delete_environment
     client_3.delete_environment
   end
-
-
+  
+  # test 'longpolling holding get' do
+  #   client_1 = create_client
+  #   client_2 = create_client
+  # 
+  #   # t2 = Thread.new {client_1.receive("one-to-many")}    
+  #   t2 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
+  #   sleep(20)
+  #   t1 = Thread.new {client_2.share("one-to-many", { "inline" => "foobar" } )}
+  #   
+  #   client_1_response = t1.value
+  #   client_2_response = t2.value
+  #   
+  #   expected = "[{\"inline\":\"foobar\"}]"
+  #   
+  #   assert_equal "200", client_1_response.header.code
+  #   assert_equal expected, client_1_response.body
+  #   
+  #   client_1.delete_environment
+  #   client_2.delete_environment
+  # end
+  
 end

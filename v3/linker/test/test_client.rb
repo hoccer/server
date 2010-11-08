@@ -1,4 +1,4 @@
-class TestClient
+class LinccerClient
 
   attr_accessor :uuid
 

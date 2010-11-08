@@ -30,5 +30,29 @@ def method_missing symbol, *args, &block
   else
     super symbol, args, &block
   end
+end
 
+def authorized_request &block
+  EM.next_tick do
+    db          = EM::Mongo::Connection.new.db('hoccer_development')
+    collection  = db.collection('accounts')
+
+    collection.first("api_key" => params["apiKey"]) do |account|
+      if account.nil?
+        ahalt 401
+      else
+        signature = params.delete("signature")
+        uri       = env['REQUEST_URI'].gsub(/\&signature\=.+$/, "")
+
+        digestor = Digest::HMAC.new(account["shared_secret"], Digest::SHA1)
+        computed_signature = digestor.base64digest(uri)
+
+        if signature == computed_signature
+          block.call( account )
+        else
+          ahalt 401
+        end
+      end
+    end
+  end
 end

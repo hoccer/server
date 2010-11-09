@@ -229,7 +229,30 @@ class ExhibitTest < Test::Unit::TestCase
     )
 
     assert_equal 3, Environment.last.group.size
+  end                                          
+  
+  test 'not pairing on different bssids and no gps' do
+    env_1 = Environment.create(
+      {:bssids => ["01:1a:b2:be:1e:c9", "00:00:00:00:00:01"] }
+    )
 
+    env_2 = Environment.create(
+      { :bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:02"] }
+    )
+
+    # [ env_1, env_2 ].each { |env| env.reload }
+    
+    assert_equal 1, env_1.group.count
+    assert_equal 1, env_2.group.count
   end
+  
+  test 'not pairing bogus environments' do
+    env_1 = Environment.create( 'bla' => 'hallo' )
+    env_2 = Environment.create( 'wu' => "ha" )
+    
+    assert_equal 1, env_1.group.count
+    assert_equal 1, env_2.group.count
+  end
+  
 
 end

@@ -32,6 +32,8 @@ class Environment
   end
 
   def group
+    puts "looking for group: #{self[:group_id]}" 
+    
     Environment
       .where(:group_id => self[:group_id])
       .only(:client_uuid, :group_id) || []
@@ -46,7 +48,7 @@ class Environment
   end
 
   def nearby_gps
-    gps = best_location
+    #gps = self.gps
     return [] unless gps
 
     lon = ( gps[:longitude] || gps["longitude"] )
@@ -76,17 +78,17 @@ class Environment
 
   private
   def ensure_indexable
-    return nil unless self.gps
-
+    self[:group_id] = rand(Time.now.to_i)
+    
+    return unless self.gps
     begin
       location = {
         "longitude" => ( self.gps["longitude"] || self.gps[:longitude] ),
         "latitude"  => ( self.gps["latitude"]  || self.gps[:latitude] )
       }
-      self.gps = location.merge(self.gps)
+      self.gps = location.merge(self.gps)    
     rescue => e
       puts "!!!!!!! Panic: #{e}"
-      self.gps
     end
   end
 
@@ -95,11 +97,8 @@ class Environment
   end
 
   def update_groups
-    puts "via bssids: #{nearby_bssids}"
-    puts "via gps: #{nearby_gps}"
-    
     relevant_envs = self.nearby | self.nearby_bssids
-
+    
     grouped_envs  = relevant_envs.inject([]) do |result, element|
       element.group.each do |group_env|
         unless result.include?( group_env )

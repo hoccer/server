@@ -34,7 +34,8 @@ class ActionStore < Hash
     self[uuid] = nil
   end
 
-  def actions_in_group group, mode
+  def actions_in_group group, mode    
+    puts group.inspect
     actions = group.inject([]) do |result, environment|
       action = self[ environment["client_uuid"] ]
       result << action unless action.nil?

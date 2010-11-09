@@ -95,6 +95,9 @@ class Environment
   end
 
   def update_groups
+    puts "via bssids: #{nearby_bssids}"
+    puts "via gps: #{nearby_gps}"
+    
     relevant_envs = self.nearby | self.nearby_bssids
 
     grouped_envs  = relevant_envs.inject([]) do |result, element|

@@ -7,7 +7,7 @@ module Hoccer
       @action_store = action_store
     end
 
-    def add action
+    def add action, waiting = false
       uuid = action[:uuid]
       @action_store[uuid] = action
 
@@ -19,11 +19,11 @@ module Hoccer
         else
           verify group
         end
-
+        
         EM::Timer.new(timeout) do
           if @action_store[uuid]
             verify group, true
-            @action_store.invalidate uuid
+            @action_store.invalidate(uuid) unless waiting
           end
         end
       end

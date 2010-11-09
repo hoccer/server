@@ -69,7 +69,7 @@ module Hoccer
     aget %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
       action = { :mode => action_name, :type => :receiver, :request => self, :uuid => uuid }
 
-      @@evaluators[action_name].add action
+      @@evaluators[action_name].add action, params['waiting']
     end
   end
 

@@ -15,9 +15,9 @@ class Environment
   field :gps,     :type => Hash
   field :bssids,  :type => Array
   field :network, :type => Hash
-
-  before_create :ensure_indexable
-  before_create :add_creation_time
+               
+  before_create :add_group_id, :add_creation_time
+  before_save   :ensure_indexable
   after_create  :update_groups
 
   Mongoid.configure do |config|
@@ -59,8 +59,8 @@ class Environment
       "geoNear"     => "environments",
       "near"        => [lon.to_f, lat.to_f],
       "maxDistance" => 0.00078480615288,
-      "spherical" => true,
-      "query" => { "created_at" => {"$gt" => Time.now.to_f - 120}}
+      "spherical" => true
+#      "query" => { "created_at" => {"$gt" => Time.now.to_f - 120}}
     })["results"]
 
     results.select! do |result|
@@ -78,8 +78,6 @@ class Environment
 
   private
   def ensure_indexable
-    self[:group_id] = rand(Time.now.to_i)
-    
     return unless self.gps
     begin
       location = {
@@ -90,6 +88,10 @@ class Environment
     rescue => e
       puts "!!!!!!! Panic: #{e}"
     end
+  end
+       
+  def add_group_id
+    self[:group_id] = rand(Time.now.to_i)
   end
 
   def add_creation_time

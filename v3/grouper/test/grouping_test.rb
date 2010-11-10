@@ -84,7 +84,6 @@ class ExhibitTest < Test::Unit::TestCase
     env_2.reload
     env_3.reload
 
-    assert_equal 3, env_1.group.count
     assert_equal 3, env_2.group.count
     assert_equal 3, env_3.group.count
   end
@@ -127,6 +126,16 @@ class ExhibitTest < Test::Unit::TestCase
     )
 
     assert_equal "longitude", env_1.gps.keys[0]
+    
+    env_1.update_attributes( :gps => {
+        :timestamp => 12345678909,
+        :latitude  => 52.522,
+        :longitude => 13.420,
+        :accuracy  => 100
+    })
+    
+    assert_equal "longitude", env_1.gps.keys[0]
+    # assert_
   end
 
   test 'pairing via bssids' do
@@ -253,6 +262,4 @@ class ExhibitTest < Test::Unit::TestCase
     assert_equal 1, env_1.group.count
     assert_equal 1, env_2.group.count
   end
-  
-
 end

@@ -91,11 +91,11 @@ class TestOneToMany < Test::Unit::TestCase
     client_3.delete_environment
   end
   
+
   test 'longpolling holding get' do
     client_1 = create_client
     client_2 = create_client
   
-    # t2 = Thread.new {client_1.receive("one-to-many")}    
     t2 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
     sleep(10)
     t1 = Thread.new {client_2.share("one-to-many", { "inline" => "foobar" } )}

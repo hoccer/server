@@ -34,12 +34,16 @@ module Grouper
       client.group.to_json
     end
 
-    get %r{/clients/(.+$)} do |uuid|
+    get %r{/clients/(.{36,36})$} do |uuid|
       environment = Environment.where(:client_uuid => uuid).first
       environment ? environment.to_json : 404
     end
 
     delete %r{/clients/(.{36,36})/delete} do |uuid|
+      Environment.delete_all(:conditions => { :client_uuid =>  uuid })
+    end
+
+    get %r{/clients/(.{36,36})/delete} do |uuid|
       Environment.delete_all(:conditions => { :client_uuid =>  uuid })
     end
 

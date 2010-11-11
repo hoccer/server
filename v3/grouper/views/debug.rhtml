@@ -29,10 +29,14 @@
               <%= environment.created_at %>
             </td>
           </tr>
+          <tr>
+            <td colspan="2"><a href="/clients/<%= environment.client_uuid %>/delete">Delete</a></td>
+          </tr>
         </table>
       </li>
       <% end %>
     </ul>
+
   </div>
 
 <% end %>

@@ -1,0 +1,40 @@
+<% @groups.each do |group| %>
+
+  <div>
+    <h3><%= group["group_id"] %></h3>
+    <div>group size: <%= group["group"].size %></div>
+    <ul>
+      <% group["group"].each do |environment| %>
+      <li>
+        <table>
+          <tr>
+            <td>client uuid</td>
+            <td><%= environment.client_uuid %></td>
+          </tr>
+          <tr>
+            <td>gps:</td>
+            <td><%= environment.gps %></td>
+          </tr>
+          <tr>
+            <td>wifi:</td>
+            <td><%= environment.wifi %></td>
+          </tr>
+          <tr>
+            <td>network:</td>
+            <td><%= environment.network %></td>
+          </tr>
+          <tr>
+            <td>created at:</td>
+            <td style='color: <%= (Time.now - environment.created_at) > 3600 ? "red" : "" %>' >
+              <%= environment.created_at %>
+            </td>
+          </tr>
+        </table>
+      </li>
+      <% end %>
+    </ul>
+  </div>
+
+<% end %>
+
+

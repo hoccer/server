@@ -12,10 +12,11 @@ class Environment
 
   include Mongoid::Document
 
-  field :gps,     :type => Hash
-  field :bssids,  :type => Array
-  field :network, :type => Hash
-               
+  field :gps,         :type => Hash
+  field :wifi,        :type => Hash
+  field :network,     :type => Hash
+  field :created_at,  :type => Time
+
   before_create :add_group_id, :add_creation_time
   before_save   :ensure_indexable
   after_create  :update_groups
@@ -32,8 +33,8 @@ class Environment
   end
 
   def group
-    puts "looking for group: #{self[:group_id]}" 
-    
+    puts "looking for group: #{self[:group_id]}"
+
     Environment
       .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 120} })
       .only(:client_uuid, :group_id).to_a || []
@@ -71,7 +72,7 @@ class Environment
       Mongoid::Factory.build(Environment, result["obj"])
     end
   end
-  
+
   def nearby
     nearby_gps | nearby_bssids
   end
@@ -85,12 +86,12 @@ class Environment
         "latitude"  => ( self.gps["latitude"]  || self.gps[:latitude] )
       }
       self.gps = location.merge(self.gps)
-      
+
     rescue => e
       puts "!!!!!!! Panic: #{e}"
     end
   end
-       
+
   def add_group_id
     self[:group_id] = rand(Time.now.to_i)
   end
@@ -102,7 +103,7 @@ class Environment
   def update_groups
     puts "updating ><<<<<>>>"
     relevant_envs = self.nearby | self.nearby_bssids
-    
+
     grouped_envs  = relevant_envs.inject([]) do |result, element|
       element.group.each do |group_env|
         unless result.include?( group_env )
@@ -120,11 +121,11 @@ class Environment
 
     reload
   end
-  
+
   def best_location
     if !gps && !network
       nil
-    elsif gps && !network 
+    elsif gps && !network
       gps
     elsif !gps && network
       network

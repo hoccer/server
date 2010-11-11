@@ -2,6 +2,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 
 require 'test/unit'
 require 'init'
+require 'linccer_client'
 
 class FakeRequest
 

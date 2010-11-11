@@ -2,7 +2,8 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 require 'helper'
 require 'linccer_client'
 require 'mongo'
-require 'net/http'
+require 'net/http' 
+require 'ruby-debug'
 
 class TestRequest < Test::Unit::TestCase
 
@@ -222,5 +223,12 @@ class TestRequest < Test::Unit::TestCase
       client_1.delete_environment
       client_2.delete_environment
   end
-
+  
+  test "updating environment" do
+    client = create_client
+    client.update_environment( 
+        :gps => { :timestamp => 1289456, :latitude => 12.22, :longitude => 18.74, :accuracy => 100 } 
+    )
+  end
+  
 end

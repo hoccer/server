@@ -19,15 +19,12 @@ module Grouper
     
     put %r{/clients/(.{36,36})/environment} do |uuid|
       request_body  = request.body.read
-      puts request_body
       environment_data   = JSON.parse( request_body )
       
-      if environment = Environment.where( :client_uuid => uuid ).first
-        environment.update_attributes(environment_data)
-        environment.save
-      else  
-        Environment.create( environment_data.merge!( :client_uuid => uuid ) )
-      end
+      if environment = Environment.first({ :conditions => {:client_uuid => uuid} })
+        environment.destroy
+      end  
+      Environment.create( environment_data.merge!( :client_uuid => uuid ) )
       
       "OK"
     end

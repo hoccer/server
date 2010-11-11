@@ -1,6 +1,5 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 require 'helper'
-require 'test_client'
 require 'mongo'
 require 'net/http'
 
@@ -111,5 +110,34 @@ class TestOneToMany < Test::Unit::TestCase
     client_1.delete_environment
     client_2.delete_environment
   end
+  
+  test 'longpolling twice' do
+    client_1 = create_client
+    client_2 = create_client
+  
+    t2 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
+    sleep(10)
+    t1 = Thread.new {client_2.share("one-to-many", { "inline" => "foobar" } )}
+    
+    client_1_response = t1.value
+    client_2_response = t2.value
+    assert_equal [{"inline" => "foobar" }], client_1_response
+    
+    client_1.update_environment({
+        :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
+    })
+    
+    t2 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
+    sleep(3)
+    t1 = Thread.new {client_2.share("one-to-many", { "inline" => "barbaz" } )}
+    
+    client_1_response = t1.value
+    client_2_response = t2.value
+    assert_equal [{"inline" => "barbaz" }], client_1_response
+    
+    client_1.delete_environment
+    client_2.delete_environment
+  end
+  
   
 end

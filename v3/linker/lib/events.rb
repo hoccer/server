@@ -14,7 +14,7 @@ module Hoccer
       em_get( "/clients/#{uuid}/group") do |response|
         group = parse_group response[:content]
 
-        if group.size < 2
+        if group.size < 2 && !waiting
           @action_store.invalidate uuid
         else
           verify group
@@ -63,7 +63,7 @@ module Hoccer
       sender   = actions.select { |c| c[:type] == :sender }
       receiver = actions.select { |c| c[:type] == :receiver }
       
-      puts "verifying #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
+      puts "verifying group (#{group.size}) with #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
       if sender.size > 1 || receiver.size > 1
         conflict actions
@@ -88,7 +88,7 @@ module Hoccer
       sender   = actions.select { |c| c[:type] == :sender }
       receiver = actions.select { |c| c[:type] == :receiver }
 
-      puts "verifying #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
+      puts "verifying group (#{group.size}) with #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
       if sender.size > 1
         actions.each do |client|

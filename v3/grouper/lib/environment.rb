@@ -35,8 +35,8 @@ class Environment
     puts "looking for group: #{self[:group_id]}" 
     
     Environment
-      .where(:group_id => self[:group_id])
-      .only(:client_uuid, :group_id) || []
+      .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 120} })
+      .only(:client_uuid, :group_id).to_a || []
   end
 
   def nearby_bssids
@@ -59,8 +59,8 @@ class Environment
       "geoNear"     => "environments",
       "near"        => [lon.to_f, lat.to_f],
       "maxDistance" => 0.00078480615288,
-      "spherical" => true
-#      "query" => { "created_at" => {"$gt" => Time.now.to_f - 120}}
+      "spherical" => true,
+      "query" => { "created_at" => {"$gt" => Time.now.to_f - 120}}
     })["results"]
 
     results.select! do |result|
@@ -84,7 +84,8 @@ class Environment
         "longitude" => ( self.gps["longitude"] || self.gps[:longitude] ),
         "latitude"  => ( self.gps["latitude"]  || self.gps[:latitude] )
       }
-      self.gps = location.merge(self.gps)    
+      self.gps = location.merge(self.gps)
+      
     rescue => e
       puts "!!!!!!! Panic: #{e}"
     end
@@ -99,6 +100,7 @@ class Environment
   end
 
   def update_groups
+    puts "updating ><<<<<>>>"
     relevant_envs = self.nearby | self.nearby_bssids
     
     grouped_envs  = relevant_envs.inject([]) do |result, element|

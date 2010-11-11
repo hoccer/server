@@ -51,10 +51,11 @@ class Test::Unit::TestCase
       :gps => {
         :longitude => lon,
         :latitude  => lat,
-        :accuracy  => 100
+        :accuracy  => 100,
       },
-      :client_uuid => UUID.generate
-    }.merge( :bssids => bssids )
+      :client_uuid => UUID.generate,
+      :wifi => { :bssids => bssids, :timestamp => Time.now.to_f }
+    }
 
     Environment.create( options )
   end

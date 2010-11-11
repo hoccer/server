@@ -141,7 +141,7 @@ class ExhibitTest < Test::Unit::TestCase
   test 'pairing via bssids' do
     environment_1 = new_location
     environment_1 = environment_1.merge(
-      :bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:01"]
+      :wifi => { :bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:01"], :timestamp => Time.now.to_f }
     )
 
     environment_2 = new_environmnent(
@@ -151,7 +151,7 @@ class ExhibitTest < Test::Unit::TestCase
     )
 
     environment_2 = environment_2.merge(
-      :bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:02"]
+      :wifi => {:bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:02"], :timestamp => Time.now.to_f }
     )
 
     env_1 = Environment.create environment_1
@@ -169,12 +169,12 @@ class ExhibitTest < Test::Unit::TestCase
       new_environmnent( :longitude => 13.422,
                         :latitude => 52.522,
                         :accuracy => 35
-      ).merge( {:bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:01"] })
+      ).merge( :wifi => { :bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:01"], :timestamp => Time.now.to_f })
     )
 
 
     env_3 = Environment.create(
-      { :bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:02"] }
+      { :wifi => {:bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:02"], :timestamp => Time.now.to_f } }
     )
 
     [ env_1, env_2, env_3 ].each { |env| env.reload }
@@ -242,11 +242,11 @@ class ExhibitTest < Test::Unit::TestCase
   
   test 'not pairing on different bssids and no gps' do
     env_1 = Environment.create(
-      {:bssids => ["01:1a:b2:be:1e:c9", "00:00:00:00:00:01"] }
+      { :wifi => {:bssids => ["01:1a:b2:be:1e:c9", "00:00:00:00:00:01"], :timestamp => Time.now.to_f} }
     )
 
     env_2 = Environment.create(
-      { :bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:02"] }
+      { :wifi => {:bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:02"], :timestamp => Time.now.to_f } }
     )
 
     # [ env_1, env_2 ].each { |env| env.reload }

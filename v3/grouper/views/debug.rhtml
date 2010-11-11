@@ -25,7 +25,7 @@
           </tr>
           <tr>
             <td>created at:</td>
-            <td style='color: <%= (Time.now - environment.created_at) > 30 ? "red" : "" %>' >
+            <td style='color: <%= (Time.now.to_i - environment.created_at) > 30 ? "red" : "" %>' >
               <%= environment.created_at %>
             </td>
           </tr>

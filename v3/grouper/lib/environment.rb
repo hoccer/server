@@ -15,7 +15,6 @@ class Environment
   field :gps,         :type => Hash
   field :wifi,        :type => Hash
   field :network,     :type => Hash
-  field :created_at,  :type => Time
 
   before_create :add_group_id, :add_creation_time
   before_save   :ensure_indexable
@@ -36,15 +35,16 @@ class Environment
     puts "looking for group: #{self[:group_id]}"
 
     Environment
-      .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 120} })
+      .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 30} })
       .only(:client_uuid, :group_id).to_a || []
   end
 
   def nearby_bssids
-    return [] unless self.bssids
-
+    return [] unless self.wifi   
+    
+    bssids = self.wifi[:bssids] || self.wifi["bssids"]
     Environment.any_of(
-      *self.bssids.map { |bssid| {:bssids => bssid} }
+      *(bssids.map { |bssid| {"wifi.bssids" => bssid} })
     ).to_a
   end
 
@@ -61,7 +61,7 @@ class Environment
       "near"        => [lon.to_f, lat.to_f],
       "maxDistance" => 0.00078480615288,
       "spherical" => true,
-      "query" => { "created_at" => {"$gt" => Time.now.to_f - 120}}
+      "query" => { "created_at" => {"$gt" => Time.now.to_f - 30}}
     })["results"]
 
     results.select! do |result|

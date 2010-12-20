@@ -10,3 +10,4 @@ v2/public/system
 v2/vendor/plugins/newrelic_rpm
 v2/tmp
 v2/old
+.rvmrc

@@ -1,0 +1,14 @@
+development:
+  database: hoccer_development
+  grouper_host: localhost
+  grouper_port: 9292
+
+production:
+  database: hoccer_development
+  grouper_host: localhost
+  grouper_port: 9292
+
+test:
+  database: hoccer_development
+  grouper_host: localhost
+  grouper_port: 9292

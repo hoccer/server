@@ -18,16 +18,19 @@ class Numeric
   end
 end
 
-def config_file_path filename
-  File.join( File.dirname(__FILE__), 'config', filename )
+def config_file_path
+  File.join( File.dirname(__FILE__), 'config', 'hoccer.yml')
 end
 
 def load_config
   puts puts ">>>>>>>>>>>>>>>> #{ENV["RACK_ENV"].upcase} <<<<<<<<<<<<<<<<<"
   Hoccer.instance_eval do
     def config
-      puts config_file_path("#{ENV["RACK_ENV"]}.yml")
-      @config ||= YAML.load_file( config_file_path("#{ENV["RACK_ENV"]}.yml") )
+      begin
+        @config ||= YAML.load_file( config_file_path )[ENV["RACK_ENV"]]
+      rescue
+        raise "Unable to load config/hoccer.yml"
+      end
     end
   end
 end

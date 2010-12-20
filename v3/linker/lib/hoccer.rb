@@ -34,7 +34,7 @@ module Hoccer
       end
     end
 
-    aput %r{#{CLIENTS}/environment} do |uuid|
+    aput %r{#{CLIENTS}/environment$} do |uuid|
       authorized_request do |account|
         request_body = request.body.read
         puts "put body: #{request_body}"
@@ -52,7 +52,7 @@ module Hoccer
       end
     end
 
-    aput %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
+    aput %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
       payload = JSON.parse( request.body.read )
 
       action  = {
@@ -66,11 +66,38 @@ module Hoccer
       @@evaluators[action_name].add action
     end
 
-    aget %r{#{CLIENTS}/action/([\w-]+)} do |uuid, action_name|
+    aget %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
       action = { :mode => action_name, :type => :receiver, :request => self, :uuid => uuid }
 
       @@evaluators[action_name].add action, params['waiting']
     end
+    
+    # javasctipt routes
+    aget %r{/clients/([a-zA-Z0-9\-]{36,36})/environment.js} do |uuid|
+      puts params.inspect
+      environment = Hash.new
+      environment["gps"] = {
+        "latitude" => params["latitude"].to_f,
+        "longitude" => params["longitude"].to_f,
+        "accuracy" => params["accuracy"].to_f,
+        "timestamp" => params["timestamp"].to_f
+      }
+      
+      puts "put body #{environment}"
+      em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
+        status 201
+        body {"#{params['jsonp']}({content: \"hallo\"})"}
+      end
+    end
+    
+    aget %r{/clients/([a-zA-Z0-9\-]{36,36})/action/send.js} do |uuid|
+      body {"#{params['jsonp']}({content: \"hallo\"})"}
+    end
+
+    aget %r{/clients/([a-zA-Z0-9\-]{36,36})/action/receive\.js} do |uuid|
+      body {"#{params['jsonp']}({content: \"hallo\"})"}
+    end
+
   end
 
 end

@@ -1,10 +1,7 @@
-SERVER        = "localhost"
-PORT          = 4567
-
 def em_request method, path, content, &block
   http = EM::Protocols::HttpClient.request(
-    :host => SERVER,
-    :port => PORT,
+    :host => Hoccer.config["grouper_host"],
+    :port => Hoccer.config["grouper_port"],
     :verb => method   ||= "GET",
     :request => path  ||= "/",
     :content => content
@@ -32,27 +29,49 @@ def method_missing symbol, *args, &block
   end
 end
 
+def halt_with_error code, message = ""
+  ahalt(
+    code,
+    {'Content-Type' => 'application/json' },
+    {:error => message}.to_json
+  )
+end
+
+def protocol_and_host
+  scheme = request.env["HTTP_X_FORWARDED_PROTO"] || request.scheme
+  "#{scheme}://#{request.host}"
+end
+
+def request_uri
+  uri_without_signature = env['REQUEST_URI'].gsub(/\&signature\=.+$/, "")
+
+  if env['REQUEST_URI'] =~ /^http\:\/\//
+    uri_without_signature
+  else
+    protocol_and_host + uri_without_signature
+  end
+end
+
 def authorized_request &block
 
   if ENV["RACK_ENV"] == "production"
     EM.next_tick do
-      db          = EM::Mongo::Connection.new.db('hoccer_development')
+      db          = EM::Mongo::Connection.new.db( Hoccer.config["database"] )
       collection  = db.collection('accounts')
 
-      collection.first("api_key" => params["apiKey"]) do |account|
+      collection.first("api_key" => params["api_key"]) do |account|
         if account.nil?
-          ahalt 401
+          halt_with_error 401, "Invalid API Key"
         else
           signature = params.delete("signature")
-          uri       = env['REQUEST_URI'].gsub(/\&signature\=.+$/, "")
 
-          digestor = Digest::HMAC.new(account["shared_secret"], Digest::SHA1)
-          computed_signature = digestor.base64digest(uri)
+          digestor = Digest::HMAC.new( account["shared_secret"], Digest::SHA1 )
+          computed_signature = digestor.base64digest( request_uri )
 
           if signature == computed_signature
             block.call( account )
           else
-            ahalt 401
+            halt_with_error 401, "Invalid Signature"
           end
         end
       end

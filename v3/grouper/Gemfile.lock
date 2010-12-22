@@ -8,8 +8,11 @@ GEM
     activesupport (3.0.1)
     archive-tar-minitar (0.5.2)
     bson (1.1.1)
+    bson_ext (1.1.5)
     builder (2.1.2)
     columnize (0.3.1)
+    daemons (1.1.0)
+    eventmachine (0.12.11)
     i18n (0.4.2)
     linecache19 (0.5.11)
       ruby_core_source (>= 0.1.4)
@@ -35,6 +38,10 @@ GEM
     sinatra (1.1.0)
       rack (~> 1.1)
       tilt (~> 1.1)
+    thin (1.2.7)
+      daemons (>= 1.0.9)
+      eventmachine (>= 0.12.6)
+      rack (>= 1.0.0)
     tilt (1.1)
     tzinfo (0.3.23)
     uuid (2.3.1)
@@ -45,7 +52,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bson_ext
   mongoid (>= 2.0.0.beta.18)
   ruby-debug19
   sinatra
+  thin
   uuid

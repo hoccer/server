@@ -2,20 +2,16 @@ require 'mongoid'
 
 EARTH_RADIUS = 1000 * 6371
 
-class Numeric
-  def to_rad
-    (self * (Math::PI / 180) / 1000)
-  end
-end
-
 module Hoccer
   class Environment
 
     include Mongoid::Document
+    store_in :environments
 
     field :gps,         :type => Hash
     field :wifi,        :type => Hash
     field :network,     :type => Hash
+    field :group_id
 
     before_create :add_group_id, :add_creation_time
     before_save   :ensure_indexable
@@ -43,7 +39,6 @@ module Hoccer
     end
 
     def nearby_gps
-      #gps = self.gps
       return [] unless gps
 
       lon = ( gps[:longitude] || gps["longitude"] )

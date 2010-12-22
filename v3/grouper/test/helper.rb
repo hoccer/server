@@ -1,8 +1,14 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 
 require 'test/unit'
+require 'sinatra'
+
+set :environment, :test
+
+require 'init'
 
 class Test::Unit::TestCase
+  include Hoccer
 
   def new_message
     path = File.join(File.dirname(__FILE__), "fixtures", "dummy_messages.txt")

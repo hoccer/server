@@ -1,9 +1,6 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__)))
 require 'helper'
-require 'ruby-debug'
-require 'uuid'
-require 'lib/environment'
 
 class ExhibitTest < Test::Unit::TestCase
 
@@ -126,14 +123,14 @@ class ExhibitTest < Test::Unit::TestCase
     )
 
     assert_equal "longitude", env_1.gps.keys[0]
-    
+
     env_1.update_attributes( :gps => {
         :timestamp => 12345678909,
         :latitude  => 52.522,
         :longitude => 13.420,
         :accuracy  => 100
     })
-    
+
     assert_equal "longitude", env_1.gps.keys[0]
     # assert_
   end
@@ -238,8 +235,8 @@ class ExhibitTest < Test::Unit::TestCase
     )
 
     assert_equal 3, Environment.last.group.size
-  end                                          
-  
+  end
+
   test 'not pairing on different bssids and no gps' do
     env_1 = Environment.create(
       { :wifi => {:bssids => ["01:1a:b2:be:1e:c9", "00:00:00:00:00:01"], :timestamp => Time.now.to_f} }
@@ -250,15 +247,15 @@ class ExhibitTest < Test::Unit::TestCase
     )
 
     # [ env_1, env_2 ].each { |env| env.reload }
-    
+
     assert_equal 1, env_1.group.count
     assert_equal 1, env_2.group.count
   end
-  
+
   test 'not pairing bogus environments' do
     env_1 = Environment.create( 'bla' => 'hallo' )
     env_2 = Environment.create( 'wu' => "ha" )
-    
+
     assert_equal 1, env_1.group.count
     assert_equal 1, env_2.group.count
   end

@@ -30,8 +30,12 @@ module Grouper
     end
 
     get %r{/clients/(.{36,36})/group} do |uuid|
-      client       = Environment.newest uuid
-      client.group.to_json
+      client = Environment.newest uuid
+      if client && client.group
+        client.group.to_json
+      else
+        halt 404, { :message => "Not Found" }.to_json
+      end
     end
 
     get %r{/clients/(.{36,36})$} do |uuid|

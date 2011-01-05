@@ -23,7 +23,7 @@ def config_file_path
 end
 
 def load_config
-  puts puts ">>>>>>>>>>>>>>>> #{ENV["RACK_ENV"].upcase} <<<<<<<<<<<<<<<<<"
+  # puts ">>>>>>>>>>>>>>>> #{ENV["RACK_ENV"].upcase} <<<<<<<<<<<<<<<<<"
   Hoccer.instance_eval do
     def config
       begin

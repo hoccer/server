@@ -74,7 +74,6 @@ module Hoccer
     
     # javasctipt routes
     aget %r{/clients/([a-zA-Z0-9\-]{36,36})/environment.js} do |uuid|
-      puts params.inspect
       environment = Hash.new
       environment["gps"] = {
         "latitude" => params["latitude"].to_f,
@@ -91,11 +90,27 @@ module Hoccer
     end
     
     aget %r{/clients/([a-zA-Z0-9\-]{36,36})/action/send.js} do |uuid|
-      body {"#{params['jsonp']}({content: \"hallo\"})"}
+      puts params["payload"]
+      action  = {
+        :mode     => params["mode"],
+        :type     => :sender,
+        :payload  => params["payload"],
+        :request  => self,
+        :uuid     => uuid,
+        :jsonp_method => params["jsonp"]  
+      }
+
+      @@evaluators[params["mode"]].add action
     end
 
-    aget %r{/clients/([a-zA-Z0-9\-]{36,36})/action/receive\.js} do |uuid|
-      body {"#{params['jsonp']}({content: \"hallo\"})"}
+    aget %r{/clients/([a-zA-Z0-9\-]{36,36})/action/receive.js} do |uuid|
+      action = { :mode => params["mode"], 
+                 :type => :receiver, 
+                 :request => self, 
+                 :uuid => uuid,
+                 :jsonp_method => params["jsonp"] }
+
+      @@evaluators[params["mode"]].add action, params['waiting']
     end
 
   end

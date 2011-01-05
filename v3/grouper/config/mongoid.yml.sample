@@ -1,0 +1,18 @@
+development:
+  host: localhost
+  database: hoccer_development
+  persist_in_safe_mode: true
+  reconnect_time: 3
+  logger:
+
+test:
+  host: localhost
+  database: hoccer_development
+  persist_in_safe_mode: true
+  reconnect_time: 3
+
+production:
+  host: localhost
+  database: hoccer_development
+  persist_in_safe_mode: true
+  reconnect_time: 3

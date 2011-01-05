@@ -1,17 +1,5 @@
-$LOAD_PATH.unshift( File.join( File.dirname( __FILE__), "lib"))
-
-require 'sinatra'
-require 'mongoid'
-require 'environment'
-
-class Numeric
-  def to_rad
-    self * (Math::PI / 180)
-  end
-end
-
-module Grouper
-  class App < Sinatra::Base
+module Hoccer
+  class Grouper < Sinatra::Base
 
     get "/" do
       "Hallo"
@@ -30,8 +18,12 @@ module Grouper
     end
 
     get %r{/clients/(.{36,36})/group} do |uuid|
-      client       = Environment.newest uuid
-      client.group.to_json
+      client = Environment.newest uuid
+      if client && client.group
+        client.group.to_json
+      else
+        halt 404, { :message => "Not Found" }.to_json
+      end
     end
 
     get %r{/clients/(.{36,36})$} do |uuid|

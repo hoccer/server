@@ -30,7 +30,7 @@ module Hoccer
     def nearby_bssids
       return [] unless self.wifi
 
-      bssids = self.wifi[:bssids] || self.wifi["bssids"]
+      bssids = self.wifi.with_indifferent_access[:bssids]
       Environment.any_of(
         *(bssids.map { |bssid| {"wifi.bssids" => bssid} })
       ).to_a
@@ -89,11 +89,13 @@ module Hoccer
 
     def normalize_bssids
       return unless self.wifi
+      wifi = self.wifi.with_indifferent_access
 
-      bssids = self.wifi[:bssids] || self.wifi["bssids"]
-      self.wifi[:bssids] = bssids.map do |bssid| 
+      bssids = wifi[:bssids]
+      self.wifi[:bssids] = bssids.map do |bssid|
         bssid.gsub(/\b([A-Fa-f0-9])\b/, '0\1').downcase
       end
+      self.delete("bssids")
     end
 
     def update_groups

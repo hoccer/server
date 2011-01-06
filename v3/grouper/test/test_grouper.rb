@@ -2,7 +2,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__)))
 require 'helper'
 
-class ExhibitTest < Test::Unit::TestCase
+class TestGrouper < Test::Unit::TestCase
 
   def new_location
     @gps ||= [13, 52]

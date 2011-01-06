@@ -181,7 +181,7 @@ class TestEnvironment < Test::Unit::TestCase
     assert_equal 3, env_3.group.count
   end
 
-  test "find nearby events with multiple matching bssids" do
+  test "find nearby environments with multiple matching bssids" do
     create_env_with_locations(
       32.1,
       10.5,
@@ -307,4 +307,38 @@ class TestEnvironment < Test::Unit::TestCase
     assert_equal 1, env_1.group.count
     assert_equal 1, env_2.group.count
   end
+
+  test 'grouping by only providing inaccurate network data' do
+    env_1 = Environment.create({:network => {
+        :longitude => 51.11, :latitude  => 14.153,
+        :accuracy  => 10000} 
+      }
+    )
+
+    env_2 = Environment.create({:network => {
+        :longitude => 51.11, :latitude  => 14.154, :accuracy  => 10000} 
+      }
+    )
+
+    assert_equal 2, Environment.last.group.size
+  end
+
+  test 'grouping by providing wrong and old gps but fresh network location' do
+    env_1 = Environment.create({
+      :gps => {
+        :longitude => 51.446367, :latitude  => 14.153577778,
+        :accuracy  => 100, :timestamp => (Time.now - 1.hour).to_f},
+      :network => {
+        :longitude => 51.114, :latitude  => 14.153,
+        :accuracy  => 10000, :timestamp => (Time.now - 1.hour).to_f}
+      })
+
+    env_2 = Environment.create({:gps => {
+        :longitude => 51.11222, :latitude  => 14.15444, :accuracy  => 100} 
+      }
+    )
+
+    assert_equal 2, Environment.last.group.size
+  end
+
 end

@@ -261,6 +261,18 @@ class TestEnvironment < Test::Unit::TestCase
     assert_equal 2, Environment.last.group.size
   end
 
+  test 'grouping by providing upper and lowercase bssid variants' do
+    env_android = Environment.create(
+      { :wifi => {:bssids => ["01:0a:b2:f0:1e:09"], :timestamp => Time.now.to_f} }
+    )
+
+    env_ios = Environment.create(
+      { :wifi => {:bssids => ["01:0A:B2:f0:1E:09"], :timestamp => Time.now.to_f } }
+    )
+ 
+    assert_equal 2, Environment.last.group.size
+  end
+
   test 'not pairing on different bssids and no gps' do
     env_1 = Environment.create(
       { :wifi => {:bssids => ["01:1a:b2:be:1e:c9", "00:00:00:00:00:01"], :timestamp => Time.now.to_f} }

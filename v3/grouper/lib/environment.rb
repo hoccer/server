@@ -94,7 +94,7 @@ module Hoccer
 
       bssids = self.wifi[:bssids] || self.wifi["bssids"]
       self.wifi[:bssids] = bssids.map do |bssid| 
-        bssid.gsub(/\b([A-Fa-f0-9])\b/, '0\1') 
+        bssid.gsub(/\b([A-Fa-f0-9])\b/, '0\1').downcase
       end
     end
 

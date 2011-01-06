@@ -97,6 +97,7 @@ module Hoccer
     end
 
     def update_groups
+      puts "updating <#{self[:client_uuid]}> to #{self.inspect}"
       relevant_envs = self.nearby | self.nearby_bssids
 
       grouped_envs = relevant_envs.inject([]) do |result, element|

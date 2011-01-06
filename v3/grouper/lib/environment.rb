@@ -22,8 +22,6 @@ module Hoccer
     end
 
     def group
-      puts "<#{self[:client_uuid]}> is looking for group #{self[:group_id]}"
-
       Environment
         .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 30} })
         .only(:client_uuid, :group_id).to_a || []
@@ -99,7 +97,6 @@ module Hoccer
     end
 
     def update_groups
-      puts "updating client <#{self[:client_uuid]}>"
       relevant_envs = self.nearby | self.nearby_bssids
 
       grouped_envs = relevant_envs.inject([]) do |result, element|
@@ -115,6 +112,9 @@ module Hoccer
       ( grouped_envs | relevant_envs ).each do |foobar|
         foobar[:group_id] = new_group_id
         foobar.save
+      end
+      if grouped_envs and grouped_envs.count > 1
+        puts "grouped <#{grouped_envs.map {|e|  e.client_uuid rescue "<unknown>"} }>"
       end
 
       reload

@@ -237,7 +237,7 @@ class TestGrouper < Test::Unit::TestCase
     assert_equal 3, Environment.last.group.size
   end
 
-  test 'groping by only providing bssids' do
+  test 'grouping by only providing bssids' do
     env_1 = Environment.create(
       { :wifi => {:bssids => ["01:1a:b2:be:1e:c9", "00:00:00:00:00:01"], :timestamp => Time.now.to_f} }
     )
@@ -249,6 +249,17 @@ class TestGrouper < Test::Unit::TestCase
     assert_equal 2, Environment.last.group.size
   end
 
+  test 'grouping by providing short and long bssid variants' do
+    env_android = Environment.create(
+      { :wifi => {:bssids => ["01:0a:b2:f0:1e:09"], :timestamp => Time.now.to_f} }
+    )
+
+    env_ios = Environment.create(
+      { :wifi => {:bssids => ["1:a:b2:f0:1e:9"], :timestamp => Time.now.to_f } }
+    )
+
+    assert_equal 2, Environment.last.group.size
+  end
 
   test 'not pairing on different bssids and no gps' do
     env_1 = Environment.create(

@@ -90,10 +90,10 @@ module Hoccer
     end
 
     def update_groups
-      puts "updating ><<<<<>>>"
+      puts "updating #{:client_uuid}"
       relevant_envs = self.nearby | self.nearby_bssids
 
-      grouped_envs  = relevant_envs.inject([]) do |result, element|
+      grouped_envs = relevant_envs.inject([]) do |result, element|
         element.group.each do |group_env|
           unless result.include?( group_env )
             result << group_env

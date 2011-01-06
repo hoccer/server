@@ -95,7 +95,7 @@ module Hoccer
       self.wifi[:bssids] = bssids.map do |bssid|
         bssid.gsub(/\b([A-Fa-f0-9])\b/, '0\1').downcase
       end
-      self.delete("bssids")
+      self.wifi.delete("bssids")
     end
 
     def update_groups

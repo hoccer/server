@@ -257,7 +257,7 @@ class TestGrouper < Test::Unit::TestCase
     env_ios = Environment.create(
       { :wifi => {:bssids => ["1:a:b2:f0:1e:9"], :timestamp => Time.now.to_f } }
     )
-
+ 
     assert_equal 2, Environment.last.group.size
   end
 

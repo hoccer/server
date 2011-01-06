@@ -13,7 +13,7 @@ module Hoccer
     field :network,     :type => Hash
     field :group_id
 
-    before_create :add_group_id, :add_creation_time
+    before_create :add_group_id, :add_creation_time, :normalize_bssids
     before_save   :ensure_indexable
     after_create  :update_groups
 
@@ -22,7 +22,7 @@ module Hoccer
     end
 
     def group
-      puts "looking for group: #{self[:group_id]}"
+      puts "<#{self[:client_uuid]}> is looking for group #{self[:group_id]}"
 
       Environment
         .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 30} })
@@ -89,8 +89,17 @@ module Hoccer
       self[:created_at] = Time.now.to_f
     end
 
+    def normalize_bssids
+      return unless self.wifi
+
+      bssids = self.wifi[:bssids] || self.wifi["bssids"]
+      self.wifi[:bssids] = bssids.map do |bssid| 
+        bssid.gsub(/\b([A-Fa-f0-9])\b/, '0\1') 
+      end
+    end
+
     def update_groups
-      puts "updating #{:client_uuid}"
+      puts "updating client <#{self[:client_uuid]}>"
       relevant_envs = self.nearby | self.nearby_bssids
 
       grouped_envs = relevant_envs.inject([]) do |result, element|

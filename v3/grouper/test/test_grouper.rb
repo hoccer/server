@@ -237,6 +237,19 @@ class TestGrouper < Test::Unit::TestCase
     assert_equal 3, Environment.last.group.size
   end
 
+  test 'groping by only providing bssids' do
+    env_1 = Environment.create(
+      { :wifi => {:bssids => ["01:1a:b2:be:1e:c9", "00:00:00:00:00:01"], :timestamp => Time.now.to_f} }
+    )
+
+    env_2 = Environment.create(
+      { :wifi => {:bssids => ["01:1a:b2:be:1e:c9"], :timestamp => Time.now.to_f } }
+    )
+
+    assert_equal 2, Environment.last.group.size
+  end
+
+
   test 'not pairing on different bssids and no gps' do
     env_1 = Environment.create(
       { :wifi => {:bssids => ["01:1a:b2:be:1e:c9", "00:00:00:00:00:01"], :timestamp => Time.now.to_f} }
@@ -246,7 +259,7 @@ class TestGrouper < Test::Unit::TestCase
       { :wifi => {:bssids => ["00:1a:b2:be:1e:c9", "00:00:00:00:00:02"], :timestamp => Time.now.to_f } }
     )
 
-    # [ env_1, env_2 ].each { |env| env.reload }
+    [ env_1, env_2 ].each { |env| env.reload }
 
     assert_equal 1, env_1.group.count
     assert_equal 1, env_2.group.count

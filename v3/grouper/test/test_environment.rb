@@ -59,6 +59,26 @@ class TestEnvironment < Test::Unit::TestCase
     assert JSON.parse(env_1.group.to_json)
   end
 
+  test 'grouping clients with ultra precise locations standing near by' do
+
+    location = new_location
+    location[:gps][:accuracy] = 1;
+    env_1 = Environment.create(location)
+
+    # move second client ~150 to the away from first client
+    location[:gps][:longitude] += 0.0014; 
+    location[:client_uuid] = UUID.generate
+    env_2 = Environment.create(location)  
+
+    assert env_1.reload[:group_id], "should have a group id"
+    assert env_2.reload[:group_id], "should have a group id"
+
+    assert_equal env_1.group.count, 2, "should have grouped environments"
+    assert_equal env_2.group.count, 2, "should have grouped environments"
+    assert_equal env_1[:group_id], env_2[:group_id], "group ids should match"
+    assert_equal env_2.group, env_1.group
+  end
+
   test 'chain grouping 3 clients' do
 
     env_1 = Environment.create(

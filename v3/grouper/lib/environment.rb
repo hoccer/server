@@ -46,12 +46,13 @@ module Hoccer
       results = Environment.db.command({
         "geoNear"     => "environments",
         "near"        => [lon.to_f, lat.to_f],
-        "maxDistance" => 0.00078480615288,
+        "maxDistance" => 5000 / EARTH_RADIUS,
         "spherical" => true,
         "query" => { "created_at" => {"$gt" => Time.now.to_f - 30}}
       })["results"]
 
       results.select! do |result|
+        puts (result["dis"] * EARTH_RADIUS)
         (result["dis"] * EARTH_RADIUS) < ((result["obj"]["gps"]["accuracy"] + acc) * 2)
       end
 

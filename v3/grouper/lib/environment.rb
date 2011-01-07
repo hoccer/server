@@ -1,6 +1,5 @@
 require 'mongoid'
 
-
 module Hoccer
   class Environment
 

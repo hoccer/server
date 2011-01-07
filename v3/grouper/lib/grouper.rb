@@ -1,9 +1,8 @@
 require 'sinatra'
 
-
 module Hoccer
   class Grouper < Sinatra::Base
-    set :show_exceptions, false
+    set :show_exceptions, false # we render our own errors
     
     error do
       e = request.env['sinatra.error'];
@@ -25,9 +24,10 @@ module Hoccer
       if environment = Environment.first({ :conditions => {:client_uuid => uuid} })
         environment.destroy
       end
-      Environment.create( environment_data.merge!( :client_uuid => uuid ) )
+      e = Environment.create( environment_data.merge!( :client_uuid => uuid ) )
 
-      {:message => "hallo", :quality => 2}.to_json
+      
+      (Hoccability.analyze e).to_json
     end
 
     get %r{/clients/(.{36,36})/group} do |uuid|

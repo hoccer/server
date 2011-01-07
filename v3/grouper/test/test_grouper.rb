@@ -35,13 +35,13 @@ class TestGrouper < Test::Unit::TestCase
 
   def test_getting_emtpy_environment_error
     put "/clients/#{UUID.generate}/environment", {}.to_json
-    assert_equal ({:message => "nothing", :quality => 0}), last_json_response
+    assert_equal Hoccability::status("no_message_infos_provided", 0), last_json_response
   end
 
   def test_getting_empty_environment_error_even_if_keys_exist
     put "/clients/#{UUID.generate}/environment", 
         {:wifi => {}, :network => {}, :gps => {}}.to_json
-    assert_equal ({:message => "nothing", :quality => 0}), last_json_response
+    assert_equal Hoccability::status("no_message_infos_provided", 0), last_json_response
   end
 
 end

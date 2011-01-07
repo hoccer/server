@@ -1,14 +1,18 @@
 module Hoccer
   class Hoccability
 
+    def self.status id, quality
+      {:msg_id => id, :quality => quality}
+    end
+
     def self.analyze env
-      puts env.inspect
       if not (env.has_gps or env.has_network or env.has_wifi)
-        {:message => "nothing", :quality => 0}
+        status :no_message_infos_provided, 0
       else
-        {:message => "nothing applies, your location is unknown!", :quality => 0}
+        status :unknown_error, 0
       end
     end 
+
 
   end
 end

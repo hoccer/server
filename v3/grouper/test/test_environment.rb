@@ -308,7 +308,7 @@ class TestEnvironment < Test::Unit::TestCase
     assert_equal 1, env_2.group.count
   end
 
-  test 'grouping by only providing inaccurate network data' do
+  test 'grouping by only providing coarse network data' do
     env_1 = Environment.create({:network => {
         :longitude => 51.11, :latitude  => 14.153,
         :accuracy  => 10000} 
@@ -322,6 +322,22 @@ class TestEnvironment < Test::Unit::TestCase
 
     assert_equal 2, Environment.last.group.size
   end
+
+  test 'grouping gps location with network location' do
+    env_1 = Environment.create({
+      :gps => {
+        :longitude => 51.446367, :latitude  => 14.153577778,
+        :accuracy  => 100}
+      })
+
+    env_2 = Environment.create({
+      :network => {
+        :longitude => 51.451222, :latitude  => 14.15444, :accuracy  => 10000} 
+      })
+
+    assert_equal 2, Environment.last.group.size
+  end
+
 
   test 'grouping by providing wrong and old gps but fresh network location' do
     env_1 = Environment.create({

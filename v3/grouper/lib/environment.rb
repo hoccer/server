@@ -13,7 +13,7 @@ module Hoccer
     field :network,     :type => Hash
     field :group_id
 
-    before_create :add_group_id, :add_creation_time, :normalize_bssids
+    before_create :add_group_id, :add_creation_time, :normalize_bssids, :choose_best_location
     before_save   :ensure_indexable
     after_create  :update_groups
 
@@ -123,17 +123,13 @@ module Hoccer
       reload
     end
 
-    def best_location
-      if !gps && !network
-        nil
-      elsif gps && !network
-        gps
-      elsif !gps && network
-        network
-      elsif network[:timestamp] < gps[:timestamp]
-        network
-      else
-        gps
+    def choose_best_location
+      if self[:network]
+        if not self.gps
+          self.gps = self[:network]
+        elsif self[:network][:timestamp] > self.gps[:timestamp]
+          self.gps = self[:network]
+        end
       end
     end
   end

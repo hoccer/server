@@ -34,6 +34,7 @@ module Hoccer
       return [] unless self.wifi
 
       bssids = self.wifi.with_indifferent_access[:bssids]
+      return [] unless bssids
       Environment.any_of(
         *(bssids.map { |bssid| {"wifi.bssids" => bssid} })
       ).to_a
@@ -97,6 +98,7 @@ module Hoccer
       wifi = self.wifi.with_indifferent_access
 
       bssids = wifi[:bssids]
+      return unless bssids
       self.wifi[:bssids] = bssids.map do |bssid|
         bssid.gsub(/\b([A-Fa-f0-9])\b/, '0\1').downcase
       end

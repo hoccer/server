@@ -1,3 +1,5 @@
+require 'sinatra'
+
 module Hoccer
   class Grouper < Sinatra::Base
 
@@ -7,7 +9,7 @@ module Hoccer
     end
 
     get "/" do
-      "Hallo"
+      "I'm the grouper!"
     end
 
     put %r{/clients/(.{36,36})/environment} do |uuid|

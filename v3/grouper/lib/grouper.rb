@@ -1,11 +1,17 @@
 require 'sinatra'
 
+
 module Hoccer
   class Grouper < Sinatra::Base
-
+    set :show_exceptions, false
+    
     error do
       e = request.env['sinatra.error'];
       "#{e.class}: #{e.message}\n"
+    end
+
+    not_found do
+      'resource could not be found.'
     end
 
     get "/" do

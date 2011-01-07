@@ -1,9 +1,12 @@
 require 'mongoid'
 
-EARTH_RADIUS = 1000 * 6371
 
 module Hoccer
   class Environment
+
+    GUARANTEED_DISTANCE = 200.0
+    MAX_SEARCH_DISTANCE  = 5050.0
+    EARTH_RADIUS = 1000 * 6371
 
     include Mongoid::Document
     store_in :environments
@@ -46,14 +49,15 @@ module Hoccer
       results = Environment.db.command({
         "geoNear"     => "environments",
         "near"        => [lon.to_f, lat.to_f],
-        "maxDistance" => 5000 / EARTH_RADIUS,
+        "maxDistance" => MAX_SEARCH_DISTANCE / EARTH_RADIUS,
         "spherical" => true,
         "query" => { "created_at" => {"$gt" => Time.now.to_f - 30}}
       })["results"]
 
       results.select! do |result|
-        puts (result["dis"] * EARTH_RADIUS)
-        (result["dis"] * EARTH_RADIUS) < ((result["obj"]["gps"]["accuracy"] + acc) * 2)
+        distance = (result["dis"] * EARTH_RADIUS) # in meters
+        uncerteny = [(result["obj"]["gps"]["accuracy"] + acc) * 2, MAX_SEARCH_DISTANCE].min
+        distance <= [GUARANTEED_DISTANCE, uncerteny].max
       end
 
       results.map do |result|

@@ -1,20 +1,25 @@
 module Hoccer
   class Grouper < Sinatra::Base
 
+    error do
+      e = request.env['sinatra.error'];
+      "#{e.class}: #{e.message}\n"
+    end
+
     get "/" do
       "Hallo"
     end
 
     put %r{/clients/(.{36,36})/environment} do |uuid|
       request_body  = request.body.read
-      environment_data   = JSON.parse( request_body )
+      environment_data = JSON.parse( request_body )
 
       if environment = Environment.first({ :conditions => {:client_uuid => uuid} })
         environment.destroy
       end
       Environment.create( environment_data.merge!( :client_uuid => uuid ) )
 
-      "OK"
+      {:message => "hallo", :quality => 2}.to_json
     end
 
     get %r{/clients/(.{36,36})/group} do |uuid|

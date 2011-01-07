@@ -29,8 +29,24 @@ module Hoccer
         .only(:client_uuid, :group_id).to_a || []
     end
 
+    def has_wifi
+      return false unless self.wifi
+      w = self.wifi.with_indifferent_access
+      w[:bssids] && w[:bssids].count > 0
+    end
+
+    def has_gps
+      return false unless self.gps
+      g = self.gps.with_indifferent_access
+      g[:latitude] && g[:longitude] && g[:accuracy]
+    end
+
+    def has_network
+      self[:network] && self[:network][:latitude] && self[:network][:longitude] && self[:network][:accuracy]
+    end
+
     def nearby_bssids
-      return [] unless self.wifi
+      return [] unless has_wifi
 
       bssids = self.wifi.with_indifferent_access[:bssids]
       return [] unless bssids
@@ -40,7 +56,7 @@ module Hoccer
     end
 
     def nearby_gps
-      return [] unless gps
+      return [] unless has_gps
 
       lon = ( gps[:longitude] || gps["longitude"] )
       lat = ( gps[:latitude]  || gps["latitude"] )
@@ -71,7 +87,7 @@ module Hoccer
 
     private
     def ensure_indexable
-      return unless self.gps
+      return unless has_gps
       begin
         location = {
           "longitude" => ( self.gps["longitude"] || self.gps[:longitude] ),
@@ -93,7 +109,7 @@ module Hoccer
     end
 
     def normalize_bssids
-      return unless self.wifi
+      return unless has_wifi
       wifi = self.wifi.with_indifferent_access
 
       bssids = wifi[:bssids]
@@ -130,8 +146,8 @@ module Hoccer
     end
 
     def choose_best_location
-      if self[:network]
-        if not self.gps
+      if has_network
+        if not has_gps
           self.gps = self[:network]
         elsif self[:network][:timestamp] > self.gps[:timestamp]
           self.gps = self[:network]

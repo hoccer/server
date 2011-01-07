@@ -15,13 +15,23 @@ class TestGrouper < Test::Unit::TestCase
     Hoccer::Grouper.new
   end
 
+  def last_json_response
+    JSON.parse last_response.body, {:symbolize_names => true}
+  end
+
   def test_default_route
     get '/'
     assert_equal "I'm the grouper!", last_response.body
   end
 
-  def test_getting_emtpy_environment_error
+  def test_getting_no_body_error
     put "/clients/#{UUID.generate}/environment"
     assert_equal "JSON::ParserError: A JSON text must at least contain two octets!\n", last_response.body
   end
+
+  def test_getting_emtpy_environment_error
+    put "/clients/#{UUID.generate}/environment", {:wifi => {}}.to_json
+    assert_equal ({:message => "hallo", :quality => 2}), last_json_response
+  end
+
 end

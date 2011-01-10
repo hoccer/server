@@ -1,19 +1,33 @@
 module Hoccer
-  class Hoccability
+  module Hoccability
 
     NO_DATA = {:quality => 0, :info => "no_data"}
+    GOOD_DATA = {:quality => 3, :info => "good_data"}
 
     def self.analyze env
       status = {}
 
-      status[:coordinates] = NO_DATA unless env.has_gps or env.has_network
-      status[:wifi] = NO_DATA unless env.has_wifi
+      status[:coordinates] = env.has_gps ? judge_coordinates(env[:gps]) : NO_DATA
+      status[:wifi] = env.has_wifi ? judge_wifi(env[:wifi].with_indifferent_access[:bssids]) : NO_DATA
 
-      status[:quality] = status[:coordinates][:quality]
+      status[:quality] = 0
+      status[:quality] += 1 if status[:wifi][:quality] > 0
+      status[:quality] += [status[:coordinates][:quality],2].min
+
       status[:devices] = env.group.count
 
       status
     end 
+
+    def self.judge_coordinates gps
+      NO_DATA
+    end
+
+    def self.judge_wifi bssids
+      return NO_DATA unless bssids.class.equal? Array
+      
+      GOOD_DATA
+    end
 
   end
 end

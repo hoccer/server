@@ -34,10 +34,10 @@ class TestGrouper < Test::Unit::TestCase
   end
 
   def assert_empty_environment
+    assert_equal 1, last_json_response[:devices], "lonely in the group"
+    assert_equal 0, last_json_response[:quality]
     assert_equal Hoccability::NO_DATA, last_json_response[:coordinates]
     assert_equal Hoccability::NO_DATA, last_json_response[:wifi]
-    assert_equal 0, last_json_response[:quality]
-    assert_equal 1, last_json_response[:devices], "lonely in the group"
   end
 
   def test_getting_emtpy_environment_error
@@ -63,4 +63,15 @@ class TestGrouper < Test::Unit::TestCase
     assert_empty_environment
   end
 
+  def test_getting_bssid_feedback
+    put "/clients/#{UUID.generate}/environment", 
+        {:wifi => 
+          {:bssids => ["00:22:3f:11:5e:5d","00:26:4d:72:cc:90"], 
+           :timestamp => Time.now.to_i - 10}
+        }.to_json
+
+    assert_equal 1, last_json_response[:quality], "overall quality not so good because only wifi provided"
+    assert_equal Hoccability::GOOD_DATA, last_json_response[:wifi]
+    
+  end
 end

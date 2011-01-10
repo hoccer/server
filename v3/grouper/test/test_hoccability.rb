@@ -28,16 +28,18 @@ class TestHoccability < Test::Unit::TestCase
     assert_equal Hoccability::GOOD_DATA, Hoccability::judge_wifi(wifi), "good bssids"  end
 
   def test_judging_coordinates
+    judge = lambda {|gps| Hoccability::judge_coordinates gps}
+
     gps = {:longitude => 13.33, :latitude => 52.33, :accuracy => 100}
-    assert_equal Hoccability::NO_TIMESTAMP, Hoccability::judge_coordinates(gps), "no timestamp"
+    assert_equal Hoccability::NO_TIMESTAMP, judge.call(gps), "no timestamp"
     gps[:timestamp] = Time.now.to_i - 2.minutes
-    assert_equal Hoccability::OLD_DATA, Hoccability::judge_coordinates(gps), "old fix"
+    assert_equal Hoccability::OLD_DATA, judge.call(gps), "old fix"
     gps[:timestamp] = Time.now.to_i
-    assert_equal Hoccability::GOOD_DATA, Hoccability::judge_coordinates(gps), "good fix"
+    assert_equal Hoccability::GOOD_DATA, judge.call(gps), "good fix"
     gps[:accuracy] = 19
-    assert_equal Hoccability::EXACT_DATA, Hoccability::judge_coordinates(gps), "exact fix"
+    assert_equal Hoccability::EXACT_DATA, judge.call(gps), "exact fix"
     gps[:accuracy] = 350
-    assert_equal Hoccability::IMPRECISE_DATA, Hoccability::judge_coordinates(gps), "inaccurate fix"
+    assert_equal Hoccability::IMPRECISE_DATA, judge.call(gps), "inaccurate fix"
   end
 
 end

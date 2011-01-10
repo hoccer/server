@@ -19,8 +19,21 @@ class TestHoccability < Test::Unit::TestCase
   end
 
   def test_judging_wifi
-    assert_equal Hoccability::BAD_DATA, Hoccability::judge_wifi(["ff:ff"]), "bad bssids"
-    assert_equal Hoccability::GOOD_DATA, Hoccability::judge_wifi(["00:22:3f:11:5e:5d","00:26:4d:72:cc:90"]), "good bssids"
+    assert_equal Hoccability::WRONG_DATA, Hoccability::judge_wifi({:bssids => ["ff:ff"]}), "bad bssids"
+    wifi = {:bssids => ["00:22:3f:11:5e:5d","00:26:4d:72:cc:90"]}
+    assert_equal Hoccability::NO_TIMESTAMP, Hoccability::judge_wifi(wifi), "no timestamp"
+    wifi[:timestamp] = Time.now.to_i - 2.minutes
+    assert_equal Hoccability::OLD_DATA, Hoccability::judge_wifi(wifi), "old bssids"
+    wifi[:timestamp] = Time.now.to_i
+    assert_equal Hoccability::GOOD_DATA, Hoccability::judge_wifi(wifi), "good bssids"  end
+
+  def test_judging_coordinates
+    gps = {:longitude => 13.33, :latitude => 52.33, :accuracy => 100}
+    assert_equal Hoccability::NO_TIMESTAMP, Hoccability::judge_coordinates(gps), "no timestamp"
+    gps[:timestamp] = Time.now.to_i - 2.minutes
+    assert_equal Hoccability::OLD_DATA, Hoccability::judge_coordinates(gps), "old fix"
+    gps[:timestamp] = Time.now.to_i
+    assert_equal Hoccability::GOOD_DATA, Hoccability::judge_coordinates(gps), "good fix"
   end
 
 end

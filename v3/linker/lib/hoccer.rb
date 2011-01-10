@@ -37,10 +37,10 @@ module Hoccer
     aput %r{#{CLIENTS}/environment$} do |uuid|
       authorized_request do |account|
         request_body = request.body.read
-        puts "put body: #{request_body}"
+        puts "#{uuid} PUT: #{request_body}"
         em_put( "/clients/#{uuid}/environment", request_body ) do |response|
           status 201
-          body { "Created" }
+          body { response[:content] }
         end
       end
     end

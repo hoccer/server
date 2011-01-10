@@ -5,7 +5,10 @@ module Hoccer
     WRONG_DATA = {:quality => 0, :info => "bad_data"}
     OLD_DATA = {:quality => 1, :info => "old_data"}
     NO_TIMESTAMP = {:quality => 1, :info => "no_timestamp"}
-    GOOD_DATA = {:quality => 3, :info => "good_data"}
+    IMPRECISE_DATA = {:quality => 1, :info => "imprecise_data"}
+    IMPRECISE_DATA = {:quality => 1, :info => "imprecise_data"}
+    GOOD_DATA = {:quality => 2, :info => "good_data"}
+    EXACT_DATA = {:quality => 3, :info => "exact_data"}
 
     def self.analyze env
       status = {}
@@ -26,7 +29,13 @@ module Hoccer
       return NO_TIMESTAMP unless gps[:timestamp]
       NO_DATA
 
-      judge_timestamp(gps) or GOOD_DATA
+      time = judge_timestamp(gps)
+      return time if time
+     
+      a = gps[:accuracy]
+      if (a < 20) then EXACT_DATA
+      elsif (a < 300) then GOOD_DATA
+      else IMPRECISE_DATA end
     end
 
     def self.judge_wifi wifi

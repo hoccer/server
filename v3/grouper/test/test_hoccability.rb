@@ -34,6 +34,10 @@ class TestHoccability < Test::Unit::TestCase
     assert_equal Hoccability::OLD_DATA, Hoccability::judge_coordinates(gps), "old fix"
     gps[:timestamp] = Time.now.to_i
     assert_equal Hoccability::GOOD_DATA, Hoccability::judge_coordinates(gps), "good fix"
+    gps[:accuracy] = 19
+    assert_equal Hoccability::EXACT_DATA, Hoccability::judge_coordinates(gps), "exact fix"
+    gps[:accuracy] = 350
+    assert_equal Hoccability::IMPRECISE_DATA, Hoccability::judge_coordinates(gps), "inaccurate fix"
   end
 
 end

@@ -84,7 +84,7 @@ class TestGrouper < Test::Unit::TestCase
            :timestamp => Time.now.to_i - 14.seconds}
         }.to_json
 
-    assert_equal Hoccability::GOOD_DATA, last_json_response[:coordinates], "coords"
+    assert_equal Hoccability::EXACT_DATA, last_json_response[:coordinates], "coords"
     assert_equal Hoccability::GOOD_DATA, last_json_response[:wifi], "wifi"
     assert_equal 3, last_json_response[:quality], "maximal overall quality"
   end

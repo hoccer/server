@@ -67,11 +67,26 @@ class TestGrouper < Test::Unit::TestCase
     put "/clients/#{UUID.generate}/environment", 
         {:wifi => 
           {:bssids => ["00:22:3f:11:5e:5d","00:26:4d:72:cc:90"], 
-           :timestamp => Time.now.to_i - 10}
+           :timestamp => Time.now.to_i - 10.seconds}
         }.to_json
 
-    assert_equal 1, last_json_response[:quality], "overall quality not so good because only wifi provided"
     assert_equal Hoccability::GOOD_DATA, last_json_response[:wifi]
-    
+    assert_equal 1, last_json_response[:quality], "overall quality not so good because only wifi provided"
   end
+
+  def test_getting_maximal_quality_feedback
+    put "/clients/#{UUID.generate}/environment", 
+        {:wifi => 
+          {:bssids => ["00:22:3f:11:5e:5d","00:26:4d:72:cc:90"], 
+           :timestamp => Time.now.to_i - 10.seconds},
+        :gps => 
+          {:longitude => 17.9993, :latitude => 43.1114, :accuracy => 11, 
+           :timestamp => Time.now.to_i - 14.seconds}
+        }.to_json
+
+    assert_equal Hoccability::GOOD_DATA, last_json_response[:coordinates], "coords"
+    assert_equal Hoccability::GOOD_DATA, last_json_response[:wifi], "wifi"
+    assert_equal 3, last_json_response[:quality], "maximal overall quality"
+  end
+
 end

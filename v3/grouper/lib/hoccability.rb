@@ -10,7 +10,7 @@ module Hoccer
     def self.analyze env
       status = {}
 
-      status[:coordinates] = env.has_gps ? judge_coordinates(env[:gps]) : NO_DATA
+      status[:coordinates] = env.has_gps ? judge_coordinates(env[:gps].with_indifferent_access) : NO_DATA
       status[:wifi] = env.has_wifi ? judge_wifi(env[:wifi].with_indifferent_access) : NO_DATA
 
       status[:quality] = 0

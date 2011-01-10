@@ -1,18 +1,19 @@
 module Hoccer
   class Hoccability
 
-    def self.status id, quality
-      {:msg_id => id, :quality => quality}
-    end
+    NO_DATA = {:quality => 0, :info => "no_data"}
 
     def self.analyze env
-      if not (env.has_gps or env.has_network or env.has_wifi)
-        status :no_message_infos_provided, 0
-      else
-        status :unknown_error, 0
-      end
-    end 
+      status = {}
 
+      status[:coordinates] = NO_DATA unless env.has_gps or env.has_network
+      status[:wifi] = NO_DATA unless env.has_wifi
+
+      status[:quality] = status[:coordinates][:quality]
+      status[:devices] = env.group.count
+
+      status
+    end 
 
   end
 end

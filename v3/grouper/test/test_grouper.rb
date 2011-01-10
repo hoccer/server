@@ -33,15 +33,34 @@ class TestGrouper < Test::Unit::TestCase
     assert_equal "JSON::ParserError: A JSON text must at least contain two octets!\n", last_response.body
   end
 
-  def test_getting_emtpy_environment_error
-    put "/clients/#{UUID.generate}/environment", {}.to_json
-    assert_equal Hoccability::status("no_message_infos_provided", 0), last_json_response
+  def assert_empty_environment
+    assert_equal Hoccability::NO_DATA, last_json_response[:coordinates]
+    assert_equal Hoccability::NO_DATA, last_json_response[:wifi]
+    assert_equal 0, last_json_response[:quality]
+    assert_equal 1, last_json_response[:devices], "lonely in the group"
   end
 
-  def test_getting_empty_environment_error_even_if_keys_exist
+  def test_getting_emtpy_environment_error
+    put "/clients/#{UUID.generate}/environment", {}.to_json
+    assert_empty_environment
+  end
+
+  def test_getting_empty_environment_error_if_only_the_keys_exist
     put "/clients/#{UUID.generate}/environment", 
         {:wifi => {}, :network => {}, :gps => {}}.to_json
-    assert_equal Hoccability::status("no_message_infos_provided", 0), last_json_response
+    assert_empty_environment
+  end
+
+  def test_getting_if_only_the_keys_exist
+    put "/clients/#{UUID.generate}/environment", 
+        {:wifi => {}, :network => {}, :gps => {}}.to_json
+    assert_empty_environment
+  end
+
+  def test_getting_lonley_client_error
+    put "/clients/#{UUID.generate}/environment", 
+        {:wifi => {}, :network => {}, :gps => {}}.to_json
+    assert_empty_environment
   end
 
 end

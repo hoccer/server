@@ -25,7 +25,6 @@ module Hoccer
         environment.destroy
       end
       e = Environment.create( environment_data.merge!( :client_uuid => uuid ) )
-
       
       (Hoccability.analyze e).to_json
     end

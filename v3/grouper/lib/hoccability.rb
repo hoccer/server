@@ -2,6 +2,7 @@ module Hoccer
   module Hoccability
 
     NO_DATA = {:quality => 0, :info => "no_data"}
+    BAD_DATA = {:quality => 0, :info => "bad_data"}
     GOOD_DATA = {:quality => 3, :info => "good_data"}
 
     def self.analyze env
@@ -25,6 +26,7 @@ module Hoccer
 
     def self.judge_wifi bssids
       return NO_DATA unless bssids.class.equal? Array
+      return BAD_DATA unless bssids.inject(true) {|valid, bssid| bssid.match /^(\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2})?$/}
       
       GOOD_DATA
     end

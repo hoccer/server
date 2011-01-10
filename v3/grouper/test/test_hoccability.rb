@@ -19,7 +19,8 @@ class TestHoccability < Test::Unit::TestCase
   end
 
   def test_judging_wifi
-    assert_equal Hoccability::GOOD_DATA, Hoccability::judge_wifi(["ff:ff"])    
+    assert_equal Hoccability::BAD_DATA, Hoccability::judge_wifi(["ff:ff"]), "bad bssids"
+    assert_equal Hoccability::GOOD_DATA, Hoccability::judge_wifi(["00:22:3f:11:5e:5d","00:26:4d:72:cc:90"]), "good bssids"
   end
 
 end

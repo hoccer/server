@@ -1,9 +1,20 @@
 require 'helper'
 
 module Hoccer
+  class Group < Hash
+    def self.from_json json_string
+        begin
+          group = JSON.parse json_string
+        rescue => e
+          puts e
+          group = {}
+        end
+        group
+      end
+  end
+  
   
   class Event
-
     def initialize action_store
       @action_store = action_store
     end
@@ -13,7 +24,7 @@ module Hoccer
       @action_store[uuid] = action
 
       em_get( "/clients/#{uuid}/group") do |response|
-        group = group_from_json response[:content]
+        group = Group.from_json response[:content]
 
         if group.size < 2 && !waiting
           @action_store.invalidate uuid
@@ -58,18 +69,6 @@ module Hoccer
     def timeout
       2
     end
-
-    private
-    def group_from_json json_string
-      begin
-        group = JSON.parse json_string
-      rescue => e
-        puts e
-        group = {}
-      end
-      group
-    end
-
   end
 
   class OneToOne < Event

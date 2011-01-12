@@ -68,11 +68,10 @@ module Hoccer
 
     aget %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
       action = { :mode => action_name, :type => :receiver, :request => self, :uuid => uuid }
-
       @@evaluators[action_name].add action, params['waiting']
     end
     
-    # javasctipt routes
+    # javascript routes
     aget %r{/clients/([a-zA-Z0-9\-]{36,36})/environment.js} do |uuid|
       environment = Hash.new
       environment["gps"] = {

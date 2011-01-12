@@ -1,6 +1,6 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 require 'helper'
-require 'test_client'
+require 'linccer_client'
 require 'mongo'
 require 'net/http'
 

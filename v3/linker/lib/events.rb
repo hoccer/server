@@ -12,7 +12,7 @@ module Hoccer
       @action_store[uuid] = action
 
       em_get( "/clients/#{uuid}/group") do |response|
-        group = parse_group response[:content]
+        group = group_from_json response[:content]
 
         if group.size < 2 && !waiting
           @action_store.invalidate uuid
@@ -40,7 +40,7 @@ module Hoccer
     end
 
     private
-    def parse_group json_string
+    def group_from_json json_string
       begin
         group = JSON.parse json_string
       rescue => e

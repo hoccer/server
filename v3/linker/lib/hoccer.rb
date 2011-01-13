@@ -84,7 +84,7 @@ module Hoccer
       puts "put body #{environment}"
       em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
         status 201
-        body {"#{params['jsonp']}({content: \"hallo\"})"}
+        body {"#{params['jsonp']}(#{environment.to_json})"}
       end
     end
     

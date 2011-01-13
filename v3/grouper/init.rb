@@ -3,6 +3,7 @@ require 'uuid'
 require 'mongoid'
 require 'grouper'
 require 'environment'
+require 'hoccability'
 require 'ruby-debug'
 
 def load_config env

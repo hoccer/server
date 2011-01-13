@@ -1,9 +1,11 @@
 require 'mongoid'
 
-EARTH_RADIUS = 1000 * 6371
-
 module Hoccer
   class Environment
+
+    GUARANTEED_DISTANCE = 200.0
+    MAX_SEARCH_DISTANCE  = 5050.0
+    EARTH_RADIUS = 1000 * 6371
 
     include Mongoid::Document
     store_in :environments
@@ -13,7 +15,7 @@ module Hoccer
     field :network,     :type => Hash
     field :group_id
 
-    before_create :add_group_id, :add_creation_time
+    before_create :add_group_id, :add_creation_time, :normalize_bssids, :choose_best_location
     before_save   :ensure_indexable
     after_create  :update_groups
 
@@ -22,24 +24,39 @@ module Hoccer
     end
 
     def group
-      puts "looking for group: #{self[:group_id]}"
-
       Environment
         .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 30} })
         .only(:client_uuid, :group_id).to_a || []
     end
 
-    def nearby_bssids
-      return [] unless self.wifi
+    def has_wifi
+      return false unless self.wifi
+      w = self.wifi.with_indifferent_access
+      w[:bssids] && w[:bssids].count > 0
+    end
 
-      bssids = self.wifi[:bssids] || self.wifi["bssids"]
+    def has_gps
+      return false unless self.gps
+      g = self.gps.with_indifferent_access
+      g[:latitude] && g[:longitude] && g[:accuracy]
+    end
+
+    def has_network
+      self[:network] && self[:network][:latitude] && self[:network][:longitude] && self[:network][:accuracy]
+    end
+
+    def nearby_bssids
+      return [] unless has_wifi
+
+      bssids = self.wifi.with_indifferent_access[:bssids]
+      return [] unless bssids
       Environment.any_of(
         *(bssids.map { |bssid| {"wifi.bssids" => bssid} })
       ).to_a
     end
 
     def nearby_gps
-      return [] unless gps
+      return [] unless has_gps
 
       lon = ( gps[:longitude] || gps["longitude"] )
       lat = ( gps[:latitude]  || gps["latitude"] )
@@ -48,13 +65,15 @@ module Hoccer
       results = Environment.db.command({
         "geoNear"     => "environments",
         "near"        => [lon.to_f, lat.to_f],
-        "maxDistance" => 0.00078480615288,
+        "maxDistance" => MAX_SEARCH_DISTANCE / EARTH_RADIUS,
         "spherical" => true,
         "query" => { "created_at" => {"$gt" => Time.now.to_f - 30}}
       })["results"]
 
       results.select! do |result|
-        (result["dis"] * EARTH_RADIUS) < ((result["obj"]["gps"]["accuracy"] + acc) * 2)
+        distance = (result["dis"] * EARTH_RADIUS) # in meters
+        uncerteny = [(result["obj"]["gps"]["accuracy"] + acc) * 2, MAX_SEARCH_DISTANCE].min
+        distance <= [GUARANTEED_DISTANCE, uncerteny].max
       end
 
       results.map do |result|
@@ -68,7 +87,7 @@ module Hoccer
 
     private
     def ensure_indexable
-      return unless self.gps
+      return unless has_gps
       begin
         location = {
           "longitude" => ( self.gps["longitude"] || self.gps[:longitude] ),
@@ -89,11 +108,23 @@ module Hoccer
       self[:created_at] = Time.now.to_f
     end
 
+    def normalize_bssids
+      return unless has_wifi
+      wifi = self.wifi.with_indifferent_access
+
+      bssids = wifi[:bssids]
+      return unless bssids
+      self.wifi[:bssids] = bssids.map do |bssid|
+        bssid.gsub(/\b([A-Fa-f0-9])\b/, '0\1').downcase
+      end
+      self.wifi.delete("bssids")
+    end
+
     def update_groups
-      puts "updating ><<<<<>>>"
+      puts "updating <#{self[:client_uuid]}> to #{self.inspect}"
       relevant_envs = self.nearby | self.nearby_bssids
 
-      grouped_envs  = relevant_envs.inject([]) do |result, element|
+      grouped_envs = relevant_envs.inject([]) do |result, element|
         element.group.each do |group_env|
           unless result.include?( group_env )
             result << group_env
@@ -107,21 +138,20 @@ module Hoccer
         foobar[:group_id] = new_group_id
         foobar.save
       end
+      if grouped_envs and grouped_envs.count > 1
+        puts "grouped <#{grouped_envs.map {|e|  e.client_uuid rescue "<unknown>"} }>"
+      end
 
       reload
     end
 
-    def best_location
-      if !gps && !network
-        nil
-      elsif gps && !network
-        gps
-      elsif !gps && network
-        network
-      elsif network[:timestamp] < gps[:timestamp]
-        network
-      else
-        gps
+    def choose_best_location
+      if has_network
+        if not has_gps
+          self.gps = self[:network]
+        elsif self[:network][:timestamp] > self.gps[:timestamp]
+          self.gps = self[:network]
+        end
       end
     end
   end

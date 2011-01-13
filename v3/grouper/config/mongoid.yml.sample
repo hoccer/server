@@ -10,9 +10,11 @@ test:
   database: hoccer_development
   persist_in_safe_mode: true
   reconnect_time: 3
+  logger:
 
 production:
   host: localhost
   database: hoccer_development
   persist_in_safe_mode: true
   reconnect_time: 3
+  logger:

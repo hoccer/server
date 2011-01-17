@@ -14,6 +14,8 @@ module Hoccer
       register Sinatra::Reloader
     end
 
+    set :public, File.join(File.dirname(__FILE__), '..', '/public')
+
     @@action_store  = ActionStore.new
     @@evaluators    = {}
 
@@ -70,7 +72,7 @@ module Hoccer
       action = { :mode => action_name, :type => :receiver, :request => self, :uuid => uuid }
       @@evaluators[action_name].add action, params['waiting']
     end
-    
+
     # javascript routes
     aget %r{/clients/([a-zA-Z0-9\-]{36,36})/environment.js} do |uuid|
       environment = Hash.new
@@ -80,14 +82,14 @@ module Hoccer
         "accuracy" => params["accuracy"].to_f,
         "timestamp" => params["timestamp"].to_f
       }
-      
+
       puts "put body #{environment}"
       em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
         status 201
         body {"#{params['jsonp']}(#{environment.to_json})"}
       end
     end
-    
+
     aget %r{/clients/([a-zA-Z0-9\-]{36,36})/action/send.js} do |uuid|
       puts params["payload"]
       action  = {
@@ -96,16 +98,16 @@ module Hoccer
         :payload  => params["payload"],
         :request  => self,
         :uuid     => uuid,
-        :jsonp_method => params["jsonp"]  
+        :jsonp_method => params["jsonp"]
       }
 
       @@evaluators[params["mode"]].add action
     end
 
     aget %r{/clients/([a-zA-Z0-9\-]{36,36})/action/receive.js} do |uuid|
-      action = { :mode => params["mode"], 
-                 :type => :receiver, 
-                 :request => self, 
+      action = { :mode => params["mode"],
+                 :type => :receiver,
+                 :request => self,
                  :uuid => uuid,
                  :jsonp_method => params["jsonp"] }
 

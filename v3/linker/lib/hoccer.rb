@@ -75,18 +75,20 @@ module Hoccer
 
     # javascript routes
     aget %r{/clients/([a-zA-Z0-9\-]{36,36})/environment.js} do |uuid|
-      environment = Hash.new
-      environment["gps"] = {
-        "latitude" => params["latitude"].to_f,
-        "longitude" => params["longitude"].to_f,
-        "accuracy" => params["accuracy"].to_f,
-        "timestamp" => params["timestamp"].to_f
-      }
+      authorized_request do
+        environment = Hash.new
+        environment["gps"] = {
+          "latitude" => params["latitude"].to_f,
+          "longitude" => params["longitude"].to_f,
+          "accuracy" => params["accuracy"].to_f,
+          "timestamp" => params["timestamp"].to_f
+        }
 
-      puts "put body #{environment}"
-      em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
-        status 201
-        body {"#{params['jsonp']}(#{environment.to_json})"}
+        puts "put body #{environment}"
+        em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
+          status 201
+          body {"#{params['jsonp']}(#{environment.to_json})"}
+        end
       end
     end
 

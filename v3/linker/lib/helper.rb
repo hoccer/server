@@ -57,12 +57,10 @@ def authorized_request &block
     referer = env['HTTP_REFERER'].match(/^(https?:\/\/[\d\w\-_.]+)\//)[1]
   end
   
-  puts env.inspect
-  
   if ENV["RACK_ENV"] == "production"
     EM.next_tick do
-      db          = EM::Mongo::Connection.new.db( Hoccer.config["database"] )
-      collection  = db.collection('accounts')
+      @db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
+      collection  = @db.collection('accounts')
 
       collection.first("api_key" => params["api_key"]) do |account|
         if account.nil?

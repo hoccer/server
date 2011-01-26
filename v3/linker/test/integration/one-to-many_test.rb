@@ -10,7 +10,7 @@ class TestOneToMany < Test::Unit::TestCase
     coll = db.collection('environments')
     coll.remove
   end
-
+  
   test 'two in group - one sender - one receiver' do
     client_1 = create_client
     client_2 = create_client

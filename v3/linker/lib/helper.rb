@@ -59,8 +59,6 @@ def authorized_request &block
   
   if ENV["RACK_ENV"] == "production"
     EM.next_tick do
-      @@db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
-      collection  = @@db.collection('accounts')
 
       collection.first("api_key" => params["api_key"]) do |account|
         if account.nil?
@@ -77,10 +75,21 @@ def authorized_request &block
             halt_with_error 401, "Invalid Signature"
           end
         end
-      @@db.close
       end
     end
   else
     block.call
   end
+end
+
+private
+@@collection = nil;
+def collection
+  unless @@collection
+    puts "creating collection"
+    db            = EM::Mongo::Connection.new.db( Hoccer.config["database"] )
+    @@collection ||= db.collection('accounts')
+  end
+  
+  @@collection
 end

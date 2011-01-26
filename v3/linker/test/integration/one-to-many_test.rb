@@ -11,10 +11,6 @@ class TestOneToMany < Test::Unit::TestCase
     coll.remove
   end
   
-  def teardown
-    db.close
-  end
-
   test 'two in group - one sender - one receiver' do
     client_1 = create_client
     client_2 = create_client

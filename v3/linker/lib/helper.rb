@@ -77,6 +77,7 @@ def authorized_request &block
             halt_with_error 401, "Invalid Signature"
           end
         end
+      @@db.close
       end
     end
   else

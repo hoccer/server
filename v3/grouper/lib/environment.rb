@@ -151,7 +151,7 @@ module Hoccer
       if has_network
         if not has_gps
           self.gps = self[:network]
-        elsif self[:network][:timestamp] > self.gps[:timestamp]
+        elsif self.network[:timestamp] > self.gps[:timestamp]
           self.gps = self[:network]
         end
       end

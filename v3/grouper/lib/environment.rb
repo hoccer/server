@@ -42,7 +42,9 @@ module Hoccer
     end
 
     def has_network
-      self[:network] && self[:network][:latitude] && self[:network][:longitude] && self[:network][:accuracy]
+      return false unless self.network
+      n = self.network.with_indifferent_access
+      n && n[:latitude] && n[:longitude] && n[:accuracy]
     end
 
     def nearby_bssids

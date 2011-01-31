@@ -149,10 +149,12 @@ module Hoccer
 
     def choose_best_location
       if has_network
+        n = self.network.with_indifferent_access
+        g = self.gps.with_indifferent_access
         if not has_gps
-          self.gps = self[:network]
-        elsif self.network[:timestamp] > self.gps[:timestamp]
-          self.gps = self[:network]
+          self.gps = n
+        elsif n[:timestamp] > g[:timestamp]
+          self.gps = n
         end
       end
     end

@@ -42,7 +42,9 @@ module Hoccer
     end
 
     def has_network
-      self[:network] && self[:network][:latitude] && self[:network][:longitude] && self[:network][:accuracy]
+      return false unless self.network
+      n = self.network.with_indifferent_access
+      n && n[:latitude] && n[:longitude] && n[:accuracy]
     end
 
     def nearby_bssids
@@ -147,10 +149,11 @@ module Hoccer
 
     def choose_best_location
       if has_network
+        n = self.network.with_indifferent_access
         if not has_gps
-          self.gps = self[:network]
-        elsif self[:network][:timestamp] > self.gps[:timestamp]
-          self.gps = self[:network]
+          self.gps = n
+        elsif n[:timestamp] > self.gps.with_indifferent_access[:timestamp]
+          self.gps = n
         end
       end
     end

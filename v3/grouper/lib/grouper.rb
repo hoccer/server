@@ -3,7 +3,7 @@ require 'sinatra'
 module Hoccer
   class Grouper < Sinatra::Base
     set :show_exceptions, false # we render our own errors
-    
+
     error do
       e = request.env['sinatra.error'];
       "#{e.class}: #{e.message}\n"
@@ -25,7 +25,7 @@ module Hoccer
         environment.destroy
       end
       e = Environment.create( environment_data.merge!( :client_uuid => uuid ) )
-      
+
       (Hoccability.analyze e).to_json
     end
 

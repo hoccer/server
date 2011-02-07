@@ -103,7 +103,7 @@ module Hoccer
     end
 
     def timeout
-      7
+      4
     end
 
     def conflict? sender, receiver

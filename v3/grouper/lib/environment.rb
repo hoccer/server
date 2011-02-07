@@ -4,8 +4,8 @@ module Hoccer
   class Environment
 
     GUARANTEED_DISTANCE = 200.0
-    MAX_SEARCH_DISTANCE  = 5050.0
-    EARTH_RADIUS = 1000 * 6371
+    MAX_SEARCH_DISTANCE = 5050.0
+    EARTH_RADIUS        = 1000 * 6371
 
     include Mongoid::Document
     store_in :environments
@@ -26,7 +26,7 @@ module Hoccer
     def group
       Environment
         .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 30} })
-        .only(:client_uuid, :group_id).to_a || []
+        .only(:client_uuid, :group_id, :latency ).to_a || []
     end
 
     def has_wifi

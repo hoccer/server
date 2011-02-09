@@ -31,7 +31,7 @@ class ActionStore < Hash
   end
 
   def send uuid, content
-    puts "data #{content.inspect} for #{uuid}"
+    puts "sending data #{content.inspect} to #{uuid}"
 
     action = self[uuid]
     if action && action[:request]
@@ -57,7 +57,7 @@ class ActionStore < Hash
 
   private
   def send_no_content action
-    puts "timeout for #{self[uuid]}"
+    puts "timeout for #{action[:uuid]}"
     
     if action && action[:request]
       Logger.failed_action action

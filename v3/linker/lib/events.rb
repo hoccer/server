@@ -12,8 +12,8 @@ module Hoccer
         group
       end
   end
-  
-  
+
+
   class Event
     def initialize action_store
       @action_store = action_store
@@ -24,15 +24,22 @@ module Hoccer
       @action_store[uuid] = action
 
       em_get( "/clients/#{uuid}/group") do |response|
-        group = Group.from_json response[:content]
+        group       = Group.from_json response[:content]
+
+        if 1 < group.size && group.any? { |x| x["latency"] }
+          latencies = group.map { |x| ( x["latency"] || 1 ) }
+          max_latency = latencies.max / 1000
+        else
+          max_latency = 1
+        end
 
         if group.size < 2 && !waiting
           @action_store.invalidate uuid
         else
           verify group
         end
-        
-        EM::Timer.new(timeout) do
+
+        EM::Timer.new(max_latency + timeout) do
           if @action_store[uuid]
             verify group, true
             @action_store.invalidate(uuid) unless waiting
@@ -40,12 +47,12 @@ module Hoccer
         end
       end
     end
-    
+
     def verify group, reevaluate = false
       actions = @action_store.actions_in_group(group, name)
       sender   = actions.select { |c| c[:type] == :sender }
       receiver = actions.select { |c| c[:type] == :receiver }
-      
+
       puts "verifying group (#{group.size}) with #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
       if conflict? sender, receiver
@@ -59,7 +66,7 @@ module Hoccer
         end
       end
     end
-    
+
     def conflict actions
       actions.each do |client|
         @action_store.conflict client[:uuid]
@@ -78,13 +85,13 @@ module Hoccer
     end
 
     def timeout
-      2
+      1.2
     end
 
     def conflict? sender, receiver
       sender.size > 1 || receiver.size > 1
     end
-    
+
     def success? sender, receiver, group, reevaluate
       sender.size == 1 && receiver.size == 1 && (group.size == 2 || reevaluate)
     end
@@ -94,19 +101,19 @@ module Hoccer
     def name
       "one-to-many"
     end
-    
+
     def timeout
-      7
+      4
     end
 
     def conflict? sender, receiver
       sender.size > 1
     end
-    
+
     def success? sender, receiver, group, reevaluate
       sender.size == 1 && receiver.size >= 1 && (sender.size + receiver.size == group.size || reevaluate)
     end
-    
+
   end
 end
 

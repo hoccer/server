@@ -4,8 +4,8 @@ module Hoccer
   class Environment
 
     GUARANTEED_DISTANCE = 200.0
-    MAX_SEARCH_DISTANCE  = 5050.0
-    EARTH_RADIUS = 1000 * 6371
+    MAX_SEARCH_DISTANCE = 5050.0
+    EARTH_RADIUS        = 1000 * 6371
 
     include Mongoid::Document
     store_in :environments
@@ -26,7 +26,7 @@ module Hoccer
     def group
       Environment
         .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 30} })
-        .only(:client_uuid, :group_id).to_a || []
+        .only(:client_uuid, :group_id, :latency ).to_a || []
     end
 
     def has_wifi
@@ -42,7 +42,9 @@ module Hoccer
     end
 
     def has_network
-      self[:network] && self[:network][:latitude] && self[:network][:longitude] && self[:network][:accuracy]
+      return false unless self.network
+      n = self.network.with_indifferent_access
+      n && n[:latitude] && n[:longitude] && n[:accuracy]
     end
 
     def nearby_bssids
@@ -147,10 +149,11 @@ module Hoccer
 
     def choose_best_location
       if has_network
+        n = self.network.with_indifferent_access
         if not has_gps
-          self.gps = self[:network]
-        elsif self[:network][:timestamp] > self.gps[:timestamp]
-          self.gps = self[:network]
+          self.gps = n
+        elsif n[:timestamp] > self.gps.with_indifferent_access[:timestamp]
+          self.gps = n
         end
       end
     end

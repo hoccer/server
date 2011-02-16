@@ -99,11 +99,19 @@ module Hoccer
     end
 
     aget %r{/clients/([a-zA-Z0-9\-]{36,36})/action/send.js} do |uuid|
-      puts params["payload"]
+      
+      puts params["payload"];
+      if params["payload"]
+        content = params["payload"]
+        content['data'] = content['data'].values
+      end
+      
+      puts content
+      
       action  = {
         :mode     => params["mode"],
         :type     => :sender,
-        :payload  => params["payload"],
+        :payload  => content,
         :request  => self,
         :uuid     => uuid,
         :jsonp_method => params["jsonp"]

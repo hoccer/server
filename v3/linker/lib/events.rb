@@ -25,7 +25,13 @@ module Hoccer
 
       em_get( "/clients/#{uuid}/group") do |response|
         group       = Group.from_json response[:content]
-        max_latency = ( group.map{|x| x["latency"]}.max / 1000 )
+
+        if 1 < group.size && group.any? { |x| x["latency"] }
+          latencies = group.map { |x| ( x["latency"] || 1 ) }
+          max_latency = latencies.max / 1000
+        else
+          max_latency = 1
+        end
 
         if group.size < 2 && !waiting
           @action_store.invalidate uuid
@@ -41,12 +47,12 @@ module Hoccer
         end
       end
     end
-    
+
     def verify group, reevaluate = false
       actions = @action_store.actions_in_group(group, name)
       sender   = actions.select { |c| c[:type] == :sender }
       receiver = actions.select { |c| c[:type] == :receiver }
-      
+
       puts "verifying group (#{group.size}) with #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
       if conflict? sender, receiver
@@ -60,7 +66,7 @@ module Hoccer
         end
       end
     end
-    
+
     def conflict actions
       actions.each do |client|
         @action_store.conflict client[:uuid]
@@ -97,7 +103,7 @@ module Hoccer
     end
 
     def timeout
-      7
+      4
     end
 
     def conflict? sender, receiver

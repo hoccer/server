@@ -144,16 +144,20 @@
     </div> <!-- people layer -->
 
 	<!-- Piwik -->
-	<script type="text/javascript">
-	var pkBaseURL = (("https:" == document.location.protocol) ? "https://stats.artcom.de/" : "http://stats.artcom.de/");
-	document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
-	</script><script type="text/javascript">
-	try {
-	var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
-	piwikTracker.trackPageView();
-	piwikTracker.enableLinkTracking();
-	} catch( err ) {}
-	</script><noscript><p><img src="http://stats.artcom.de/piwik.php?idsite=1" style="border:0" alt=""/></p></noscript>
+	<!-- Piwik plugin active -->				<!-- Piwik code inserted by Piwik Analytics Wordpress plugin by Jules Stuifbergen http://forwardslash.nl/piwik-analytics/ -->
+					<script type="text/javascript">
+										var pkBaseURL = document.location.protocol + "//" + "stats.hoccer.com" + "/";
+									document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+					</script><script type="text/javascript">
+					try {
+					var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+					piwikTracker.setDocumentTitle(document.title);
+					piwikTracker.trackPageView();
+								piwikTracker.enableLinkTracking();
+								} catch( err ) {}
+					</script>
+					<!-- /Piwik -->
+					<noscript><p><img src="http://stats.hoccer.de/piwik.php?idsite=1" style="border:0" alt=""/></p></noscript>
 	<!-- End Piwik Tag -->
   </body>
 </html>

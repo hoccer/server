@@ -12,14 +12,14 @@ class ActionStore < Hash
 
   def invalidate uuid
     action = self[uuid]
-    send_no_content action
+    send_no_content action unless action.nil?
     self[uuid] = nil
   end
 
   def conflict uuid
     action = self[uuid]
     if action && action[:request]
-      if (jsonp = action[:jsonp_method]) 
+      if (jsonp = action[:jsonp_method])
         action[:request].status 200
         action[:request].body { "#{jsonp}(#{ {"message" => "conflict"}.to_json })" }
       else
@@ -36,7 +36,7 @@ class ActionStore < Hash
     action = self[uuid]
     if action && action[:request]
       action[:request].status 200
-      if (jsonp = action[:jsonp_method]) 
+      if (jsonp = action[:jsonp_method])
         action[:request].body { "#{jsonp}(#{content.to_json})" }
       else
         action[:request].body content.to_json
@@ -58,18 +58,18 @@ class ActionStore < Hash
   private
   def send_no_content action
     puts "timeout for #{action[:uuid]}"
-    
+
     if action && action[:request]
       Logger.failed_action action
       request = action[:request]
-      if (jsonp = action[:jsonp_method]) 
+      if (jsonp = action[:jsonp_method])
         request.status 200
         action[:request].body { "#{jsonp}(#{ {"message" => "timeout"}.to_json})" }
       else
         request.status 204
         request.body { {"message" => "timeout"}.to_json }
       end
-      
+
     end
   end
 end

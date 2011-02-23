@@ -1,5 +1,4 @@
 require 'sinatra/reloader'
-require 'logger'
 require 'action_store'
 require 'events'
 require 'helper'
@@ -12,6 +11,18 @@ module Hoccer
 
     configure(:development) do
       register Sinatra::Reloader
+    end
+
+    helpers do
+      def logger
+        MuninLogger
+      end
+    end
+
+    before do
+      EM::Timer.new(60) do
+        ahalt 504
+      end
     end
 
     set :public, File.join(File.dirname(__FILE__), '..', '/public')
@@ -37,6 +48,7 @@ module Hoccer
     end
 
     aput %r{#{CLIENTS}/environment$} do |uuid|
+      logger.info "202"
       authorized_request do |account|
         request_body = request.body.read
         puts "#{uuid} PUT: #{request_body}"

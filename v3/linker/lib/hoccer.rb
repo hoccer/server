@@ -47,7 +47,7 @@ module Hoccer
       end
     end
 
-    adelete %r{#{CLIENTS}/environment} do |uuid|
+    adelete %r{#{CLIENTS}/environment$} do |uuid|
       em_delete("/clients/#{uuid}/delete") do |response|
         status 200
         body {"deleted"}
@@ -74,7 +74,7 @@ module Hoccer
     end
 
     # javascript routes
-    aget %r{/clients/([a-zA-Z0-9\-]{36,36})/environment.js} do |uuid|
+    aget %r{#{CLIENTS}/environment.js$} do |uuid|
       authorized_request do
         environment = Hash.new
         environment["gps"] = {
@@ -92,16 +92,16 @@ module Hoccer
       end
     end
 
-    aget %r{/clients/([a-zA-Z0-9\-]{36,36})/action/send.js} do |uuid|
-      
+    aget %r{#{CLIENTS}/action/send.js$} do |uuid|
+
       puts params["payload"];
       if params["payload"]
         content = params["payload"]
         content['data'] = content['data'].values
       end
-      
+
       puts content
-      
+
       action  = {
         :mode     => params["mode"],
         :type     => :sender,
@@ -114,7 +114,7 @@ module Hoccer
       @@evaluators[params["mode"]].add action
     end
 
-    aget %r{/clients/([a-zA-Z0-9\-]{36,36})/action/receive.js} do |uuid|
+    aget %r{#{CLIENTS}/action/receive.js$} do |uuid|
       action = { :mode => params["mode"],
                  :type => :receiver,
                  :request => self,

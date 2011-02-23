@@ -60,7 +60,6 @@ class ActionStore < Hash
     puts "timeout for #{action[:uuid]}"
 
     if action && action[:request]
-      Logger.failed_action action
       request = action[:request]
       if (jsonp = action[:jsonp_method])
         request.status 200

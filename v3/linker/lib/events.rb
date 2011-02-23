@@ -59,7 +59,6 @@ module Hoccer
         conflict actions
       elsif success? sender, receiver, group, reevaluate
         data_list = sender.map { |s| s[:payload] }
-        Logger.successful_actions actions
 
         actions.each do |client|
           @action_store.send client[:uuid], data_list

@@ -81,8 +81,14 @@ module Hoccer
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
-      action = { :mode => action_name, :type => :receiver, :request => self, :uuid => uuid }
-      @@evaluators[action_name].add action, params['waiting']
+      action = {
+        :mode     => action_name,
+        :type     => :receiver,
+        :request  => self,
+        :uuid     => uuid,
+        :waiting  => params['waiting'] || false
+      }
+      @@evaluators[action_name].add action
     end
 
     # javascript routes

@@ -19,7 +19,7 @@ module Hoccer
       @action_store = action_store
     end
 
-    def add action, waiting = false
+    def add action
       uuid = action[:uuid]
       @action_store[uuid] = action
 
@@ -33,7 +33,7 @@ module Hoccer
           max_latency = 1
         end
 
-        if group.size < 2 && !waiting
+        if group.size < 2 && !action[:waiting]
           @action_store.invalidate uuid
         else
           verify group
@@ -42,7 +42,7 @@ module Hoccer
         EM::Timer.new(max_latency + timeout) do
           if @action_store[uuid]
             verify group, true
-            @action_store.invalidate(uuid) unless waiting
+            @action_store.invalidate(uuid) unless action[:waiting]
           end
         end
       end

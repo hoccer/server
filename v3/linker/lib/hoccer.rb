@@ -102,6 +102,11 @@ module Hoccer
           "timestamp" => params["timestamp"].to_f
         }
 
+        environment["wifi"] = {
+          "bssids"    => params["bssids"],
+          "timestamp" => Time.now.to_i
+        }
+
         puts "put body #{environment}"
         em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
           status 201

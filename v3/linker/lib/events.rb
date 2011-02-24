@@ -66,7 +66,7 @@ module Hoccer
           end
         end
 
-        sender.each {|s| @action_store.invalidate s[:uuid]}
+        sender.each {|s| @action_store.send( s[:uuid], data_list ) }
       end
 
       if conflict? sender, receiver

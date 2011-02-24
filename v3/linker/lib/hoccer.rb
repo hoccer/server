@@ -107,10 +107,12 @@ module Hoccer
           "timestamp" => Time.now.to_i
         }
 
+        callback_method = params["jsonp"] || params["callback"]
+
         puts "put body #{environment}"
         em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
           status 201
-          body {"#{params['jsonp']}(#{environment.to_json})"}
+          body {"#{callback_method}(#{environment.to_json})"}
         end
       end
     end
@@ -131,7 +133,7 @@ module Hoccer
         :payload  => content,
         :request  => self,
         :uuid     => uuid,
-        :jsonp_method => params["jsonp"]
+        :jsonp_method => (params["jsonp"] || params["callback"])
       }
 
       @@evaluators[params["mode"]].add action
@@ -143,7 +145,7 @@ module Hoccer
         :type         => :receiver,
         :request      => self,
         :uuid         => uuid,
-        :jsonp_method => params["jsonp"],
+        :jsonp_method => (params["jsonp"] || params["callback"]),
         :waiting      => params["waiting"] || false
       }
 

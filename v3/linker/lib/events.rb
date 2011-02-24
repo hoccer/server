@@ -55,10 +55,18 @@ module Hoccer
 
       puts "verifying group (#{group.size}) with #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
-      actions.select {|a| a[:waiting]}.each do |waiter|
+      waiter = actions.select {|a| a[:waiting]}
+
+      if 0 < waiter.size
         data_list = sender.map { |s| s[:payload] }
 
-        @action_store.send waiter[:uuid], data_list
+        unless data_list.empty?
+          waiter.each do |waiter|
+            @action_store.send waiter[:uuid], data_list
+          end
+        end
+
+        sender.each {|s| @action_store.invalidate s[:uuid]}
       end
 
       if conflict? sender, receiver

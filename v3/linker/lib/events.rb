@@ -55,6 +55,12 @@ module Hoccer
 
       puts "verifying group (#{group.size}) with #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
+      actions.select {|a| a[:waiting]}.each do |waiter|
+        data_list = sender.map { |s| s[:payload] }
+
+        @action_store.send waiter[:uuid], data_list
+      end
+
       if conflict? sender, receiver
         conflict actions
       elsif success? sender, receiver, group, reevaluate

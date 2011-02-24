@@ -12,7 +12,7 @@ class ActionStore < Hash
 
   def invalidate uuid
     action = self[uuid]
-    send_no_content action
+    send_no_content action unless action.nil?
     self[uuid] = nil
   end
 
@@ -60,7 +60,6 @@ class ActionStore < Hash
     puts "timeout for #{action[:uuid]}"
 
     if action && action[:request]
-      Logger.failed_action action
       request = action[:request]
       if (jsonp = action[:jsonp_method])
         request.status 200

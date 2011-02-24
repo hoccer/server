@@ -10,7 +10,10 @@ module Hoccer
     end
 
     not_found do
-      'resource could not be found.'
+      puts ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+      puts request.env
+      puts "-----------------------------"
+      { :message => "Not Found" }.to_json
     end
 
     get "/" do

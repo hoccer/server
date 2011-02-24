@@ -133,13 +133,16 @@ module Hoccer
     end
 
     aget %r{#{CLIENTS}/action/receive.js$} do |uuid|
-      action = { :mode => params["mode"],
-                 :type => :receiver,
-                 :request => self,
-                 :uuid => uuid,
-                 :jsonp_method => params["jsonp"] }
+      action = {
+        :mode         => params["mode"],
+        :type         => :receiver,
+        :request      => self,
+        :uuid         => uuid,
+        :jsonp_method => params["jsonp"],
+        :waiting      => params["waiting"] || false
+      }
 
-      @@evaluators[params["mode"]].add action, params['waiting']
+      @@evaluators[params["mode"]].add action
     end
 
   end

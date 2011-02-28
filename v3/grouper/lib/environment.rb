@@ -51,8 +51,9 @@ module Hoccer
       return [] unless has_wifi
 
       bssids = self.wifi.with_indifferent_access[:bssids]
+
       return [] unless bssids
-      Environment.any_of(
+      Environment.where({ "created_at" => {"$gt" => Time.now.to_f - 30}}).any_of(
         *(bssids.map { |bssid| {"wifi.bssids" => bssid} })
       ).to_a
     end
@@ -123,8 +124,7 @@ module Hoccer
     end
 
     def update_groups
-      puts "updating <#{self[:client_uuid]}> to #{self.inspect}"
-      relevant_envs = self.nearby | self.nearby_bssids
+      relevant_envs = self.nearby
 
       grouped_envs = relevant_envs.inject([]) do |result, element|
         element.group.each do |group_env|
@@ -141,7 +141,7 @@ module Hoccer
         foobar.save
       end
       if grouped_envs and grouped_envs.count > 1
-        puts "grouped <#{grouped_envs.map {|e|  e.client_uuid rescue "<unknown>"} }>"
+        #puts "grouped <#{grouped_envs.map {|e|  e.client_uuid rescue "<unknown>"} }>"
       end
 
       reload

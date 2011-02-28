@@ -47,7 +47,7 @@ class ActionStore < Hash
 
   def actions_in_group group, mode
     actions = group.inject([]) do |result, environment|
-      action = self[ environment["client_uuid"] ]
+      action = self[ environment["client_uuid"] ] rescue nil
       result << action unless action.nil?
       result
     end

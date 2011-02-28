@@ -29,6 +29,9 @@ module Hoccer
         if 1 < group.size && group.any? { |x| x["latency"] }
           latencies = group.map { |x| ( x["latency"] || 1 ) }
           max_latency = latencies.max / 1000
+          if max_latency > 4
+            max_latency = 4
+          end
         else
           max_latency = 1
         end

@@ -31,7 +31,7 @@ class ActionStore < Hash
   end
 
   def send uuid, content
-    puts "sending data #{content.inspect} to #{uuid}"
+    #puts "sending data #{content.inspect} to #{uuid}"
 
     action = self[uuid]
     if action && action[:request]

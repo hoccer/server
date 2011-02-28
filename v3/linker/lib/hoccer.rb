@@ -20,9 +20,9 @@ module Hoccer
     end
 
     before do
-      EM::Timer.new(60) do
-        ahalt 504
-      end
+      #EM::Timer.new(60) do
+      #  ahalt 504
+      #end
     end
 
     set :public, File.join(File.dirname(__FILE__), '..', '/public')

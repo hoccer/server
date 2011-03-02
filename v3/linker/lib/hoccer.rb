@@ -51,8 +51,11 @@ module Hoccer
       logger.info "202"
       authorized_request do |account|
         request_body = request.body.read
+        request_hash = JSON.parse( request_body )
+        request_hash.merge!( :api_key => params["api_key"] )
+
         puts "#{uuid} PUT: #{request_body}"
-        em_put( "/clients/#{uuid}/environment", request_body ) do |response|
+        em_put( "/clients/#{uuid}/environment", request_hash.to_json ) do |response|
           status 201
           body { response[:content] }
         end

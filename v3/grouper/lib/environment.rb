@@ -14,6 +14,7 @@ module Hoccer
     field :wifi,        :type => Hash
     field :network,     :type => Hash
     field :group_id
+    field :api_key
 
     before_create :add_group_id, :add_creation_time, :normalize_bssids, :choose_best_location
     before_save   :ensure_indexable
@@ -53,7 +54,11 @@ module Hoccer
       bssids = self.wifi.with_indifferent_access[:bssids]
 
       return [] unless bssids
-      Environment.where({ "created_at" => {"$gt" => Time.now.to_f - 30}}).any_of(
+      Environment.where(
+        { "created_at" => {"$gt" => Time.now.to_f - 30}}
+      ).where(
+        { "api_key" => api_key }
+      ).any_of(
         *(bssids.map { |bssid| {"wifi.bssids" => bssid} })
       ).to_a
     end
@@ -70,7 +75,7 @@ module Hoccer
         "near"        => [lon.to_f, lat.to_f],
         "maxDistance" => MAX_SEARCH_DISTANCE / EARTH_RADIUS,
         "spherical" => true,
-        "query" => { "created_at" => {"$gt" => Time.now.to_f - 30}}
+        "query" => { "api_key" => api_key, "created_at" => {"$gt" => Time.now.to_f - 30}}
       })["results"]
 
       results.select! do |result|

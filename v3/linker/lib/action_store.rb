@@ -11,8 +11,15 @@ class ActionStore < Hash
   end
 
   def invalidate uuid
+    send_no_content action
+    self[uuid] = nil
+  end
+
+  def send_timeout uuid
     action = self[uuid]
-    send_no_content action unless action.nil?
+    unless action.nil? || action[:request].nil?
+      action[:request].ahalt 504
+    end
     self[uuid] = nil
   end
 

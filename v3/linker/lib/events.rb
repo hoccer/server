@@ -24,7 +24,7 @@ module Hoccer
       @action_store[uuid] = action
 
       em_get( "/clients/#{uuid}/group") do |response|
-        group       = Group.from_json response[:content]
+        group = Group.from_json response[:content]
 
         if 1 < group.size && group.any? { |x| x["latency"] }
           latencies = group.map { |x| ( x["latency"] || 1 ) }
@@ -42,10 +42,17 @@ module Hoccer
           verify group
         end
 
-        EM::Timer.new(max_latency + timeout) do
-          if @action_store[uuid]
-            verify group, true
-            @action_store.invalidate(uuid) unless action[:waiting]
+
+        if action[:waiting]
+          EM::Timer.new(60) do
+            @action_store.send_timeout(uuid)
+          end
+        else
+          EM::Timer.new(max_latency + timeout) do
+            if @action_store[uuid]
+              verify group, true
+              @action_store.invalidate(uuid)
+            end
           end
         end
       end

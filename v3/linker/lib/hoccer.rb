@@ -19,12 +19,6 @@ module Hoccer
       end
     end
 
-    before do
-      #EM::Timer.new(60) do
-      #  ahalt 504
-      #end
-    end
-
     set :public, File.join(File.dirname(__FILE__), '..', '/public')
 
     @@action_store  = ActionStore.new

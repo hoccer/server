@@ -132,6 +132,8 @@ module Hoccer
         :jsonp_method => (params["jsonp"] || params["callback"])
       }
 
+      headers "Access-Control-Allow-Origin" => "*"
+
       @@evaluators[params["mode"]].add action
     end
 
@@ -144,6 +146,8 @@ module Hoccer
         :jsonp_method => (params["jsonp"] || params["callback"]),
         :waiting      => params["waiting"] || false
       }
+
+      headers "Access-Control-Allow-Origin" => "*"
 
       @@evaluators[params["mode"]].add action
     end

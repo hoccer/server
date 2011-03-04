@@ -91,17 +91,18 @@ module Hoccer
     # javascript routes
     aget %r{#{CLIENTS}/environment.js$} do |uuid|
       authorized_request do
-        environment = Hash.new
-        environment["gps"] = {
-          "latitude" => params["latitude"].to_f,
-          "longitude" => params["longitude"].to_f,
-          "accuracy" => params["accuracy"].to_f,
-          "timestamp" => params["timestamp"].to_f
-        }
-
-        environment["wifi"] = {
-          "bssids"    => params["bssids"],
-          "timestamp" => Time.now.to_i
+        environment = {
+          "gps" => {
+            "latitude"  => params["latitude"].to_f,
+            "longitude" => params["longitude"].to_f,
+            "accuracy"  => params["accuracy"].to_f,
+            "timestamp" => params["timestamp"].to_f
+          },
+          "wifi" => {
+            "bssids"    => params["bssids"],
+            "timestamp" => Time.now.to_i
+          },
+          "api_key" => params["api_key"]
         }
 
         puts "put body #{environment}"

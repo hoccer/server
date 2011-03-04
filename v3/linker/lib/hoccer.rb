@@ -104,13 +104,11 @@ module Hoccer
           "timestamp" => Time.now.to_i
         }
 
-        callback_method = params["jsonp"] || params["callback"]
-
         puts "put body #{environment}"
         em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
           status 201
           headers "Access-Control-Allow-Origin" => "*"
-          body {"#{callback_method}(#{environment.to_json})"}
+          body { environment.to_json }
         end
       end
     end

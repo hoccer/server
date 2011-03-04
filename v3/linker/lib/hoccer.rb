@@ -109,6 +109,7 @@ module Hoccer
         puts "put body #{environment}"
         em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
           status 201
+          headers "Access-Control-Allow-Origin" => "*"
           body {"#{callback_method}(#{environment.to_json})"}
         end
       end

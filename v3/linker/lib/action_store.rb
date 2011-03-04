@@ -11,7 +11,8 @@ class ActionStore < Hash
   end
 
   def invalidate uuid
-    send_no_content action
+    action = self[uuid]
+    send_no_content( action ) unless action.nil?
     self[uuid] = nil
   end
 

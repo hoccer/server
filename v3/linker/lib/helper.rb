@@ -53,9 +53,7 @@ def request_uri
 end
 
 def authorized_request &block
-  if env['HTTP_REFERER']
-    referer = env['HTTP_REFERER'].match(/^(https?:\/\/[\d\w\-_.]+)\//)[1]
-  end
+  referrer = env['HTTP_ORIGIN']
 
   if ENV["RACK_ENV"] == "production"
     EM.next_tick do
@@ -71,7 +69,7 @@ def authorized_request &block
           digestor = Digest::HMAC.new( account["shared_secret"], Digest::SHA1 )
           computed_signature = digestor.base64digest( request_uri )
 
-          if signature == computed_signature || (referer && account["websites"].include?(referer))
+          if signature == computed_signature || (referrer && account["websites"].include?(referrer))
             block.call( account )
           else
             halt_with_error 401, "Invalid Signature"

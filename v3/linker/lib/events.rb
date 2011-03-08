@@ -67,13 +67,14 @@ module Hoccer
 
       waiter = actions.select {|a| a[:waiting]}
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9e7513099217f9007af2b1dd4895f7dec9d2cb72
       if 0 < waiter.size
-        puts "THERE IS SOMEONE WAITING"
         data_list = sender.map { |s| s[:payload] }
 
         unless data_list.empty?
-          puts "THERE IS SOMEONE SENDING"
           waiter.each do |waiter|
             @action_store.send waiter[:uuid], data_list
           end

@@ -83,3 +83,16 @@ def authorized_request &block
     block.call
   end
 end
+
+def log_action action_name, api_key
+  EM.next_tick do
+    $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
+    collection  = $db.collection('api_stats')
+    doc = {
+      :api_key    => api_key,
+      :action     => action_name,
+      :timestamp  => Time.now
+    }
+    collection.insert( doc )
+  end
+end

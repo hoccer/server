@@ -67,7 +67,6 @@ module Hoccer
 
       waiter = actions.select {|a| a[:waiting]}
 
-      puts "sender: #{sender.count}, receiver: #{receiver.count}, actions: #{actions.count}, waiting: #{waiting.size}"
 
       if 0 < waiter.size
         puts "THERE IS SOMEONE WAITING"
@@ -89,7 +88,9 @@ module Hoccer
         data_list = sender.map { |s| s[:payload] }
 
         actions.each do |client|
-          @action_store.send client[:uuid], data_list
+          @action_store.send( client[:uuid], data_list )
+          action = sender.first
+          log_action( action[:mode], action[:api_key] ) if client[:type] == :receiver
         end
       end
     end

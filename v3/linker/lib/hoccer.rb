@@ -71,7 +71,8 @@ module Hoccer
         :type     => :sender,
         :payload  => payload,
         :request  => self,
-        :uuid    => uuid
+        :uuid     => uuid,
+        :api_key  => params["api_key"]
       }
 
       @@evaluators[action_name].add action
@@ -83,7 +84,8 @@ module Hoccer
         :type     => :receiver,
         :request  => self,
         :uuid     => uuid,
-        :waiting  => params['waiting'] || false
+        :waiting  => ( params['waiting'] || false ),
+        :api_key  => params["api_key"]
       }
       @@evaluators[action_name].add action
     end
@@ -91,17 +93,18 @@ module Hoccer
     # javascript routes
     aget %r{#{CLIENTS}/environment.js$} do |uuid|
       authorized_request do
-        environment = Hash.new
-        environment["gps"] = {
-          "latitude" => params["latitude"].to_f,
-          "longitude" => params["longitude"].to_f,
-          "accuracy" => params["accuracy"].to_f,
-          "timestamp" => params["timestamp"].to_f
-        }
+        environment = {
+          :gps => {
+            :latitude   => params["latitude"].to_f,
+            :longitude  => params["longitude"].to_f,
+            :accuracy   => params["accuracy"].to_f,
+            :timestamp  => params["timestamp"].to_f
+          },
 
-        environment["wifi"] = {
-          "bssids"    => params["bssids"],
-          "timestamp" => Time.now.to_i
+          :wifi => {
+            :bssids    => params["bssids"],
+            :timestamp => Time.now.to_i
+          }
         }
 
         puts "put body #{environment}"
@@ -129,7 +132,8 @@ module Hoccer
         :payload  => content,
         :request  => self,
         :uuid     => uuid,
-        :jsonp_method => (params["jsonp"] || params["callback"])
+        :jsonp_method => (params["jsonp"] || params["callback"]),
+        :api_key  => params["api_key"]
       }
 
       headers "Access-Control-Allow-Origin" => "*"
@@ -144,7 +148,8 @@ module Hoccer
         :request      => self,
         :uuid         => uuid,
         :jsonp_method => (params["jsonp"] || params["callback"]),
-        :waiting      => params["waiting"] || false
+        :waiting      => (params["waiting"] || false),
+        :api_key      => params["api_key"]
       }
 
       headers "Access-Control-Allow-Origin" => "*"

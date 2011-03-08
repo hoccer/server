@@ -39,9 +39,9 @@ class ActionStore < Hash
   end
 
   def send uuid, content
-    #puts "sending data #{content.inspect} to #{uuid}"
+    action      = self[uuid]
+    self[uuid]  = nil
 
-    action = self[uuid]
     if action && action[:request]
       action[:request].status 200
       if (jsonp = action[:jsonp_method])
@@ -50,7 +50,6 @@ class ActionStore < Hash
         action[:request].body content.to_json
       end
     end
-    self[uuid] = nil
   end
 
   def actions_in_group group, mode

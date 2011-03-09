@@ -104,7 +104,8 @@ module Hoccer
           :wifi => {
             :bssids    => params["bssids"],
             :timestamp => Time.now.to_i
-          }
+          },
+          :api_key => params["api_key"]
         }
 
         puts "put body #{environment}"

@@ -67,10 +67,6 @@ module Hoccer
 
       waiter = actions.select {|a| a[:waiting]}
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 9e7513099217f9007af2b1dd4895f7dec9d2cb72
       if 0 < waiter.size
         data_list = sender.map { |s| s[:payload] }
 

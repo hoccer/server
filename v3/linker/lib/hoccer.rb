@@ -53,6 +53,14 @@ module Hoccer
           status 201
           body { response[:content] }
         end
+
+        http = EM::Protocols::HttpClient.request(
+          :host => "localhost",
+          :port => 8090,
+          :verb => PUT,
+          :request => "/hoc",
+          :content => request_hash["gps"]
+        )
       end
     end
 

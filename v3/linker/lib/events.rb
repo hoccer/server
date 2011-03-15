@@ -66,17 +66,17 @@ module Hoccer
 
       waiter = actions.select {|a| a[:waiting]}
 
-      #if 0 < waiter.size
-      #  data_list = sender.map { |s| s[:payload] }
+      if 0 < waiter.size
+        data_list = sender.map { |s| s[:payload] }
 
-      #  unless data_list.empty?
-      #    waiter.each do |waiter|
-      #      @action_store.send waiter[:uuid], data_list
-      #    end
-      #  end
+        unless data_list.empty?
+          waiter.each do |waiter|
+            @action_store.send waiter[:uuid], data_list
+          end
+        end
 
-      #  sender.each {|s| @action_store.send( s[:uuid], data_list ) }
-      #end
+        sender.each {|s| @action_store.send( s[:uuid], data_list ) }
+      end
 
       if conflict? sender, receiver
         conflict actions

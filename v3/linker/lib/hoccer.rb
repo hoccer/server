@@ -54,13 +54,15 @@ module Hoccer
           body { response[:content] }
         end
 
-        http = EM::Protocols::HttpClient.request(
-          :host => "localhost",
-          :port => 8090,
-          :verb => PUT,
-          :request => "/hoc",
-          :content => request_hash["gps"]
-        )
+        if data = (request_hash["gps"] || request_hash["network"])
+          http = EM::Protocols::HttpClient.request(
+            :host => "localhost",
+            :port => 8090,
+            :verb => 'PUT',
+            :request => "/hoc",
+            :content => data.to_json
+          )
+        end
       end
     end
 

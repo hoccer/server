@@ -27,13 +27,13 @@ module Hoccer
         group = Group.from_json response[:content]
 
         if 1 < group.size && group.any? { |x| x["latency"] }
-          latencies = group.map { |x| ( x["latency"] || 1 ) }
+          latencies = group.map { |x| ( x["latency"] || 3 ) }
           max_latency = latencies.max / 1000
-          if max_latency > 4
-            max_latency = 4
+          if max_latency > 6
+            max_latency = 6
           end
         else
-          max_latency = 1
+          max_latency = 3
         end
 
         if group.size < 2 && !action[:waiting]
@@ -42,11 +42,10 @@ module Hoccer
           verify group
         end
 
-
         if action[:waiting]
-          EM::Timer.new(60) do
-            @action_store.send_timeout(uuid)
-          end
+          #EM::Timer.new(60) do
+          #  @action_store.send_timeout(uuid)
+          #end
         else
           EM::Timer.new(max_latency + timeout) do
             if @action_store[uuid]

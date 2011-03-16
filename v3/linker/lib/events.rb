@@ -132,8 +132,7 @@ module Hoccer
     end
 
     def conflict? sender, receiver
-      false
-      #sender.size > 1
+      sender.size > 1
     end
 
     def success? sender, receiver, group, reevaluate

@@ -58,25 +58,14 @@ module Hoccer
     end
 
     def verify group, reevaluate = false
-      actions = @action_store.actions_in_group(group, name)
-      sender   = actions.select { |c| c[:type] == :sender }
-      receiver = actions.select { |c| c[:type] == :receiver }
+      actions   = @action_store.actions_in_group(group, name)
+      sender    = actions.select { |c| c[:type] == :sender }
+      receiver  = actions.select { |c| c[:type] == :receiver }
+      waiter    = actions.select { |a| a[:waiting] }
 
       puts "verifying group (#{group.size}) with #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
-      waiter = actions.select {|a| a[:waiting]}
-
-      if 0 < waiter.size
-        data_list = sender.map { |s| s[:payload] }
-
-        unless data_list.empty?
-          waiter.each do |waiter|
-            @action_store.send waiter[:uuid], data_list
-          end
-        end
-
-        sender.each {|s| @action_store.send( s[:uuid], data_list ) }
-      end
+      quick_deliver( sender, receiver, waiter )
 
       if conflict? sender, receiver
         conflict actions
@@ -89,6 +78,32 @@ module Hoccer
           log_action( action[:mode], action[:api_key] ) if client[:type] == :receiver
         end
       end
+    end
+
+    def quick_deliver sender, receiver, waiter
+
+      if waiter.empty?
+        return true
+      elsif !waiter.empty? && receiver.empty?
+        data_list = sender.map { |s| s[:payload] }
+
+        unless data_list.empty?
+          waiter.each do |waiter|
+            @action_store.send waiter[:uuid], data_list
+          end
+        end
+
+        sender.each {|s| @action_store.send( s[:uuid], data_list ) }
+      elsif !waiter.empty? && !receiver.empty?
+        data_list = sender.map { |s| s[:payload] }
+
+        unless data_list.empty?
+          waiter.each do |waiter|
+            @action_store.send waiter[:uuid], data_list
+          end
+        end
+      end
+
     end
 
     def conflict actions

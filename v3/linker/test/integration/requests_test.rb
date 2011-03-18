@@ -185,43 +185,43 @@ class TestRequest < Test::Unit::TestCase
   end
 
   test "sending and receiving in both directions" do
-      client_1 = create_client
-      client_2 = create_client
+    client_1 = create_client
+    client_2 = create_client
 
-      t1 = Thread.new { client_2.receive("one-to-one") }
-      t2 = Thread.new { client_1.share("one-to-one", {:inline => "foobar"}) }
+    t1 = Thread.new { client_2.receive("one-to-one") }
+    t2 = Thread.new { client_1.share("one-to-one", {:inline => "foobar"}) }
 
-      client_2_response = t2.value
-      client_1_response = t1.value
+    client_2_response = t2.value
+    client_1_response = t1.value
 
-      assert client_1_response
-      assert client_2_response
+    assert client_1_response
+    assert client_2_response
 
-      expected_2 =  [ { "inline" => "foobar"} ]
-      assert_equal expected_2, client_2_response
+    expected_2 =  [ { "inline" => "foobar"} ]
+    assert_equal expected_2, client_2_response
 
-      expexted_1 = [{"inline" =>"foobar"}]
-      assert_equal expexted_1, client_1_response
+    expexted_1 = [{"inline" =>"foobar"}]
+    assert_equal expexted_1, client_1_response
 
-      sleep(2)
+    sleep(2)
 
-      t1 = Thread.new { client_1.share("one-to-one", {:inline => "buubaa"}) }
-      t2 = Thread.new { client_2.receive("one-to-one") }
+    t1 = Thread.new { client_1.share("one-to-one", {:inline => "buubaa"}) }
+    t2 = Thread.new { client_2.receive("one-to-one") }
 
-      client_2_response = t2.value
-      client_1_response = t1.value
+    client_2_response = t2.value
+    client_1_response = t1.value
 
-      assert client_1_response
-      assert client_2_response
+    assert client_1_response
+    assert client_2_response
 
-      expected_2 = [{"inline" => "buubaa"}]
-      assert_equal expected_2, client_2_response
+    expected_2 = [{"inline" => "buubaa"}]
+    assert_equal expected_2, client_2_response
 
-      expexted_1 = [{"inline" => "buubaa"}]
-      assert_equal expexted_1, client_1_response
+    expexted_1 = [{"inline" => "buubaa"}]
+    assert_equal expexted_1, client_1_response
 
-      client_1.delete_environment
-      client_2.delete_environment
+    client_1.delete_environment
+    client_2.delete_environment
   end
 
   test "updating environment" do

@@ -68,7 +68,7 @@ class Test::Unit::TestCase
 
     client
   end
-  
+
   def threaded_receive client, mode
     Thread.new(Thread.current) { |parent|
       begin

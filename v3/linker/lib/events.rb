@@ -21,7 +21,12 @@ module Hoccer
 
     def add action
       uuid = action[:uuid]
-      @action_store[uuid] = action
+
+      if action[:waiting]
+        @action_store[uuid] = action if @action_store[uuid].nil?
+      else
+        @action_store[uuid] = action
+      end
 
       em_get( "/clients/#{uuid}/group") do |response|
         group = Group.from_json response[:content]
@@ -61,7 +66,7 @@ module Hoccer
       actions   = @action_store.actions_in_group(group, name)
       sender    = actions.select { |c| c[:type] == :sender }
       receiver  = actions.select { |c| c[:type] == :receiver }
-      waiter    = actions.select { |a| a[:waiting] }
+      waiter    = actions.select { |c| c[:waiting] }
 
       puts "verifying group (#{group.size}) with #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
@@ -81,28 +86,38 @@ module Hoccer
     end
 
     def quick_deliver sender, receiver, waiter
+      data_list = sender.map { |s| s[:payload] }
 
-      if waiter.empty?
-        return true
-      elsif !waiter.empty? && receiver.empty?
-        data_list = sender.map { |s| s[:payload] }
-
-        unless data_list.empty?
-          waiter.each do |waiter|
-            @action_store.send waiter[:uuid], data_list
-          end
-        end
-
-        sender.each {|s| @action_store.send( s[:uuid], data_list ) }
-      elsif !waiter.empty? && !receiver.empty?
-        data_list = sender.map { |s| s[:payload] }
-
-        unless data_list.empty?
-          waiter.each do |waiter|
-            @action_store.send waiter[:uuid], data_list
-          end
+      unless data_list.empty?
+        waiter.each do |waiter|
+          @action_store.quick_send(
+            waiter[:uuid],
+            data_list
+          )
         end
       end
+      #debugger unless sender.empty?
+      # if waiter.empty?
+      #   return true
+      # elsif !waiter.empty? && receiver.empty?
+      #   data_list = sender.map { |s| s[:payload] }
+
+      #   unless data_list.empty?
+      #     waiter.each do |waiter|
+      #       @action_store.quick_send waiter[:uuid], data_list
+      #     end
+      #   end
+
+      #   sender.each {|s| @action_store.send( s[:uuid], data_list ) }
+      # elsif !waiter.empty? && !receiver.empty?
+      #   data_list = sender.map { |s| s[:payload] }
+
+      #   unless data_list.empty?
+      #     waiter.each do |waiter|
+      #       @action_store.quick_send waiter[:uuid], data_list
+      #     end
+      #   end
+      # end
 
     end
 

@@ -22,11 +22,11 @@ module Hoccer
     def add action
       uuid = action[:uuid]
 
-      if action[:waiting]
-        @action_store[uuid] = action if @action_store[uuid].nil?
-      else
+      #if action[:waiting]
+      #  @action_store[uuid] = action if @action_store[uuid].nil?
+      #else
         @action_store[uuid] = action
-      end
+      #end
 
       em_get( "/clients/#{uuid}/group") do |response|
         group = Group.from_json response[:content]
@@ -78,28 +78,34 @@ module Hoccer
         data_list = sender.map { |s| s[:payload] }
 
         actions.each do |client|
-          @action_store.send( client[:uuid], data_list )
-          action = sender.first
-          log_action( action[:mode], action[:api_key] ) if client[:type] == :receiver
+          unless sender.first[:sent_to].include?( client[:uuid] )
+            @action_store.send( client[:uuid], data_list )
+            action = sender.first
+            log_action( action[:mode], action[:api_key] ) if client[:type] == :receiver
+          end
         end
       end
     end
 
     def quick_deliver sender, receiver, waiter
-      data_list = sender.map { |s| s[:payload] }
 
-      unless data_list.empty?
-        sender.first[:sent_to] ||= []
+      waiter.each do |waiter|
 
-        waiter.each do |waiter|
-          unless sender.first[:sent_to].include?( waiter[:uuid] )
-            @action_store.quick_send(
-              waiter[:uuid],
-              data_list
-            )
+        data_list = []
 
-            sender.first[:sent_to] << waiter[:uuid]
+        sender.each do |s|
+          s[:sent_to] ||= []
+          unless s[:sent_to].include?( waiter[:uuid] )
+            s[:sent_to] << waiter[:uuid]
+            data_list << s[:payload]
           end
+        end
+
+        unless data_list.empty?
+          @action_store.quick_send(
+            waiter[:uuid],
+            data_list
+          )
         end
       end
     end

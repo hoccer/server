@@ -76,7 +76,7 @@ module Hoccer
         conflict actions
       elsif success? sender, receiver, group, reevaluate
         deliver( sender, actions )
-      elsif (0 < sender.first[:sent_to].size) && reevaluate
+      elsif !sender.empty? && (0 < sender.first[:sent_to].size) && reevaluate
         deliver( sender, sender )
       end
     end

@@ -89,36 +89,19 @@ module Hoccer
       data_list = sender.map { |s| s[:payload] }
 
       unless data_list.empty?
+        sender.first[:sent_to] ||= []
+
         waiter.each do |waiter|
-          @action_store.quick_send(
-            waiter[:uuid],
-            data_list
-          )
+          unless sender.first[:sent_to].include?( waiter[:uuid] )
+            @action_store.quick_send(
+              waiter[:uuid],
+              data_list
+            )
+
+            sender.first[:sent_to] << waiter[:uuid]
+          end
         end
       end
-      #debugger unless sender.empty?
-      # if waiter.empty?
-      #   return true
-      # elsif !waiter.empty? && receiver.empty?
-      #   data_list = sender.map { |s| s[:payload] }
-
-      #   unless data_list.empty?
-      #     waiter.each do |waiter|
-      #       @action_store.quick_send waiter[:uuid], data_list
-      #     end
-      #   end
-
-      #   sender.each {|s| @action_store.send( s[:uuid], data_list ) }
-      # elsif !waiter.empty? && !receiver.empty?
-      #   data_list = sender.map { |s| s[:payload] }
-
-      #   unless data_list.empty?
-      #     waiter.each do |waiter|
-      #       @action_store.quick_send waiter[:uuid], data_list
-      #     end
-      #   end
-      # end
-
     end
 
     def conflict actions

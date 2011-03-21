@@ -22,11 +22,7 @@ module Hoccer
     def add action
       uuid = action[:uuid]
 
-      #if action[:waiting]
-      #  @action_store[uuid] = action if @action_store[uuid].nil?
-      #else
-        @action_store[uuid] = action
-      #end
+      @action_store[uuid] = action
 
       em_get( "/clients/#{uuid}/group") do |response|
         group = Group.from_json response[:content]
@@ -48,9 +44,9 @@ module Hoccer
         end
 
         if action[:waiting]
-          #EM::Timer.new(60) do
-          #  @action_store.send_timeout(uuid)
-          #end
+          EM::Timer.new(60) do
+            @action_store.send_timeout(uuid)
+          end
         else
           EM::Timer.new(max_latency + timeout) do
             if @action_store[uuid]
@@ -76,9 +72,15 @@ module Hoccer
         conflict actions
       elsif success? sender, receiver, group, reevaluate
         deliver( sender, actions )
-      elsif !sender.empty? && (0 < sender.first[:sent_to].size) && reevaluate
+      elsif delivered? sender, reevaluate
         deliver( sender, sender )
       end
+    end
+
+    def delivered? sender, reevaluate
+      return false unless sender && sender.first
+      sender.first[:sent_to] ||= []
+      !sender.empty? && (0 < sender.first[:sent_to].size) && reevaluate
     end
 
     def deliver sender, receivers

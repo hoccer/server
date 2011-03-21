@@ -52,21 +52,6 @@ class ActionStore < Hash
     end
   end
 
-  def quick_send uuid, content
-    action      = self[uuid]
-
-    if action && action[:request]
-      action[:request].status 200
-      if (jsonp = action[:jsonp_method])
-        action[:request].body { "#{jsonp}(#{content.to_json})" }
-      else
-        action[:request].body content.to_json
-      end
-    end
-
-    action[:request] = nil
-  end
-
   def actions_in_group group, mode
     actions = group.inject([]) do |result, environment|
       action = self[ environment["client_uuid"] ] rescue nil

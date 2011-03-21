@@ -82,7 +82,6 @@ module Hoccer
     def deliver sender, receivers
 
       receivers.each do |receiver|
-
         data_list = []
 
         sender.each do |s|

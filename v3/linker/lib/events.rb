@@ -76,6 +76,8 @@ module Hoccer
         conflict actions
       elsif success? sender, receiver, group, reevaluate
         deliver( sender, actions )
+      elsif (0 < sender.first[:sent_to].size) && reevaluate
+        deliver( sender, sender )
       end
     end
 
@@ -93,7 +95,7 @@ module Hoccer
         end
 
         unless data_list.empty?
-          @action_store.quick_send(
+          @action_store.send(
             receiver[:uuid],
             data_list
           )

@@ -70,41 +70,32 @@ module Hoccer
 
       puts "verifying group (#{group.size}) with #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
-      quick_deliver( sender, receiver, waiter )
+      deliver( sender,  waiter )
 
       if conflict? sender, receiver
         conflict actions
       elsif success? sender, receiver, group, reevaluate
-        data_list = sender.map { |s| s[:payload] }
-
-        actions.each do |client|
-          unless sender.first[:sent_to].include?( client[:uuid] )
-            @action_store.send( client[:uuid], data_list )
-            action = sender.first
-            log_action( action[:mode], action[:api_key] ) if client[:type] == :receiver
-          end
-        end
+        deliver( sender, actions )
       end
     end
 
-    def quick_deliver sender, receiver, waiter
+    def deliver sender, receivers
 
-
-      waiter.each do |waiter|
+      receivers.each do |receiver|
 
         data_list = []
 
         sender.each do |s|
           s[:sent_to] ||= []
-          unless s[:sent_to].include?( waiter[:uuid] )
-            s[:sent_to] << waiter[:uuid]
+          unless s[:sent_to].include?( receiver[:uuid] )
+            s[:sent_to] << receiver[:uuid]
             data_list << s[:payload]
           end
         end
 
         unless data_list.empty?
           @action_store.quick_send(
-            waiter[:uuid],
+            receiver[:uuid],
             data_list
           )
         end

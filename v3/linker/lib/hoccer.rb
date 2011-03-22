@@ -1,6 +1,7 @@
 require 'sinatra/reloader'
 require 'action_store'
 require 'events'
+require 'client'
 require 'helper'
 
 CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
@@ -15,6 +16,10 @@ module Hoccer
 
     set :public, File.join(File.dirname(__FILE__), '..', '/public')
 
+    before do
+      @current_client = Hoccer::Client.new( self )
+    end
+
     @@action_store  = ActionStore.new
     @@evaluators    = {}
 
@@ -25,7 +30,7 @@ module Hoccer
     end
 
     aget %r{#{CLIENTS}$} do |uuid|
-      em_get( "/clients/#{uuid}" ) do |response|
+      @current_client.info do |response|
         if response[:status] == 200
           body { response[:content] }
         else
@@ -36,27 +41,18 @@ module Hoccer
     end
 
     aput %r{#{CLIENTS}/environment$} do |uuid|
-      logger.info "202"
       authorized_request do |account|
-        request_body = request.body.read
-        request_hash = JSON.parse( request_body )
-        request_hash.merge!( :api_key => params["api_key"] )
-
-        puts "#{uuid} PUT: #{request_body}"
-        em_put( "/clients/#{uuid}/environment", request_hash.to_json ) do |response|
-          status 201
-          body { response[:content] }
+        @current_client.update_environment do |response|
+          if response[:status] == 200
+            status 201
+            body { response[:content] }
+          else
+            status 400
+            body { {:error => @current_client.error}.to_json }
+          end
         end
 
-        if data = (request_hash["gps"] || request_hash["network"])
-          http = EM::Protocols::HttpClient.request(
-            :host => "localhost",
-            :port => 8090,
-            :verb => 'PUT',
-            :request => "/hoc",
-            :content => data.to_json
-          )
-        end
+        @current_client.update_worldmap
       end
     end
 

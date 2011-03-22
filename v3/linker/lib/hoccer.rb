@@ -13,12 +13,6 @@ module Hoccer
       register Sinatra::Reloader
     end
 
-    helpers do
-      def logger
-        MuninLogger
-      end
-    end
-
     set :public, File.join(File.dirname(__FILE__), '..', '/public')
 
     @@action_store  = ActionStore.new

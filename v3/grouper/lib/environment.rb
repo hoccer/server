@@ -53,11 +53,17 @@ module Hoccer
 
       bssids = self.wifi.with_indifferent_access[:bssids]
 
+      if hoccer_compatible?
+        query = { "api_key" => { "$in" => hoccer_compatible_api_keys } }
+      else
+        query = { "api_key" => api_key }
+      end
+
       return [] unless bssids
       Environment.where(
         { "created_at" => {"$gt" => Time.now.to_f - 30}}
       ).where(
-        { "api_key" => api_key }
+        query
       ).any_of(
         *(bssids.map { |bssid| {"wifi.bssids" => bssid} })
       ).to_a

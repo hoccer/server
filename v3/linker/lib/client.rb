@@ -53,7 +53,7 @@ module Hoccer
       end
     end
 
-    def update_hoccer_worldmap
+    def update_worldmap
       if data = (@environment["gps"] || @environment["network"])
         http = EM::Protocols::HttpClient.request(
           :host => "localhost",

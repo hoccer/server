@@ -64,18 +64,9 @@ module Hoccer
     end
 
     aput %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
-      payload = JSON.parse( request.body.read )
+      @current_client.add_action( action_name, :sender )
 
-      action  = {
-        :mode     => action_name,
-        :type     => :sender,
-        :payload  => payload,
-        :request  => self,
-        :uuid     => uuid,
-        :api_key  => params["api_key"]
-      }
-
-      @@evaluators[action_name].add action
+      # @@evaluators[action_name].add action
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|

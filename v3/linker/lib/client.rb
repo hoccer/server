@@ -65,14 +65,18 @@ module Hoccer
       end
     end
 
-    def add_action params
-      begin
-        options = parse_json( params )
-        @action = Action.new( options )
-      rescue => e
-        @errors << e.message
-        false
-      end
+    def add_action name, role
+      params = parse_body
+
+      action  = Action.new(
+        :name     => name,
+        :type     => role,
+        :payload  => params,
+        :request  => request,
+        :uuid     => uuid,
+        :api_key  => environment[:api_key]
+      )
+
     end
 
   end

@@ -97,6 +97,8 @@ module Hoccer
         end
 
         unless data_list.empty?
+          log_action( receiver[:mode], receiver[:api_key] )
+
           @action_store.send(
             receiver[:uuid],
             data_list

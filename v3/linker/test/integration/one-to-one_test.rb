@@ -12,30 +12,30 @@ class TestOneToOne < Test::Unit::TestCase
     coll.remove
   end
 
-  test 'two in group - one sender - one receiver' do
-    client_1 = create_client
-    client_2 = create_client
+  # test 'two in group - one sender - one receiver' do
+  #   client_1 = create_client
+  #   client_2 = create_client
 
-    start_time = Time.now
-    t2 = Thread.new { client_2.receive("one-to-one") }
-    t1 = Thread.new { client_1.share("one-to-one", { :inline => "foobar" }) }
+  #   start_time = Time.now
+  #   t2 = Thread.new { client_2.receive("one-to-one") }
+  #   t1 = Thread.new { client_1.share("one-to-one", { :inline => "foobar" }) }
 
-    client_2_response = t2.value
-    client_1_response = t1.value
+  #   client_2_response = t2.value
+  #   client_1_response = t1.value
 
-    duration = Time.now - start_time
+  #   duration = Time.now - start_time
 
-    assert client_1_response
-    assert client_2_response
-    assert duration < 0.1, "clients should pair immediatly"
+  #   assert client_1_response
+  #   assert client_2_response
+  #   assert duration < 0.1, "clients should pair immediatly"
 
-    expected = [ { "inline" => "foobar"} ]
-    assert_equal expected, client_1_response
-    assert_equal expected, client_2_response
+  #   expected = [ { "inline" => "foobar"} ]
+  #   assert_equal expected, client_1_response
+  #   assert_equal expected, client_2_response
 
-    client_1.delete_environment
-    client_2.delete_environment
-  end
+  #   client_1.delete_environment
+  #   client_2.delete_environment
+  # end
 
   # test 'three in group - two sender - one receiver' do
   #   client_1 = create_client

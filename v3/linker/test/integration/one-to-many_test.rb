@@ -91,25 +91,25 @@ class TestOneToMany < Test::Unit::TestCase
   # end
 
 
-  # test 'longpolling holding get' do
-  #   client_1 = create_client
-  #   client_2 = create_client
+  test 'longpolling holding get' do
+    client_1 = create_client
+    client_2 = create_client
 
-  #   t2 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
-  #   sleep(10)
-  #   t1 = Thread.new {client_2.share("one-to-many", { "inline" => "foobar" } )}
+    t2 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
+    sleep(10)
+    t1 = Thread.new {client_2.share("one-to-many", { "inline" => "foobar" } )}
 
-  #   client_1_response = t1.value
-  #   client_2_response = t2.value
+    client_1_response = t1.value
+    client_2_response = t2.value
 
-  #   expected = [{"inline" => "foobar" }]
+    expected = [{"inline" => "foobar" }]
 
-  #   assert client_1_response
-  #   assert_equal expected, client_1_response
+    assert client_1_response
+    assert_equal expected, client_1_response
 
-  #   client_1.delete_environment
-  #   client_2.delete_environment
-  # end
+    client_1.delete_environment
+    client_2.delete_environment
+  end
 
   # test 'longpolling twice' do
   #   client_1 = create_client

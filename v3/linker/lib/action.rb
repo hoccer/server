@@ -24,6 +24,62 @@ module Hoccer
       self[:jsonp_method]
     end
 
+    def client
+      Client.find( self[:uuid] )
+    end
+
+    def verify group, reevaluate = false
+      actions   = actions_in_group(group, name)
+      sender    = actions.select { |c| c.action[:role] == :sender }
+      receiver  = actions.select { |c| c.action[:role] == :receiver }
+      waiter    = actions.select { |c| c.action[:waiting] }
+
+      puts "verifying group (#{group.size}) with #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
+
+      puts "!!!!!!!!!!!!!!!!!!!!!"
+      puts sender.map {|x| !!x.request}
+      puts waiter.map {|x| !!x.request}
+
+      if !sender.empty? and !waiter.empty?
+        sender.each { |x| x.request.body { ["robert"].to_json } }
+        waiter.each { |x| x.request.body { ["robert"].to_json } }
+      end
+
+      deliver( sender,  waiter )
+
+      if conflict? sender, receiver
+        conflict actions
+      elsif success? sender, receiver, group, reevaluate
+        deliver( sender, actions )
+      # elsif delivered? sender, reevaluate
+      else
+        deliver( sender, sender )
+      end
+
+      # if sender.all? {|x| x.request}
+      #   deliver( sender, sender )
+      # end
+    end
+
+    def deliver sender, receivers
+
+      receivers.each do |receiver|
+        data_list = []
+
+        sender.each do |s|
+          # s[:sent_to] ||= []
+          # unless s[:sent_to].include?( receiver[:uuid] )
+          # s[:sent_to] << receiver[:uuid]
+            data_list << s.action[:payload]
+          # end
+        end
+
+        unless data_list.empty?
+          send( data_list )
+        end
+      end
+    end
+
     def hold_action_for_seconds action, seconds
       uuid = action[:uuid]
       self[uuid] = action
@@ -47,41 +103,32 @@ module Hoccer
     end
 
     def conflict uuid
-      action = self[uuid]
-      if action && action[:request]
-        if (jsonp = action[:jsonp_method])
-          action[:request].status 200
-          action[:request].body { "#{jsonp}(#{ {"message" => "conflict"}.to_json })" }
+      if request
+        if jsonp_method
+          request.status 200
+          request.body { "#{jsonp_method}(#{ {"message" => "conflict"}.to_json })" }
         else
-          action[:request].status 409
-          action[:request].body { {"message" => "conflict"}.to_json }
+          request.status 409
+          request.body { {"message" => "conflict"}.to_json }
         end
       end
-      self[uuid] = nil
     end
 
-    def send uuid, content
-      action      = self[uuid]
-      self[uuid]  = nil
-
-      if action && action[:request]
-        action[:request].status 200
-        if (jsonp = action[:jsonp_method])
-          action[:request].body { "#{jsonp}(#{content.to_json})" }
+    def send content
+      if request
+        request.status 200
+        if jsonp_method
+          request.body { "#{jsonp_method}(#{content.to_json})" }
         else
-          action[:request].body content.to_json
+          request.body content.to_json
         end
       end
     end
 
     def actions_in_group group, mode
-      actions = group.inject([]) do |result, environment|
-        action = self[ environment["client_uuid"] ] rescue nil
-        result << action unless action.nil?
-        result
+      clients = group.clients.select do |c|
+        c.action && c.action.name == self.name
       end
-
-      actions.select {|action| action[:mode] == mode}
     end
 
     private

@@ -38,7 +38,7 @@ module Hoccer
       em_get( "/clients/#{uuid}" ) { |response| block.call( response ) }
     end
 
-    def find
+    def self.find uuid
       @@clients[uuid]
     end
 
@@ -72,6 +72,10 @@ module Hoccer
       end
     end
 
+    def waiting?
+      request.params['waiting'] || false
+    end
+
     def async_group &block
       em_get( "/clients/#{uuid}/group") do |response|
         group = Group.new( response[:content] )
@@ -81,29 +85,18 @@ module Hoccer
 
     def add_action name, role
 
-      action  = Action.create(
+      self.action  = Action.create(
         :name     => name,
-        :type     => role,
+        :role     => role,
         :payload  => parse_body,
-        :waiting  => ( request.params['waiting'] || false ),
+        :waiting  => waiting?,
         :request  => request,
         :uuid     => uuid,
         :api_key  => environment[:api_key]
       )
 
-      verify_group
+      async_group { |group| action.verify( group ) }
     end
-
-    def verify_group
-      async_group do |group|
-        group.latency
-
-        if group.size < 2 && !action[:waiting]
-          action.invalidate
-        end
-      end
-    end
-
 
   end
 end

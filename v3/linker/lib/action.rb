@@ -3,15 +3,25 @@ module Hoccer
 
     @@actions = {}
 
-    def initialize hash = {}
+    def self.create hash
       case hash[:name]
       when 'one-to-one'
-        @@actions[hash[:uuid]] = OneToOne.new( hash )
+        @@actions[hash[:uuid]] = OneToOne.new.merge!( hash )
       when 'one-to-many'
-        @@actions[hash[:uuid]] = OneToMany.new( hash )
-      else
-        super.merge!( hash )
+        @@actions[hash[:uuid]] = OneToMany.new.merge!( hash )
       end
+    end
+
+    def request
+      self[:request]
+    end
+
+    def uuid
+      self[:uuid]
+    end
+
+    def jsonp_method
+      self[:jsonp_method]
     end
 
     def hold_action_for_seconds action, seconds
@@ -23,10 +33,9 @@ module Hoccer
       end
     end
 
-    def invalidate uuid
-      action = self[uuid]
-      send_no_content( action ) unless action.nil?
-      self[uuid] = nil
+    def invalidate
+      send_no_content
+      @@actions[self[:uuid]] = nil
     end
 
     def send_timeout uuid
@@ -76,14 +85,13 @@ module Hoccer
     end
 
     private
-    def send_no_content action
-      puts "timeout for #{action[:uuid]}"
+    def send_no_content
+      puts "timeout for #{uuid}"
 
-      if action && action[:request]
-        request = action[:request]
-        if (jsonp = action[:jsonp_method])
+      if request
+        if jsonp_method
           request.status 200
-          action[:request].body { "#{jsonp}(#{ {"message" => "timeout"}.to_json})" }
+          request.body { "#{jsonp_method}(#{ {"message" => "timeout"}.to_json})" }
         else
           request.status 204
           request.body { {"message" => "timeout"}.to_json }

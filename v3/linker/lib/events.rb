@@ -1,17 +1,17 @@
 require 'helper'
 
 module Hoccer
-  class Group < Hash
-    def self.from_json json_string
-        begin
-          group = JSON.parse json_string
-        rescue => e
-          puts e
-          group = {}
-        end
-        group
-      end
-  end
+  # class Group < Hash
+  #   def self.from_json json_string
+  #       begin
+  #         group = JSON.parse json_string
+  #       rescue => e
+  #         puts e
+  #         group = {}
+  #       end
+  #       group
+  #     end
+  # end
 
 
   class Event
@@ -19,44 +19,44 @@ module Hoccer
       @action_store = action_store
     end
 
-    def add action
-      uuid = action[:uuid]
+    # def add action
+    #   uuid = action[:uuid]
 
-      @action_store[uuid] = action
+    #   @action_store[uuid] = action
 
-      em_get( "/clients/#{uuid}/group") do |response|
-        group = Group.from_json response[:content]
+    #   em_get( "/clients/#{uuid}/group") do |response|
+    #     group = Group.from_json response[:content]
 
-        if 1 < group.size && group.any? { |x| x["latency"] }
-          latencies = group.map { |x| ( x["latency"] || 3 ) }
-          max_latency = latencies.max / 1000
-          if max_latency > 6
-            max_latency = 6
-          end
-        else
-          max_latency = 3
-        end
+    #     if 1 < group.size && group.any? { |x| x["latency"] }
+    #       latencies = group.map { |x| ( x["latency"] || 3 ) }
+    #       max_latency = latencies.max / 1000
+    #       if max_latency > 6
+    #         max_latency = 6
+    #       end
+    #     else
+    #       max_latency = 3
+    #     end
 
-        if group.size < 2 && !action[:waiting]
-          @action_store.invalidate uuid
-        else
-          verify group
-        end
+    #     if group.size < 2 && !action[:waiting]
+    #       @action_store.invalidate uuid
+    #     else
+    #       verify group
+    #     end
 
-        if action[:waiting]
-          EM::Timer.new(60) do
-            @action_store.send_timeout(uuid)
-          end
-        else
-          EM::Timer.new(max_latency + timeout) do
-            if @action_store[uuid]
-              verify group, true
-              @action_store.invalidate(uuid)
-            end
-          end
-        end
-      end
-    end
+    #     if action[:waiting]
+    #       EM::Timer.new(60) do
+    #         @action_store.send_timeout(uuid)
+    #       end
+    #     else
+    #       EM::Timer.new(max_latency + timeout) do
+    #         if @action_store[uuid]
+    #           verify group, true
+    #           @action_store.invalidate(uuid)
+    #         end
+    #       end
+    #     end
+    #   end
+    # end
 
     def verify group, reevaluate = false
       actions   = @action_store.actions_in_group(group, name)
@@ -116,42 +116,42 @@ module Hoccer
     end
   end
 
-  class OneToOne < Event
-
-    def name
-      "one-to-one"
-    end
-
-    def timeout
-      1.2
-    end
-
-    def conflict? sender, receiver
-      sender.size > 1 || receiver.size > 1
-    end
-
-    def success? sender, receiver, group, reevaluate
-      sender.size == 1 && receiver.size == 1 && (group.size == 2 || reevaluate)
-    end
-  end
-
-  class OneToMany < Event
-    def name
-      "one-to-many"
-    end
-
-    def timeout
-      4
-    end
-
-    def conflict? sender, receiver
-      sender.size > 1
-    end
-
-    def success? sender, receiver, group, reevaluate
-      sender.size == 1 && receiver.size >= 1 && (sender.size + receiver.size == group.size || reevaluate)
-    end
-
-  end
+#   class OneToOne < Event
+#
+#     def name
+#       "one-to-one"
+#     end
+#
+#     def timeout
+#       1.2
+#     end
+#
+#     def conflict? sender, receiver
+#       sender.size > 1 || receiver.size > 1
+#     end
+#
+#     def success? sender, receiver, group, reevaluate
+#       sender.size == 1 && receiver.size == 1 && (group.size == 2 || reevaluate)
+#     end
+#   end
+#
+#   class OneToMany < Event
+#     def name
+#       "one-to-many"
+#     end
+#
+#     def timeout
+#       4
+#     end
+#
+#     def conflict? sender, receiver
+#       sender.size > 1
+#     end
+#
+#     def success? sender, receiver, group, reevaluate
+#       sender.size == 1 && receiver.size >= 1 && (sender.size + receiver.size == group.size || reevaluate)
+#     end
+#
+#   end
 end
 

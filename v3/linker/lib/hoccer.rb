@@ -1,5 +1,7 @@
 require 'sinatra/reloader'
 require 'action_store'
+require 'action'
+require 'group'
 require 'events'
 require 'client'
 require 'helper'
@@ -70,15 +72,16 @@ module Hoccer
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
-      action = {
-        :mode     => action_name,
-        :type     => :receiver,
-        :request  => self,
-        :uuid     => uuid,
-        :waiting  => ( params['waiting'] || false ),
-        :api_key  => params["api_key"]
-      }
-      @@evaluators[action_name].add action
+      @current_client.add_action( action_name, :receiver )
+      # action = {
+      #   :mode     => action_name,
+      #   :type     => :receiver,
+      #   :request  => self,
+      #   :uuid     => uuid,
+      #   :waiting  => ( params['waiting'] || false ),
+      #   :api_key  => params["api_key"]
+      # }
+      # @@evaluators[action_name].add action
     end
 
     # javascript routes

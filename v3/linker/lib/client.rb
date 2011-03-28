@@ -6,7 +6,6 @@ module Hoccer
     UUID_PATTERN = /[a-zA-Z0-9\-]{36,36}/
 
     attr_accessor :environment,
-                  :group,
                   :action,
                   :body_buffer,
                   :request,
@@ -17,11 +16,13 @@ module Hoccer
     @@clients = {}
 
     def initialize connection
-      @request      = connection
-      @uuid         = connection.request.path_info.match(UUID_PATTERN)[0]
-      @body_buffer  = connection.request.body.read
-      @environment  = { :api_key => connection.params["api_key"] }
-      @error        = nil
+      @request          = connection
+      @uuid             = connection.request.path_info.match(UUID_PATTERN)[0]
+      @body_buffer      = connection.request.body.read
+      @environment      = { :api_key => connection.params["api_key"] }
+      @error            = nil
+
+      @@clients[@uuid]  = self
     end
 
     def parse_body
@@ -39,6 +40,12 @@ module Hoccer
 
     def find
       @@clients[uuid]
+    end
+
+    def self.find_all_by_uuids uuids
+      uuids.inject([]) do |result, uuid|
+        result << @@clients[uuid]
+      end
     end
 
     def find_or_create uuid
@@ -65,19 +72,38 @@ module Hoccer
       end
     end
 
-    def add_action name, role
-      params = parse_body
+    def async_group &block
+      em_get( "/clients/#{uuid}/group") do |response|
+        group = Group.new( response[:content] )
+        block.call( group )
+      end
+    end
 
-      action  = Action.new(
+    def add_action name, role
+
+      action  = Action.create(
         :name     => name,
         :type     => role,
-        :payload  => params,
+        :payload  => parse_body,
+        :waiting  => ( request.params['waiting'] || false ),
         :request  => request,
         :uuid     => uuid,
         :api_key  => environment[:api_key]
       )
 
+      verify_group
     end
+
+    def verify_group
+      async_group do |group|
+        group.latency
+
+        if group.size < 2 && !action[:waiting]
+          action.invalidate
+        end
+      end
+    end
+
 
   end
 end

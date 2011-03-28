@@ -53,11 +53,17 @@ module Hoccer
 
       bssids = self.wifi.with_indifferent_access[:bssids]
 
+      if hoccer_compatible?
+        query = { "api_key" => { "$in" => hoccer_compatible_api_keys } }
+      else
+        query = { "api_key" => api_key }
+      end
+
       return [] unless bssids
       Environment.where(
         { "created_at" => {"$gt" => Time.now.to_f - 30}}
       ).where(
-        { "api_key" => api_key }
+        query
       ).any_of(
         *(bssids.map { |bssid| {"wifi.bssids" => bssid} })
       ).to_a
@@ -69,6 +75,18 @@ module Hoccer
       lon = ( gps[:longitude] || gps["longitude"] )
       lat = ( gps[:latitude]  || gps["latitude"] )
       acc = ( gps[:accuracy]  || gps["accuracy"] )
+
+      if hoccer_compatible?
+        query = {
+          "api_key" => {"$in" => hoccer_compatible_api_keys},
+          "created_at" => {"$gt" => Time.now.to_f - 30}
+        }
+      else
+        query = {
+          "api_key" => api_key,
+          "created_at" => {"$gt" => Time.now.to_f - 30}
+        }
+      end
 
       results = Environment.db.command({
         "geoNear"     => "environments",
@@ -160,6 +178,25 @@ module Hoccer
         elsif n[:timestamp] > self.gps.with_indifferent_access[:timestamp]
           self.gps = n
         end
+      end
+    end
+
+    def hoccer_compatible?
+      db   = Mongo::Connection.new.db('hoccer_accounts')
+      coll = db.collection('accounts')
+
+      0 < coll.find(
+        :api_key            => api_key,
+        :hoccer_compatible  => true
+      ).count
+    end
+
+    def hoccer_compatible_api_keys
+      db   = Mongo::Connection.new.db('hoccer_accounts')
+      coll = db.collection('accounts')
+
+      coll.find({:hoccer_compatible => true}, :fields => :api_key).map do |k|
+        k["api_key"]
       end
     end
   end

@@ -25,12 +25,12 @@ module Hoccer
     @@evaluators    = {}
 
     def initialize
-       super
-       @@evaluators['one-to-one'] = OneToOne.new @@action_store
-       @@evaluators['one-to-many'] = OneToMany.new @@action_store
+      super
+      @@evaluators['one-to-one']  = OneToOne.new @@action_store
+      @@evaluators['one-to-many'] = OneToMany.new @@action_store
     end
 
-     aget %r{#{CLIENTS}$} do |uuid|
+    aget %r{#{CLIENTS}$} do |uuid|
       em_get( "/clients/#{uuid}" ) do |response|
         if response[:status] == 200
           body { response[:content] }

@@ -93,7 +93,7 @@ module Hoccer
         "near"        => [lon.to_f, lat.to_f],
         "maxDistance" => MAX_SEARCH_DISTANCE / EARTH_RADIUS,
         "spherical" => true,
-        "query" => { "api_key" => api_key, "created_at" => {"$gt" => Time.now.to_f - 30}}
+        "query" => query
       })["results"]
 
       results.select! do |result|
@@ -109,6 +109,25 @@ module Hoccer
 
     def nearby
       nearby_gps | nearby_bssids
+    end
+
+    def hoccer_compatible?
+      db   = Mongo::Connection.new.db('hoccer_accounts')
+      coll = db.collection('accounts')
+
+      0 < coll.find(
+        :api_key            => api_key,
+        :hoccer_compatible  => true
+      ).count
+    end
+
+    def hoccer_compatible_api_keys
+      db   = Mongo::Connection.new.db('hoccer_accounts')
+      coll = db.collection('accounts')
+
+      coll.find({:hoccer_compatible => true}, :fields => :api_key).map do |k|
+        k["api_key"]
+      end
     end
 
     private
@@ -181,23 +200,5 @@ module Hoccer
       end
     end
 
-    def hoccer_compatible?
-      db   = Mongo::Connection.new.db('hoccer_accounts')
-      coll = db.collection('accounts')
-
-      0 < coll.find(
-        :api_key            => api_key,
-        :hoccer_compatible  => true
-      ).count
-    end
-
-    def hoccer_compatible_api_keys
-      db   = Mongo::Connection.new.db('hoccer_accounts')
-      coll = db.collection('accounts')
-
-      coll.find({:hoccer_compatible => true}, :fields => :api_key).map do |k|
-        k["api_key"]
-      end
-    end
   end
 end

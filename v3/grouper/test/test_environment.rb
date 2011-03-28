@@ -37,6 +37,36 @@ class TestEnvironment < Test::Unit::TestCase
     Environment.delete_all
   end
 
+  test 'grouping to clients with different but compatible api_keys' do
+
+    env_1 = Environment.create(
+      new_environmnent( :longitude => 13.420, :latitude => 52.522 ).merge(
+        :api_key => "b3b03410159c012e7b5a00163e001ab0"
+      )
+    )
+
+    env_2 = Environment.create(
+      new_environmnent( :longitude => 13.420, :latitude => 52.522 ).merge(
+        :api_key => "e101e890ea97012d6b6f00163e001ab0"
+      )
+    )
+
+    assert env_1.hoccer_compatible?
+    assert env_2.hoccer_compatible?
+
+    assert env_1.reload[:group_id], "should have a group id"
+    assert env_2.reload[:group_id], "should have a group id"
+
+    debugger
+
+    assert_equal env_1.reload[:group_id], env_2.reload[:group_id]
+
+    assert env_1.hoccer_compatible_api_keys.include?( env_1.api_key )
+    assert env_2.hoccer_compatible_api_keys.include?( env_2.api_key )
+
+    assert_equal env_1.reload.group.count, 2
+  end
+
   test 'grouping two clients' do
 
     env_1 = Environment.create(
@@ -66,9 +96,9 @@ class TestEnvironment < Test::Unit::TestCase
     env_1 = Environment.create(location)
 
     # move second client ~150 to the away from first client
-    location[:gps][:longitude] += 0.0014; 
+    location[:gps][:longitude] += 0.0014;
     location[:client_uuid] = UUID.generate
-    env_2 = Environment.create(location)  
+    env_2 = Environment.create(location)
 
     assert env_1.reload[:group_id], "should have a group id"
     assert env_2.reload[:group_id], "should have a group id"
@@ -277,7 +307,7 @@ class TestEnvironment < Test::Unit::TestCase
     env_ios = Environment.create(
       { :wifi => {:bssids => ["1:a:b2:f0:1e:9"], :timestamp => Time.now.to_f } }
     )
- 
+
     assert_equal 2, Environment.last.group.size
   end
 
@@ -289,7 +319,7 @@ class TestEnvironment < Test::Unit::TestCase
     env_ios = Environment.create(
       { :wifi => {:bssids => ["01:0A:B2:f0:1E:09"], :timestamp => Time.now.to_f } }
     )
- 
+
     assert_equal 2, Environment.last.group.size
   end
 
@@ -301,7 +331,7 @@ class TestEnvironment < Test::Unit::TestCase
     env_ios = Environment.create(
       { :wifi => {:bssids => ["01:0A:B2:f0:1E:09"], :timestamp => Time.now.to_f } }
     )
- 
+
     assert_equal 2, Environment.last.group.size
   end
 
@@ -331,12 +361,12 @@ class TestEnvironment < Test::Unit::TestCase
   test 'grouping by only providing coarse network data' do
     env_1 = Environment.create({:network => {
         :longitude => 51.11, :latitude  => 14.153,
-        :accuracy  => 10000} 
+        :accuracy  => 10000}
       }
     )
 
     env_2 = Environment.create({:network => {
-        :longitude => 51.11, :latitude  => 14.154, :accuracy  => 10000} 
+        :longitude => 51.11, :latitude  => 14.154, :accuracy  => 10000}
       }
     )
 
@@ -352,7 +382,7 @@ class TestEnvironment < Test::Unit::TestCase
 
     env_2 = Environment.create({
       :network => {
-        :longitude => 51.451222, :latitude  => 14.15444, :accuracy  => 10000} 
+        :longitude => 51.451222, :latitude  => 14.15444, :accuracy  => 10000}
       })
 
     assert_equal 2, Environment.last.group.size
@@ -370,7 +400,7 @@ class TestEnvironment < Test::Unit::TestCase
       })
 
     env_2 = Environment.create({:gps => {
-        :longitude => 51.11222, :latitude  => 14.15444, :accuracy  => 100} 
+        :longitude => 51.11222, :latitude  => 14.15444, :accuracy  => 100}
       }
     )
 

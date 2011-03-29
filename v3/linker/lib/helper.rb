@@ -94,3 +94,11 @@ def log_action action_name, api_key
     collection.insert( doc )
   end
 end
+
+def log_hoc options
+  $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
+  collection  = $db.collection('hoc_stats')
+  doc = options.merge({:timestamp => Time.now})
+  
+  collection.insert( doc )
+end

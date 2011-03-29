@@ -54,11 +54,17 @@ module Hoccer
           body { response[:content] }
         end
 
+        log_hoc( 
+          :type      => :environment,
+          :client_id => uuid, 
+          :doc       => request_hash 
+        )
+
         if data = (request_hash["gps"] || request_hash["network"])
           http = EM::Protocols::HttpClient.request(
-            :host => "localhost",
-            :port => 8090,
-            :verb => 'PUT',
+            :host    => "localhost",
+            :port    => 8090,
+            :verb    => 'PUT',
             :request => "/hoc",
             :content => data.to_json
           )
@@ -86,6 +92,14 @@ module Hoccer
       }
 
       @@evaluators[action_name].add action
+      
+      log_hoc( 
+        :type      => :action, 
+        :method    => "PUT",
+        :client_id => uuid,
+        :doc       => action.reject { |k,v| k == :request }
+      )
+      
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
@@ -98,6 +112,14 @@ module Hoccer
         :api_key  => params["api_key"]
       }
       @@evaluators[action_name].add action
+      
+      log_hoc(
+        :type      => :action, 
+        :method    => "GET",
+        :client_id => uuid,
+        :doc       => (action.reject{ |k,v| k == :request })
+      )
+      
     end
 
     # javascript routes

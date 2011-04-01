@@ -40,9 +40,11 @@ module Hoccer
       puts sender.map {|x| !!x.request}
       puts waiter.map {|x| !!x.request}
 
-      if !sender.empty? and !waiter.empty?
-        sender.each { |x| x.request.body { ["robert"].to_json } }
-        waiter.each { |x| x.request.body { ["robert"].to_json } }
+      if !sender.empty? and !waiter.empty?        
+        data_list = sender.map { |s| s.action[:payload] }
+        
+        sender.each { |x| x.request.body { data_list.to_json } }
+        waiter.each { |x| x.request.body { data_list.to_json } }
       end
 
       deliver( sender,  waiter )

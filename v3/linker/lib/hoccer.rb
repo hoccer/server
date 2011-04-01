@@ -67,7 +67,15 @@ module Hoccer
 
     aput %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
       @current_client.add_action( action_name, :sender )
-
+      
+      # @current_client.success do 
+      #   
+      # end
+      # 
+      # @current_client.error do 
+      # 
+      # end
+      
       # @@evaluators[action_name].add action
     end
 

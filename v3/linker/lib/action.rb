@@ -18,10 +18,6 @@ module Hoccer
       self[:uuid]
     end
 
-    def jsonp_method
-      self[:jsonp_method]
-    end
-
     def client
       Client.find( self[:uuid] )
     end

@@ -71,31 +71,14 @@ module Hoccer
         status action.response[0]
         body   action.response[1].to_json
       end
-      # 
-      # @current_client.error do 
-      # 
-      # end
-      
-      # @@evaluators[action_name].add action
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
       @current_client.add_action( action_name, :receiver )
-      
       @current_client.success do |action| 
          status action.response[0]
          body   action.response[1].to_json
       end
-      
-      # action = {
-      #   :mode     => action_name,
-      #   :type     => :receiver,
-      #   :request  => self,
-      #   :uuid     => uuid,
-      #   :waiting  => ( params['waiting'] || false ),
-      #   :api_key  => params["api_key"]
-      # }
-      # @@evaluators[action_name].add action
     end
 
     # javascript routes
@@ -126,46 +109,36 @@ module Hoccer
     end
 
     aget %r{#{CLIENTS}/action/send.js$} do |uuid|
-
-      puts params["payload"];
       if params["payload"]
         content = params["payload"]
         content['data'] = content['data'].values
       end
-
-      puts content
-
-      action  = {
-        :mode     => params["mode"],
-        :type     => :sender,
-        :payload  => content,
-        :request  => self,
-        :uuid     => uuid,
-        :jsonp_method => (params["jsonp"] || params["callback"]),
-        :api_key  => params["api_key"]
-      }
-
       headers "Access-Control-Allow-Origin" => "*"
-
-      @@evaluators[params["mode"]].add action
+      
+      @current_client.body_buffer = content
+      
+      @current_client.add_action( action_name, :receiver )
+      @current_client.success do |action| 
+        status action.response[0]
+        body   { "#{jsonp}(#{action.response[1].to_json})" }
+      end
     end
 
     aget %r{#{CLIENTS}/action/receive.js$} do |uuid|
-      action = {
-        :mode         => params["mode"],
-        :type         => :receiver,
-        :request      => self,
-        :uuid         => uuid,
-        :jsonp_method => (params["jsonp"] || params["callback"]),
-        :waiting      => (params["waiting"] || false),
-        :api_key      => params["api_key"]
-      }
-
       headers "Access-Control-Allow-Origin" => "*"
-
-      @@evaluators[params["mode"]].add action
+      
+      @current_client.add_action( action_name, :receiver )
+      @current_client.success do |action| 
+        status action.response[0]
+        body   { "#{jsonp}(#{action.response[1].to_json})" }
+      end
     end
-
+    
+    private
+    
+    def jsonp
+      params[:jsonp] || params[:content]
+    end
   end
 
 end

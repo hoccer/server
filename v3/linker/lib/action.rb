@@ -2,6 +2,8 @@ module Hoccer
   class Action < Hash
 
     @@actions = {}
+    
+    attr_accessor :response
 
     def self.create hash
       case hash[:name]
@@ -15,7 +17,7 @@ module Hoccer
     def request
       self[:request]
     end
-
+    
     def uuid
       self[:uuid]
     end
@@ -27,7 +29,12 @@ module Hoccer
     def client
       Client.find( self[:uuid] )
     end
-
+    
+    def response=(response)
+      @response = response
+      client.update
+    end
+    
     def verify group, reevaluate = false
       actions   = actions_in_group(group, name)
       sender    = actions.select { |c| c.action[:role] == :sender }
@@ -36,15 +43,11 @@ module Hoccer
 
       puts "verifying group (#{group.size}) with #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
-      puts "!!!!!!!!!!!!!!!!!!!!!"
-      puts sender.map {|x| !!x.request}
-      puts waiter.map {|x| !!x.request}
-
       if !sender.empty? and !waiter.empty?        
         data_list = sender.map { |s| s.action[:payload] }
         
-        sender.each { |x| x.request.body { data_list.to_json } }
-        waiter.each { |x| x.request.body { data_list.to_json } }
+        sender.each { |x| x.response = [200, data_list] }
+        waiter.each { |x| x.response = [200, data_list] }
       end
 
       deliver( sender,  waiter )
@@ -105,26 +108,11 @@ module Hoccer
     end
 
     def conflict uuid
-      if request
-        if jsonp_method
-          request.status 200
-          request.body { "#{jsonp_method}(#{ {"message" => "conflict"}.to_json })" }
-        else
-          request.status 409
-          request.body { {"message" => "conflict"}.to_json }
-        end
-      end
+      self.response = [409, {"message" => "conflict"}]
     end
 
     def send content
-      if request
-        request.status 200
-        if jsonp_method
-          request.body { "#{jsonp_method}(#{content.to_json})" }
-        else
-          request.body content.to_json
-        end
-      end
+        self.response = [200, content]
     end
 
     def actions_in_group group, mode
@@ -136,19 +124,7 @@ module Hoccer
     private
     def send_no_content
       puts "timeout for #{uuid}"
-
-      if request
-        if jsonp_method
-          request.status 200
-          request.body { "#{jsonp_method}(#{ {"message" => "timeout"}.to_json})" }
-        else
-          request.status 204
-          request.body { {"message" => "timeout"}.to_json }
-        end
-
-      end
-
-
+      self.response = [204, {"message" => "timeout"}]
     end
 
   end

@@ -68,9 +68,9 @@ module Hoccer
     aput %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
       @current_client.add_action( action_name, :sender )
       
-      # @current_client.success do 
-      #   
-      # end
+      @current_client.success do 
+         puts "Hallo put"
+      end
       # 
       # @current_client.error do 
       # 
@@ -81,6 +81,11 @@ module Hoccer
 
     aget %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
       @current_client.add_action( action_name, :receiver )
+      
+      @current_client.success do 
+         puts "Hallo get"
+      end
+      
       # action = {
       #   :mode     => action_name,
       #   :type     => :receiver,

@@ -84,7 +84,6 @@ module Hoccer
     end
 
     def add_action name, role
-
       self.action  = Action.create(
         :name     => name,
         :role     => role,
@@ -95,8 +94,17 @@ module Hoccer
         :api_key  => environment[:api_key]
       )
 
-      async_group { |group| action.verify( group ) }
+      async_group { |group| 
+        action.verify( group ) 
+      }
     end
-
+    
+    def success &block
+      @success = block
+    end
+    
+    def update
+      @success.call if @success
+    end
   end
 end

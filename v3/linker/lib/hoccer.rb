@@ -67,9 +67,9 @@ module Hoccer
 
     aput %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
       @current_client.add_action( action_name, :sender )
-      
-      @current_client.success do 
-        
+      @current_client.success do |action|
+        status action.response[0]
+        body   action.response[1].to_json
       end
       # 
       # @current_client.error do 
@@ -83,8 +83,8 @@ module Hoccer
       @current_client.add_action( action_name, :receiver )
       
       @current_client.success do |action| 
-         request.status = action.response[0]
-         request.body   = action.response[1]
+         status action.response[0]
+         body   action.response[1].to_json
       end
       
       # action = {

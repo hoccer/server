@@ -13,10 +13,6 @@ module Hoccer
         @@actions[hash[:uuid]] = OneToMany.new.merge!( hash )
       end
     end
-
-    def request
-      self[:request]
-    end
     
     def uuid
       self[:uuid]
@@ -46,8 +42,8 @@ module Hoccer
       if !sender.empty? and !waiter.empty?        
         data_list = sender.map { |s| s.action[:payload] }
         
-        sender.each { |x| x.response = [200, data_list] }
-        waiter.each { |x| x.response = [200, data_list] }
+        sender.each { |x| x.action.response = [200, data_list] }
+        waiter.each { |x| x.action.response = [200, data_list] }
       end
 
       deliver( sender,  waiter )
@@ -99,13 +95,13 @@ module Hoccer
       @@actions[self[:uuid]] = nil
     end
 
-    def send_timeout uuid
-      action = self[uuid]
-      unless action.nil? || action[:request].nil?
-        action[:request].ahalt 504
-      end
-      self[uuid] = nil
-    end
+    # def send_timeout uuid
+    #   action = self[uuid]
+    #   unless action.nil? || action[:request].nil?
+    #     action[:request].ahalt 504
+    #   end
+    #   self[uuid] = nil
+    # end
 
     def conflict uuid
       self.response = [409, {"message" => "conflict"}]

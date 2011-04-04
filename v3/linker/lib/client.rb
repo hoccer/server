@@ -8,15 +8,15 @@ module Hoccer
     attr_accessor :environment,
                   :action,
                   :body_buffer,
-                  :request,
                   :error,
                   :uuid,
-                  :hoccability
+                  :hoccability,
+                  :waiting
 
     @@clients = {}
 
     def initialize connection
-      @request          = connection
+      @waiting          = connection.params[:waiting] || false
       @uuid             = connection.request.path_info.match(UUID_PATTERN)[0]
       @body_buffer      = connection.request.body.read
       @environment      = { :api_key => connection.params["api_key"] }
@@ -73,7 +73,7 @@ module Hoccer
     end
 
     def waiting?
-      request.params['waiting'] || false
+      @waiting
     end
 
     def async_group &block
@@ -89,7 +89,6 @@ module Hoccer
         :role     => role,
         :payload  => parse_body,
         :waiting  => waiting?,
-        :request  => request,
         :uuid     => uuid,
         :api_key  => environment[:api_key]
       )
@@ -104,7 +103,7 @@ module Hoccer
     end
     
     def update
-      @success.call if @success
+      @success.call( action ) if @success
     end
   end
 end

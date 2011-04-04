@@ -29,6 +29,12 @@ module Hoccer
     
     def verify group, reevaluate = false
       actions   = actions_in_group(group, name)
+      
+      puts "actions ++++++++"
+      puts actions
+      
+      return if actions.size < 2
+      
       sender    = actions.select { |c| c.action[:role] == :sender }
       receiver  = actions.select { |c| c.action[:role] == :receiver }
       waiter    = actions.select { |c| c.action[:waiting] }
@@ -42,7 +48,7 @@ module Hoccer
         waiter.each { |x| x.action.response = [200, data_list] }
       end
 
-      deliver( sender,  waiter )
+      # deliver( sender,  waiter )
 
       if conflict? sender, receiver
         conflict actions

@@ -69,7 +69,7 @@ module Hoccer
       @current_client.add_action( action_name, :sender )
       
       @current_client.success do 
-         puts "Hallo put"
+        
       end
       # 
       # @current_client.error do 
@@ -83,7 +83,8 @@ module Hoccer
       @current_client.add_action( action_name, :receiver )
       
       @current_client.success do 
-         puts "Hallo get"
+         request.status = action.response[0]
+         request.body   = action.response[1]
       end
       
       # action = {

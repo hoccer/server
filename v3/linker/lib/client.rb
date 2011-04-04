@@ -94,7 +94,12 @@ module Hoccer
       )
 
       async_group { |group| 
-        action.verify( group ) 
+        action.verify( group )
+        
+        EM::Timer.new(group.latency + action.timeout) do
+          action.verify( group, true )
+          action.response = [ 204, {"message" => "timeout"}.to_json ]
+        end
       }
     end
     

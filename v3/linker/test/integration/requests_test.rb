@@ -67,7 +67,7 @@ class TestRequest < Test::Unit::TestCase
     })
 
     start_time = Time.now
-    response = client_1.share( "one-to-one", {:inline => "foobar"} )
+    response = client_1.share( "one-to-many", {:inline => "foobar"} )
     time_taken = Time.now - start_time
 
     assert time_taken >= 2, "Should timeout after 7 seconds"

@@ -8,9 +8,9 @@ module Hoccer
     def self.create hash
       case hash[:name]
       when 'one-to-one'
-        @@actions[hash[:uuid]] = OneToOne.new.merge!( hash )
+        OneToOne.new.merge!( hash )
       when 'one-to-many'
-        @@actions[hash[:uuid]] = OneToMany.new.merge!( hash )
+        OneToMany.new.merge!( hash )
       end
     end
     
@@ -28,11 +28,10 @@ module Hoccer
     end
     
     def verify group, reevaluate = false
+      invalidate if (group.size < 2) 
+      
       clients   = group.clients_with_action name
-      
-      puts "actions ++++++++"
-      puts clients
-      
+
       return if clients.size < 2
       
       sender    = clients.select { |c| c.action[:role] == :sender }
@@ -41,12 +40,12 @@ module Hoccer
 
       puts "verifying group (#{group.size}) with #{clients.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
-      if !sender.empty? and !waiter.empty?        
-        data_list = sender.map { |s| s.action[:payload] }
-        
-        sender.each { |x| x.action.response = [200, data_list] }
-        waiter.each { |x| x.action.response = [200, data_list] }
-      end
+      # if !sender.empty? and !waiter.empty?        
+      #   data_list = sender.map { |s| s.action[:payload] }
+      #   
+      #   sender.each { |x| x.action.response = [200, data_list] }
+      #   waiter.each { |x| x.action.response = [200, data_list] }
+      # end
 
       if conflict? sender, receiver
         conflict clients
@@ -92,7 +91,6 @@ module Hoccer
 
     def invalidate
       send_no_content
-      @@actions[self[:uuid]] = nil
     end
 
     # def send_timeout uuid
@@ -126,7 +124,6 @@ module Hoccer
   end
 
   class OneToOne < Action
-
     def name
       "one-to-one"
     end

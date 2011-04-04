@@ -92,8 +92,6 @@ module Hoccer
         :uuid     => uuid,
         :api_key  => environment[:api_key]
       )
-
-      puts self.action.inspect
       
       async_group { |group| 
         action.verify( group )

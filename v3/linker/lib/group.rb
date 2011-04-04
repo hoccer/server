@@ -27,6 +27,12 @@ module Hoccer
       Client.find_all_by_uuids( @members.map { |m| m['client_uuid'] } )
     end
 
+    def clients_with_action name
+      clients_with_action = clients.select do |c|
+        c.action != nil && c.action.name == name
+      end
+    end
+
   end
 
 end

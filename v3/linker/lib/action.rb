@@ -28,18 +28,18 @@ module Hoccer
     end
     
     def verify group, reevaluate = false
-      actions   = actions_in_group(group, name)
+      clients   = group.clients_with_action name
       
       puts "actions ++++++++"
-      puts actions
+      puts clients
       
-      return if actions.size < 2
+      return if clients.size < 2
       
-      sender    = actions.select { |c| c.action[:role] == :sender }
-      receiver  = actions.select { |c| c.action[:role] == :receiver }
-      waiter    = actions.select { |c| c.action[:waiting] }
+      sender    = clients.select { |c| c.action[:role] == :sender }
+      receiver  = clients.select { |c| c.action[:role] == :receiver }
+      waiter    = clients.select { |c| c.action[:waiting] }
 
-      puts "verifying group (#{group.size}) with #{actions.size} actions with #{sender.size} senders and #{receiver.size} receivers"
+      puts "verifying group (#{group.size}) with #{clients.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
       if !sender.empty? and !waiter.empty?        
         data_list = sender.map { |s| s.action[:payload] }
@@ -48,12 +48,10 @@ module Hoccer
         waiter.each { |x| x.action.response = [200, data_list] }
       end
 
-      # deliver( sender,  waiter )
-
       if conflict? sender, receiver
-        conflict actions
+        conflict clients
       elsif success? sender, receiver, group, reevaluate
-        deliver( sender, actions )
+        deliver( sender, clients )
       # elsif delivered? sender, reevaluate
       else
         deliver( sender, sender )

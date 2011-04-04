@@ -82,7 +82,7 @@ module Hoccer
     aget %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
       @current_client.add_action( action_name, :receiver )
       
-      @current_client.success do 
+      @current_client.success do |action| 
          request.status = action.response[0]
          request.body   = action.response[1]
       end

@@ -22,15 +22,6 @@ module Hoccer
       @current_client = Hoccer::Client.new( self )
     end
 
-    @@action_store  = ActionStore.new
-    @@evaluators    = {}
-
-    def initialize
-      super
-      @@evaluators['one-to-one']  = OneToOne.new @@action_store
-      @@evaluators['one-to-many'] = OneToMany.new @@action_store
-    end
-
     aget %r{#{CLIENTS}$} do |uuid|
       @current_client.info do |response|
         if response[:status] == 200

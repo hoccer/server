@@ -101,7 +101,7 @@ module Hoccer
         if @action
           if waiting?
             EM::Timer.new(60) do
-              action.response = [504, {"message" => "request_timeout"}. to_json] if self.action != nil
+              action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
             end
           else
             EM::Timer.new(group.latency + self.action.timeout) do

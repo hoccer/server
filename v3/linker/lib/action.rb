@@ -1,7 +1,7 @@
 module Hoccer
   class Action < Hash
     
-    attr_accessor :response, :content_sent
+    attr_accessor :response
 
     def self.create hash
       case hash[:name]
@@ -26,17 +26,21 @@ module Hoccer
     end
     
     def send_to_waiters group
+      return if self[:role] == :receiver 
+      
       clients   = group.clients_with_action( name )
-      waiters    = clients.select { |c| c.action[:role] == :receiver && c.action[:waiter] == true }
+      waiters    = clients.select { |c| c.action[:role] == :receiver && c.action[:waiting] }
+      puts waiters.inspect
       
       waiters.each do |w| 
-        w.action.response = [200, data]
+        w.action.response = [200, [ self[:payload] ] ]
       end
       
-      content_sent = true unless waiters.size == 0
+      @content_sent = true unless waiters.size == 0
     end
     
     def verify group, reevaluate = false
+      
       if (group.size < 2) 
         invalidate
       end
@@ -44,7 +48,7 @@ module Hoccer
       clients   = group.clients_with_action( name )
       
       sender    = clients.select { |c| c.action[:role] == :sender }
-      receiver  = clients.select { |c| c.action[:role] == :receiver }
+      receiver  = clients.select { |c| c.action[:role] == :receiver && !c.action[:waiting] }
 
       puts "verifying group (#{group.size}) with #{clients.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
@@ -60,8 +64,13 @@ module Hoccer
     end
 
     def invalidate
-      puts "timeout for #{uuid}"
-      self.response = [204, {"message" => "timeout"}]
+      if @content_sent
+        self.response = [200, [ self[:payload] ] ]
+      else
+        puts "timeout for #{uuid}"
+        self.response = [204, {"message" => "timeout"}]
+      end
+
     end
 
     def conflict clients

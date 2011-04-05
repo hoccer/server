@@ -40,8 +40,7 @@ module Hoccer
     end
     
     def verify group, reevaluate = false
-      
-      if (group.size < 2) 
+      if (group.size_without_waiters < 2) 
         invalidate
       end
       

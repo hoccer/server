@@ -24,16 +24,25 @@ module Hoccer
       @members.size
     end
 
+    def size_without_waiters 
+      clients.inject(0) do |sum, element| 
+        sum += 1 if !element.action || ( element.action && !element.action[:waiting] )
+        sum
+      end
+    end
+    
     def clients
       Client.find_all_by_uuids( @members.map { |m| m['client_uuid'] } )
     end
 
     def clients_with_action name
-      clients_with_action = clients.select do |c|
+      clients.select do |c|
         c.action != nil && c.action.name == name
       end
     end
-
+    
+    
+    
   end
 
 end

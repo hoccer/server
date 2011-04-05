@@ -93,17 +93,15 @@ module Hoccer
         :api_key  => environment[:api_key]
       )
       
-      async_group { |group| 
-        @action.send_to_waiters( group ) if @action
-        
-        @action.verify( group ) if @action
-        
-        if @action
-          if waiting?
-            EM::Timer.new(60) do
-              action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
-            end
-          else
+      async_group do |group| 
+        if waiting?
+          EM::Timer.new(60) do
+            action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
+          end
+        else
+          @action.send_to_waiters( group ) if @action
+          @action.verify( group ) if @action
+          if @action
             EM::Timer.new(group.latency + self.action.timeout) do
               action.verify( group, true ) if self.action != nil
           
@@ -112,7 +110,7 @@ module Hoccer
             end
           end
         end
-      }
+      end
     end
     
     def success &block

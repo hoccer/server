@@ -1,7 +1,7 @@
 module Hoccer
   class Action < Hash
     
-    attr_accessor :response
+    attr_accessor :response, :content_sent
 
     def self.create hash
       case hash[:name]
@@ -23,6 +23,17 @@ module Hoccer
     def response=(response)
       @response = response
       client.update
+    end
+    
+    def send_to_waiters group
+      clients   = group.clients_with_action( name )
+      waiters    = clients.select { |c| c.action[:role] == :receiver && c.action[:waiter] == true }
+      
+      waiters.each do |w| 
+        w.action.response = [200, data]
+      end
+      
+      content_sent = true unless waiters.size == 0
     end
     
     def verify group, reevaluate = false

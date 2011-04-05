@@ -1,7 +1,5 @@
 module Hoccer
   class Action < Hash
-
-    @@actions = {}
     
     attr_accessor :response
 
@@ -29,8 +27,7 @@ module Hoccer
     
     def verify group, reevaluate = false
       if (group.size < 2) 
-        send_no_content
-        puts "no content"
+        invalidate
       end
       
       clients   = group.clients_with_action( name )
@@ -41,58 +38,20 @@ module Hoccer
       puts "verifying group (#{group.size}) with #{clients.size} actions with #{sender.size} senders and #{receiver.size} receivers"
 
       return if clients.size < 2
-
-      # if !sender.empty? and !waiter.empty?        
-      #   data_list = sender.map { |s| s.action[:payload] }
-      #   
-      #   sender.each { |x| x.action.response = [200, data_list] }
-      #   waiter.each { |x| x.action.response = [200, data_list] }
-      # end
-
+      
       if conflict? sender, receiver
         conflict clients
       elsif success? sender, receiver, group, reevaluate
         data = sender.map { |s| s.action[:payload] }
         
         clients.each { |x| x.action.response = [200, data] }
-        # deliver( sender, clients )
-        # deliver( sender, sender )
-      end
-
-      # if sender.all? { |x| x.action }
-      #   deliver( sender, sender )
-      # end
-    end
-
-    def deliver sender, receivers
-      receivers.each do |receiver|
-        data_list = []
-
-        sender.each do |s|
-          # s[:sent_to] ||= []
-          # unless s[:sent_to].include?( receiver[:uuid] )
-          # s[:sent_to] << receiver[:uuid]
-            data_list << s.action[:payload]
-          # end
-        end
-
-        unless data_list.empty?
-          send( data_list )
-        end
       end
     end
 
     def invalidate
-      send_no_content
+      puts "timeout for #{uuid}"
+      self.response = [204, {"message" => "timeout"}]
     end
-
-    # def send_timeout uuid
-    #   action = self[uuid]
-    #   unless action.nil? || action[:request].nil?
-    #     action[:request].ahalt 504
-    #   end
-    #   self[uuid] = nil
-    # end
 
     def conflict clients
       clients.each do |c|
@@ -100,16 +59,7 @@ module Hoccer
       end
     end
 
-    def send content
-        self.response = [200, content]
-    end
-
     private
-    def send_no_content
-      puts "timeout for #{uuid}"
-      self.response = [204, {"message" => "timeout"}]
-    end
-
   end
 
   class OneToOne < Action

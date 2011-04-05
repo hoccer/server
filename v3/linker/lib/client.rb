@@ -84,7 +84,7 @@ module Hoccer
     end
 
     def add_action name, role
-      self.action  = Action.create(
+      @action  = Action.create(
         :name     => name,
         :role     => role,
         :payload  => parse_body,
@@ -94,14 +94,13 @@ module Hoccer
       )
       
       async_group { |group| 
-        self.action.verify( group ) if self.action != nil
         
-        if self.action
+        @action.verify( group ) if self.action != nil
+        if @action
           EM::Timer.new(group.latency + self.action.timeout) do
-            puts "action!!!!!!!!!!!!!!!!!!!!!!! #{action}"
             action.verify( group, true ) if self.action != nil
           
-            # action could be changed in above function
+            # action could be changed in function call above
             action.response = [ 204, {"message" => "timeout"}.to_json ] if self.action != nil
           end
         end
@@ -113,9 +112,8 @@ module Hoccer
     end
     
     def update
-      
-      @success.call( action ) if @success && action
-      self.action = nil;
+      @success.call( action ) if @success && @action
+      @action = nil;
     end
   end
 end

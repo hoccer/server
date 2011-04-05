@@ -98,7 +98,6 @@ class TestOneToMany < Test::Unit::TestCase
       t1 = Thread.new {client_1.receive("one-to-many")}      
       client_1_response = t1.value
       duration = Time.now - start_time
-      puts "duration #{duration}"
       assert duration > 4, "should timeout in more than 4 seconds, took #{duration}"
      
       client_1.delete_environment

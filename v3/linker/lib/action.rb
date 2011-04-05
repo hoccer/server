@@ -70,7 +70,6 @@ module Hoccer
         puts "timeout for #{uuid}"
         self.response = [204, {"message" => "timeout"}]
       end
-
     end
 
     def conflict clients

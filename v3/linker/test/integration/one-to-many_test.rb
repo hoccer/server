@@ -110,11 +110,13 @@ class TestOneToMany < Test::Unit::TestCase
      
       t2 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
       sleep(10)
+      start_time = Time.now
       t1 = Thread.new {client_2.share("one-to-many", { "inline" => "foobar" } )}
      
       client_1_response = t1.value
       client_2_response = t2.value
-     
+      duration = Time.now - start_time
+      
       expected = [{"inline" => "foobar" }]
      
       assert client_2_response, "waiters response should not be nil"
@@ -122,6 +124,8 @@ class TestOneToMany < Test::Unit::TestCase
       
       assert client_1_response, "sender response should not be nil"
       assert_equal expected, client_1_response
+      
+      assert duration < 0.5, "should response immediatly, but was #{duration}" 
            
       client_1.delete_environment
       client_2.delete_environment

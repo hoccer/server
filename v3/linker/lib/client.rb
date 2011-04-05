@@ -108,7 +108,7 @@ module Hoccer
               action.verify( group, true ) if self.action != nil
           
               # action could be changed in function call above
-              action.response = [ 204, {"message" => "timeout"}.to_json ] if self.action != nil
+              action.invalidate if self.action != nil
             end
           end
         end

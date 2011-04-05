@@ -28,17 +28,19 @@ module Hoccer
     end
     
     def verify group, reevaluate = false
-      invalidate if (group.size < 2) 
+      if (group.size < 2) 
+        send_no_content
+        puts "no content"
+      end
       
-      clients   = group.clients_with_action name
-
-      return if clients.size < 2
+      clients   = group.clients_with_action( name )
       
       sender    = clients.select { |c| c.action[:role] == :sender }
       receiver  = clients.select { |c| c.action[:role] == :receiver }
-      waiter    = clients.select { |c| c.action[:waiting] }
 
       puts "verifying group (#{group.size}) with #{clients.size} actions with #{sender.size} senders and #{receiver.size} receivers"
+
+      return if clients.size < 2
 
       # if !sender.empty? and !waiter.empty?        
       #   data_list = sender.map { |s| s.action[:payload] }
@@ -50,19 +52,19 @@ module Hoccer
       if conflict? sender, receiver
         conflict clients
       elsif success? sender, receiver, group, reevaluate
-        deliver( sender, clients )
-      # elsif delivered? sender, reevaluate
-      else
-        deliver( sender, sender )
+        data = sender.map { |s| s.action[:payload] }
+        
+        clients.each { |x| x.action.response = [200, data] }
+        # deliver( sender, clients )
+        # deliver( sender, sender )
       end
 
-      # if sender.all? {|x| x.request}
+      # if sender.all? { |x| x.action }
       #   deliver( sender, sender )
       # end
     end
 
     def deliver sender, receivers
-
       receivers.each do |receiver|
         data_list = []
 
@@ -80,15 +82,6 @@ module Hoccer
       end
     end
 
-    def hold_action_for_seconds action, seconds
-      uuid = action[:uuid]
-      self[uuid] = action
-
-      EM::Timer.new(seconds) do
-        invalidate uuid
-      end
-    end
-
     def invalidate
       send_no_content
     end
@@ -101,18 +94,14 @@ module Hoccer
     #   self[uuid] = nil
     # end
 
-    def conflict uuid
-      self.response = [409, {"message" => "conflict"}]
+    def conflict clients
+      clients.each do |c|
+        c.action.response = [409, {"message" => "conflict"}]
+      end
     end
 
     def send content
         self.response = [200, content]
-    end
-
-    def actions_in_group group, mode
-      clients = group.clients.select do |c|
-        c.action && c.action.name == self.name
-      end
     end
 
     private

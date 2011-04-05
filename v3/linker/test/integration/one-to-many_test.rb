@@ -89,8 +89,22 @@ class TestOneToMany < Test::Unit::TestCase
       client_2.delete_environment
       client_3.delete_environment
     end
-       
-       
+    
+    test 'timeout if not waiting' do
+      client_1 = create_client
+      client_2 = create_client
+     
+      start_time = Time.now
+      t1 = Thread.new {client_1.receive("one-to-many")}      
+      client_1_response = t1.value
+      duration = Time.now - start_time
+      puts "duration #{duration}"
+      assert duration > 4, "should timeout in more than 4 seconds, took #{duration}"
+     
+      client_1.delete_environment
+      client_2.delete_environment
+    end
+    
     test 'longpolling holding get' do
       client_1 = create_client
       client_2 = create_client
@@ -117,11 +131,11 @@ class TestOneToMany < Test::Unit::TestCase
        
       t2 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
       sleep(10)
-      t1 = Thread.new {client_2.share("one-to-many", { "inline" => "foobar" } )}
+      t1 = Thread.new {client_2.share("one-to-many", { "inline" => "barbaz" } )}
        
       client_1_response = t1.value
       client_2_response = t2.value
-      assert_equal [{"inline" => "foobar" }], client_1_response
+      assert_equal [{"inline" => "barbaz" }], client_1_response
        
       client_1.update_environment({
           :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
@@ -155,36 +169,36 @@ class TestOneToMany < Test::Unit::TestCase
       assert_equal [{"inline" => "foobar"}], t1.value
     end
    
-  #   test 'waiting clients only get the data once' do
-  #      client_1 = create_client
-  #      client_2 = create_client
-  #      client_3 = create_client
-  #   
-  #      t1 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
-  #      sleep(1)
-  #      t2 = Thread.new {client_2.share("one-to-many", { "inline" => "foobar" } )}
-  #   
-  #      sleep(1)
-  #      assert_equal [{"inline" => "foobar"}], t1.value
-  #      assert_equal [{"inline" => "foobar"}], t2.value
-  #   
-  #      #t3 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
-  #      t4 = Thread.new {client_1.receive("one-to-many")}
-  #   
-  #      #sleep(1)
-  #      #assert_equal t3.value, nil
-  #    end
-  #  
-  #   test 'waiting clients get quick delivery' do
-  #     client_1 = create_client
-  #     client_2 = create_client
-  #      
-  #     t1 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
-  #     sleep(6)
-  #     t2 = Thread.new {client_2.share("one-to-many", { "inline" => "foobar" } )}
-  #     puts "go"
-  #      
-  #     assert_equal [{"inline" => "foobar"}], t1.value
-  #     assert_equal [{"inline" => "foobar"}], t2.value
-  #   end
+    # test 'waiting clients only get the data once' do
+    #    client_1 = create_client
+    #    client_2 = create_client
+    #    client_3 = create_client
+    # 
+    #    t1 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
+    #    sleep(1)
+    #    t2 = Thread.new {client_2.share("one-to-many", { "inline" => "foobar" } )}
+    # 
+    #    sleep(1)
+    #    assert_equal [{"inline" => "foobar"}], t1.value
+    #    assert_equal [{"inline" => "foobar"}], t2.value
+    # 
+    #    #t3 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
+    #    t4 = Thread.new {client_1.receive("one-to-many")}
+    # 
+    #    #sleep(1)
+    #    #assert_equal t3.value, nil
+    #  end
+    #    
+    # test 'waiting clients get quick delivery' do
+    #   client_1 = create_client
+    #   client_2 = create_client
+    #    
+    #   t1 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
+    #   sleep(6)
+    #   t2 = Thread.new {client_2.share("one-to-many", { "inline" => "foobar" } )}
+    #   puts "go"
+    #    
+    #   assert_equal [{"inline" => "foobar"}], t1.value
+    #   assert_equal [{"inline" => "foobar"}], t2.value
+    # end
 end

@@ -94,11 +94,16 @@ module Hoccer
       )
       
       async_group { |group| 
-        action.verify( group )
+        self.action.verify( group ) if self.action != nil
         
-        EM::Timer.new(group.latency + action.timeout) do
-          action.verify( group, true )
-          action.response = [ 204, {"message" => "timeout"}.to_json ]
+        if self.action
+          EM::Timer.new(group.latency + self.action.timeout) do
+            puts "action!!!!!!!!!!!!!!!!!!!!!!! #{action}"
+            action.verify( group, true ) if self.action != nil
+          
+            # action could be changed in above function
+            action.response = [ 204, {"message" => "timeout"}.to_json ] if self.action != nil
+          end
         end
       }
     end
@@ -108,7 +113,9 @@ module Hoccer
     end
     
     def update
-      @success.call( action ) if @success
+      
+      @success.call( action ) if @success && action
+      self.action = nil;
     end
   end
 end

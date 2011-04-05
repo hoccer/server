@@ -128,7 +128,7 @@ module Hoccer
       headers "Access-Control-Allow-Origin" => "*"
       
       @current_client.add_action( action_name, :receiver )
-      @current_client.success do |action| 
+      @current_client.success do |action|
         status action.response[0]
         body   { "#{jsonp}(#{action.response[1].to_json})" }
       end

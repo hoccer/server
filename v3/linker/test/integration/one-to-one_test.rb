@@ -63,7 +63,6 @@ class TestOneToOne < Test::Unit::TestCase
     client_3_response = t3.value
     client_2_response = t2.value
     client_1_response = t1.value
-   
     assert_nil client_3_response
    
     client_1.delete_environment

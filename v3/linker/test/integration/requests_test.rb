@@ -37,7 +37,11 @@ class TestRequest < Test::Unit::TestCase
     client.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
+    start_time = Time.now
     response = client.share( "one-to-one", {:inline => "hello"} )
+    duration = Time.now - start_time < 0.1
+  
+    assert duration, "client should return immediatly, but it took #{duration}"
     assert_nil response
   
     client.delete_environment
@@ -166,24 +170,24 @@ class TestRequest < Test::Unit::TestCase
     client_1.delete_environment
     client_2.delete_environment
   end
-
+  
   test "two clients with different modes do not pair" do
     client_1 = create_client
     client_2 = create_client
-
+  
     t1 = Thread.new { client_2.receive("one-to-one") }
     t2 = Thread.new { client_1.share("one-to-many", {:inline => "foobar"}) }
-
+  
     client_2_response = t2.value
     client_1_response = t1.value
-
+  
     assert_nil client_1_response
     assert_nil client_2_response
-
+  
     client_1.delete_environment
     client_2.delete_environment
   end
-
+  
   test "sending and receiving in both directions" do
     client_1 = create_client
     client_2 = create_client
@@ -223,7 +227,7 @@ class TestRequest < Test::Unit::TestCase
     client_1.delete_environment
     client_2.delete_environment
   end
-
+  
   test "updating environment" do
     client = create_client
     client.update_environment(

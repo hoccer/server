@@ -3,7 +3,6 @@ module Hoccer
   class Group
 
     def initialize response
-      puts response
       @members = JSON.parse( response )
     end
 
@@ -17,6 +16,8 @@ module Hoccer
       else
         max_latency = 3
       end
+      
+      max_latency
     end
 
     def size

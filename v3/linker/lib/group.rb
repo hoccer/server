@@ -26,7 +26,7 @@ module Hoccer
 
     def size_without_waiters 
       clients.inject(0) do |sum, element| 
-        sum += 1 if !element.action || ( element.action && !element.action[:waiting] )
+        sum += 1 unless element.waiting?
         sum
       end
     end

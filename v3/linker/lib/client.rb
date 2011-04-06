@@ -83,7 +83,7 @@ module Hoccer
       end
     end
 
-    def add_action name, role
+    def add_action name, role      
       @action  = Action.create(
         :name     => name,
         :role     => role,

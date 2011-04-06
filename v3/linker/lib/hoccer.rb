@@ -1,8 +1,6 @@
 require 'sinatra/reloader'
-require 'action_store'
 require 'action'
 require 'group'
-require 'events'
 require 'client'
 require 'helper'
 

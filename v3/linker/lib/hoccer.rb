@@ -17,7 +17,8 @@ module Hoccer
     set :public, File.join(File.dirname(__FILE__), '..', '/public')
 
     before do
-      @current_client = Hoccer::Client.new( self )
+      @current_client = Hoccer::Client.find_or_create( self )
+      @current_client.update_connection self
     end
 
     aget %r{#{CLIENTS}$} do |uuid|
@@ -88,7 +89,6 @@ module Hoccer
           :api_key => params["api_key"]
         }
 
-        puts "put body #{environment}"
         em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
           status 201
           headers "Access-Control-Allow-Origin" => "*"
@@ -106,7 +106,7 @@ module Hoccer
       
       @current_client.body_buffer = content
       
-      @current_client.add_action( action_name, :receiver )
+      @current_client.add_action( params[:mode], :sender )
       @current_client.success do |action| 
         status action.response[0]
         body   { "#{jsonp}(#{action.response[1].to_json})" }
@@ -114,10 +114,12 @@ module Hoccer
     end
 
     aget %r{#{CLIENTS}/action/receive.js$} do |uuid|
-      headers "Access-Control-Allow-Origin" => "*"
+      puts "receive #{params.inspect}"
       
-      @current_client.add_action( action_name, :receiver )
+      @current_client.add_action( params[:mode], :receiver, true )
       @current_client.success do |action|
+        headers "Access-Control-Allow-Origin" => "*"
+        
         status action.response[0]
         body   { "#{jsonp}(#{action.response[1].to_json})" }
       end

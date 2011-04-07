@@ -17,6 +17,12 @@ module Hoccer
 
     def initialize connection
       @uuid             = connection.request.path_info.match(UUID_PATTERN)[0]
+
+      @@clients[@uuid]  = self
+    end
+    
+    def update_connection connection
+      @uuid             = connection.request.path_info.match(UUID_PATTERN)[0]
       @body_buffer      = connection.request.body.read
       @environment      = { :api_key => connection.params["api_key"] }
       @error            = nil
@@ -47,8 +53,10 @@ module Hoccer
       end
     end
 
-    def find_or_create uuid
-      @@clients[uuid] ||= Client.new( uuid )
+    def self.find_or_create connection
+      uuid = connection.request.path_info.match(UUID_PATTERN)[0]
+      
+      @@clients[uuid] ||= Client.new( connection )
     end
 
     def update_environment &block
@@ -94,9 +102,12 @@ module Hoccer
         :api_key  => environment[:api_key]
       )
       
+      puts "client waiting #{waiting?} name #{name} role #{role}"
+      
       async_group do |group| 
         if waiting?
           EM::Timer.new(60) do
+            puts "killing the connection"
             action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
           end
         else

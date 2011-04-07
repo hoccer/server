@@ -16,7 +16,6 @@ module Hoccer
     @@clients = {}
 
     def initialize connection
-      @waiting          = connection.params[:waiting] || false
       @uuid             = connection.request.path_info.match(UUID_PATTERN)[0]
       @body_buffer      = connection.request.body.read
       @environment      = { :api_key => connection.params["api_key"] }
@@ -83,7 +82,9 @@ module Hoccer
       end
     end
 
-    def add_action name, role      
+    def add_action name, role, waiting = false
+      @waiting = waiting
+      
       @action  = Action.create(
         :name     => name,
         :role     => role,

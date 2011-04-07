@@ -26,8 +26,6 @@ module Hoccer
       @body_buffer      = connection.request.body.read
       @environment      = { :api_key => connection.params["api_key"] }
       @error            = nil
-
-      @@clients[@uuid]  = self
     end
 
     def parse_body

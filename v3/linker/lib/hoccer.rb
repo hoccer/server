@@ -102,33 +102,26 @@ module Hoccer
         content = params["payload"]
         content['data'] = content['data'].values
       end
-      headers "Access-Control-Allow-Origin" => "*"
-      
-      @current_client.body_buffer = content
+      puts ">>>>>>>>>>>>>>>>>>>>>>>>>>>>> content #{content}"
+      @current_client.body_buffer = content.to_string
       
       @current_client.add_action( params[:mode], :sender )
       @current_client.success do |action| 
+        headers "Access-Control-Allow-Origin" => "*"
+              
         status action.response[0]
-        body   { "#{jsonp}(#{action.response[1].to_json})" }
+        body   { action.response[1].to_json }
       end
     end
 
-    aget %r{#{CLIENTS}/action/receive.js$} do |uuid|
-      puts "receive #{params.inspect}"
-      
+    aget %r{#{CLIENTS}/action/receive.js$} do |uuid|      
       @current_client.add_action( params[:mode], :receiver, true )
       @current_client.success do |action|
         headers "Access-Control-Allow-Origin" => "*"
         
         status action.response[0]
-        body   { "#{jsonp}(#{action.response[1].to_json})" }
+        body   { action.response[1].to_json }
       end
-    end
-    
-    private
-    
-    def jsonp
-      params[:jsonp] || params[:content]
     end
   end
 

@@ -179,23 +179,23 @@ class TestOneToMany < Test::Unit::TestCase
      end
        
     test 'waiting clients only get the data once' do
-       client_1 = create_client
-       client_2 = create_client
-       client_3 = create_client
+      client_1 = create_client
+      client_2 = create_client
+      client_3 = create_client
     
-       t1 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
-       sleep(1)
-       t2 = Thread.new {client_2.share("one-to-many", { "inline" => "foobar" } )}
+      t1 = Thread.new {client_1.receive("one-to-many", :waiting => true)}
+      sleep(1)
+      t2 = Thread.new {client_2.share("one-to-many", { "inline" => "foobar" } )}
     
-       sleep(1)
-       assert_equal [{"inline" => "foobar"}], t1.value
-       assert_equal [{"inline" => "foobar"}], t2.value
+      sleep(1)
+      assert_equal [{"inline" => "foobar"}], t1.value
+      assert_equal [{"inline" => "foobar"}], t2.value
     
-       t3 = Thread.new {client_1.receive("one-to-many", :waiting => true) }
-       # t4 = Thread.new {client_1.receive("one-to-many")}
-       sleep(10)
-       Thread.kill(t3)
-       assert_equal t3.value, nil
+      t3 = Thread.new {client_1.receive("one-to-many", :waiting => true) }
+      # t4 = Thread.new {client_1.receive("one-to-many")}
+      sleep(10)
+      Thread.kill(t3)
+      assert_equal t3.value, nil
     end
        
     test 'waiting clients get quick delivery' do

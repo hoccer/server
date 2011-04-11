@@ -7,11 +7,11 @@ module Hoccer
 
     attr_accessor :environment,
                   :action,
-                  :body_buffer,
                   :error,
                   :uuid,
                   :hoccability,
-                  :waiting
+                  :waiting,
+                  :body_content
 
     @@clients = {}
 
@@ -23,6 +23,7 @@ module Hoccer
     
     def update_connection connection
       @uuid             = connection.request.path_info.match(UUID_PATTERN)[0]
+      @body_content     = nil
       @body_buffer      = connection.request.body.read
       @environment      = { :api_key => connection.params["api_key"] }
       @error            = nil
@@ -30,7 +31,7 @@ module Hoccer
 
     def parse_body
       begin
-        @last_body = JSON.parse( @body_buffer )
+        @body_content || JSON.parse( @body_buffer )
       rescue => e
         @errors = e.message
         false
@@ -61,6 +62,7 @@ module Hoccer
       @environment.merge!( parse_body )
 
       em_put( "/clients/#{uuid}/environment", @environment.to_json ) do |response|
+        puts "response #{response}"
         block.call( response )
       end
     end
@@ -90,7 +92,6 @@ module Hoccer
 
     def add_action name, role, waiting = false
       @waiting = waiting
-      
       @action  = Action.create(
         :name     => name,
         :role     => role,

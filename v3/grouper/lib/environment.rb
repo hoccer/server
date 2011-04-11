@@ -16,6 +16,9 @@ module Hoccer
     field :group_id
     field :api_key
 
+    attr_accessor :grouped_envs
+
+
     before_create :add_group_id, :add_creation_time, :normalize_bssids, :choose_best_location
     before_save   :ensure_indexable
     after_create  :update_groups
@@ -168,7 +171,7 @@ module Hoccer
     def update_groups
       relevant_envs = self.nearby
 
-      grouped_envs = relevant_envs.inject([]) do |result, element|
+      @grouped_envs = relevant_envs.inject([]) do |result, element|
         element.group.each do |group_env|
           unless result.include?( group_env )
             result << group_env
@@ -178,12 +181,12 @@ module Hoccer
       end
 
       new_group_id = rand(Time.now.to_i)
-      ( grouped_envs | relevant_envs ).each do |foobar|
+      ( @grouped_envs | relevant_envs ).each do |foobar|
         foobar[:group_id] = new_group_id
         foobar.save
       end
-      if grouped_envs and grouped_envs.count > 1
-        #puts "grouped <#{grouped_envs.map {|e|  e.client_uuid rescue "<unknown>"} }>"
+      if @grouped_envs and @grouped_envs.count > 1
+        puts "grouped <#{@grouped_envs.map {|e|  e.client_uuid rescue "<unknown>"} }>"
       end
 
       reload

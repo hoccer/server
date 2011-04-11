@@ -102,8 +102,7 @@ module Hoccer
         content = params["payload"]
         content['data'] = content['data'].values
       end
-      puts ">>>>>>>>>>>>>>>>>>>>>>>>>>>>> content #{content}"
-      @current_client.body_buffer = content.to_string
+      @current_client.body_content = content
       
       @current_client.add_action( params[:mode], :sender )
       @current_client.success do |action| 

@@ -57,8 +57,6 @@ class TestEnvironment < Test::Unit::TestCase
     assert env_1.reload[:group_id], "should have a group id"
     assert env_2.reload[:group_id], "should have a group id"
 
-    debugger
-
     assert_equal env_1.reload[:group_id], env_2.reload[:group_id]
 
     assert env_1.hoccer_compatible_api_keys.include?( env_1.api_key )

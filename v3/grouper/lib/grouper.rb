@@ -24,9 +24,14 @@ module Hoccer
       if environment = Environment.first({ :conditions => {:client_uuid => uuid} })
         environment.destroy
       end
-      e = Environment.create( environment_data.merge!( :client_uuid => uuid ) )
+      env = Environment.create( environment_data.merge!( :client_uuid => uuid ) )
 
-      (Hoccability.analyze e).to_json
+      result = { 
+        :hoccability => Hoccability.analyze(env),
+        :group       => env.grouped_envs.map {|e|  e.client_uuid rescue "<unknown>"}
+      }
+      
+      result.to_json
     end
 
     get %r{/clients/(.{36,36})/group} do |uuid|

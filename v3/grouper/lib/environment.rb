@@ -112,7 +112,7 @@ module Hoccer
     end
 
     def hoccer_compatible?
-      db   = Mongo::Connection.new.db('hoccer_accounts')
+      $db  ||= Mongo::Connection.new.db('hoccer_accounts')
       coll = db.collection('accounts')
 
       0 < coll.find(
@@ -122,7 +122,7 @@ module Hoccer
     end
 
     def hoccer_compatible_api_keys
-      db   = Mongo::Connection.new.db('hoccer_accounts')
+      $db  ||= Mongo::Connection.new.db('hoccer_accounts')
       coll = db.collection('accounts')
 
       coll.find({:hoccer_compatible => true}, :fields => :api_key).map do |k|

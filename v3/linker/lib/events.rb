@@ -29,7 +29,7 @@ module Hoccer
 
         if 1 < group.size && group.any? { |x| x["latency"] }
           latencies = group.map { |x| ( x["latency"] || 3 ) }
-          max_latency = latencies.max / 1000
+          max_latency = latencies.max / 1000.0
           if max_latency > 6
             max_latency = 6
           end
@@ -125,7 +125,7 @@ module Hoccer
     end
 
     def timeout
-      1.2
+      2.5
     end
 
     def conflict? sender, receiver

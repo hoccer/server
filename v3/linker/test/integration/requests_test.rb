@@ -234,5 +234,13 @@ class TestRequest < Test::Unit::TestCase
         :gps => { :timestamp => 1289456, :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     )
   end
-
+  
+  test "grouping and notifying clients"
+    client_1 = create_client
+    client.peek
+    
+    
+  
+  
+  end
 end

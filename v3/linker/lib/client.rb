@@ -62,7 +62,6 @@ module Hoccer
       @environment.merge!( parse_body )
 
       em_put( "/clients/#{uuid}/environment", @environment.to_json ) do |response|
-        puts "response #{response}"
         block.call( response )
       end
     end

@@ -37,7 +37,9 @@ module Hoccer
         @current_client.update_environment do |response|
           if response[:status] == 200
             status 201
-            body { response[:content] }
+            content = JSON.parse( response[:content] )
+            puts "!!!!!!!!!!!!!!!!!! #{content["hoccability"]}"
+            body { content["hoccability"].to_json }
           else
             status 400
             body { {:error => @current_client.error}.to_json }

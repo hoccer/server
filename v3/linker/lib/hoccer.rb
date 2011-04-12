@@ -38,7 +38,6 @@ module Hoccer
           if response[:status] == 200
             status 201
             content = JSON.parse( response[:content] )
-            puts "!!!!!!!!!!!!!!!!!! #{content["hoccability"]}"
             body { content["hoccability"].to_json }
           else
             status 400

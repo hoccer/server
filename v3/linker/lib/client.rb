@@ -141,17 +141,19 @@ module Hoccer
       @grouped              = block
       @current_group_hash   = hash
       
-      async_group do |group|        
-        update_grouped group.client_ids
+      async_group { |group| update_grouped( group.client_ids )}
+      
+      EM::Timer.new(60) do
+        async_group { |group| update_grouped( group.client_ids, true ) }
       end
     end
     
-    def update_grouped group
+    def update_grouped group, forced=false
       related_ids = group
       
       md5 = Digest::MD5.hexdigest( related_ids.to_json )
       puts related_ids.inspect
-      if @current_group_hash != md5 && related_ids.size > 0
+      if (@current_group_hash != md5 && related_ids.size > 0) || forced
         response = { :group_id => md5, :group => related_ids }
         @grouped.call( response ) if @grouped
       end

@@ -42,6 +42,7 @@ module Hoccer
     end
     
     def client_ids
+      puts @members.inspect
       @members.map { |m|  m['client_uuid'] }
     end
   end

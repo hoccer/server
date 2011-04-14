@@ -147,12 +147,12 @@ module Hoccer
     end
     
     def update_grouped group
-      related_ids = group - [@uuid]
+      related_ids = group
       
       md5 = Digest::MD5.hexdigest( related_ids.to_json )
       puts related_ids.inspect
       if @current_group_hash != md5 && related_ids.size > 0
-        response = { :id => md5, :group => related_ids }
+        response = { :group_id => md5, :group => related_ids }
         @grouped.call( response ) if @grouped
       end
     end

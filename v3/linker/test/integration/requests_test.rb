@@ -240,12 +240,13 @@ class TestRequest < Test::Unit::TestCase
   
     t1 = Thread.new { client_1.peek }
     client_2 = create_client
-    
+    sleep 1
     response = t1.value
-    assert_equal 1, response.count
+    puts response.inspect
+    assert_equal 1, response["group"].count
     
     response_2 = client_2.peek
-    assert_equal 1, response_2.count
+    assert_equal 1, response_2["group"].count
   end
   
   test "grouping and notifying clients with waiting" do
@@ -256,7 +257,7 @@ class TestRequest < Test::Unit::TestCase
     client_2 = create_client
     
     response = t1.value
-    assert_equal 1, response.count
+    assert_equal 1, response["group"].count
   end
   
   

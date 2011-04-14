@@ -73,7 +73,7 @@ module Hoccer
     end
     
     aget %r{#{CLIENTS}/peek$} do |uuid| 
-      @current_client.grouped do |group|
+      @current_client.grouped params[:group_id] do |group|
         status 200
         body   group.to_json
       end

@@ -44,7 +44,7 @@ module Hoccer
     def client_infos
       puts @members.inspect
       @members.map do |m|  
-        { :id => m["client_uuid"], :client_name => m["client_name"] }
+        { :id => m["client_uuid"], :name => m["client_name"] }
       end
     end
   end

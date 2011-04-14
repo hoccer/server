@@ -70,6 +70,7 @@ module Hoccer
         ids = content["group"].map { |info| info["id"] }
         
         Client.find_all_by_uuids( ids ).each do |client|
+          
           client.update_grouped( content["group"] ) if client
         end
       end
@@ -108,8 +109,6 @@ module Hoccer
         :uuid     => uuid,
         :api_key  => environment[:api_key]
       )
-      
-      puts "client waiting #{waiting?} name #{name} role #{role}"
       
       async_group do |group| 
         if waiting?

@@ -41,8 +41,9 @@ module Hoccer
       end
     end
     
-    
-    
+    def client_ids
+      @members.map { |m|  m['client_uuid'] }
+    end
   end
 
 end

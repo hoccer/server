@@ -63,6 +63,11 @@ module Hoccer
 
       em_put( "/clients/#{uuid}/environment", @environment.to_json ) do |response|
         block.call( response )
+        
+        content = JSON.parse( response[:content] )
+        Client.find_all_by_uuids( content["group"] ).each do |client|
+          client.update_grouped( content["group"] )
+        end
       end
     end
 
@@ -131,5 +136,19 @@ module Hoccer
       @success.call( action ) if @success && @action
       @action = nil;
     end
+    
+    def grouped &block
+      async_group do |group|
+        block.call( group.client_ids - [@uuid] )
+      end
+      @grouped = block
+    end
+    
+    def update_grouped group
+      @grouped.call( group - [@uuid] ) if @grouped
+    end
+    
+    
+    
   end
 end

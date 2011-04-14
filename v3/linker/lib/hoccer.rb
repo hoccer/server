@@ -71,7 +71,14 @@ module Hoccer
          body   action.response[1].to_json
       end
     end
-
+    
+    aget %r{#{CLIENTS}/peek$} do |uuid| 
+      @current_client.grouped do |group|
+        status 200
+        body   group.to_json
+      end
+    end
+    
     # javascript routes
     aget %r{#{CLIENTS}/environment.js$} do |uuid|
       authorized_request do

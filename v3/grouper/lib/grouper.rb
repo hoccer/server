@@ -20,7 +20,7 @@ module Hoccer
     put %r{/clients/(.{36,36})/environment} do |uuid|
       request_body  = request.body.read
       environment_data = JSON.parse( request_body )
-
+      
       if environment = Environment.first({ :conditions => {:client_uuid => uuid} })
         environment.destroy
       end
@@ -28,7 +28,9 @@ module Hoccer
 
       result = { 
         :hoccability => Hoccability.analyze(env),
-        :group       => env.grouped_envs.map {|e|  e.client_uuid rescue "<unknown>"}
+        :group       => env.grouped_envs.map do |e| 
+          { :id => e.client_uuid, :name => e[:client_name] } 
+        end
       }
       
       result.to_json

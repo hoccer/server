@@ -30,7 +30,7 @@ module Hoccer
     def group
       Environment
         .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 30} })
-        .only(:client_uuid, :group_id, :latency ).to_a || []
+        .only(:client_uuid, :group_id, :latency, :client_name ).to_a || []
     end
 
     def has_wifi

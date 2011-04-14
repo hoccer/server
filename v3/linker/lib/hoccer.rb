@@ -78,7 +78,7 @@ module Hoccer
         content_type "application/json"
         body   group.to_json
         
-        @current_client.grouped nil
+        # @current_client.grouped nil
       end
     end
     

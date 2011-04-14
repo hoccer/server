@@ -70,7 +70,6 @@ module Hoccer
         ids = content["group"].map { |info| info["id"] }
         
         Client.find_all_by_uuids( ids ).each do |client|
-          
           client.update_grouped( content["group"] ) if client
         end
       end
@@ -87,7 +86,15 @@ module Hoccer
         )
       end
     end
-
+    
+    # def delete &block
+    #   async_group do |group|
+    #     em_delete("/clients/#{uuid}/delete") do |response|
+    #       block.call()
+    #     end
+    #   end
+    # end
+    
     def waiting?
       @waiting
     end
@@ -146,16 +153,19 @@ module Hoccer
       
       async_group { |group| update_grouped( group.client_infos ) }
       
-      EM::Timer.new(60) do
+      @peek_timer = EM::Timer.new(60) do
         async_group { |group| update_grouped( group.client_infos, true ) }
       end
     end
     
     def update_grouped group, forced = false
+      puts " #{group.inspect}"
       md5 = Digest::MD5.hexdigest( group.to_json )
       if (@current_group_hash != md5 && group.size > 0) || forced
         response = { :group_id => md5, :group => group }
         @grouped.call( response ) if @grouped
+        
+        @peek_timer.cancel if @peek_timer
       end
     end
   end

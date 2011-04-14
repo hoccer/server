@@ -152,9 +152,9 @@ module Hoccer
       end
     end
     
-    def update_grouped group, forced=false
+    def update_grouped group, forced = false
       md5 = Digest::MD5.hexdigest( group.to_json )
-      puts "!!!!!!!!!!!!!!" + group.inspect
+
       if (@current_group_hash != md5 && group.size > 0) || forced
         response = { :group_id => md5, :group => group }
         @grouped.call( response ) if @grouped

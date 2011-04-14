@@ -65,7 +65,11 @@ module Hoccer
         block.call( response )
         
         content = JSON.parse( response[:content] )
-        Client.find_all_by_uuids( content["group"] ).each do |client|
+        
+        puts content.inspect
+        ids = content["group"].map { |info| info["id"] }
+        
+        Client.find_all_by_uuids( ids ).each do |client|
           client.update_grouped( content["group"] ) if client
         end
       end
@@ -141,20 +145,18 @@ module Hoccer
       @grouped              = block
       @current_group_hash   = hash
       
-      async_group { |group| update_grouped( group.client_ids )}
+      async_group { |group| update_grouped( group.client_infos )}
       
       EM::Timer.new(60) do
-        async_group { |group| update_grouped( group.client_ids, true ) }
+        async_group { |group| update_grouped( group.client_infos, true ) }
       end
     end
     
     def update_grouped group, forced=false
-      related_ids = group
-      
-      md5 = Digest::MD5.hexdigest( related_ids.to_json )
-      puts related_ids.inspect
-      if (@current_group_hash != md5 && related_ids.size > 0) || forced
-        response = { :group_id => md5, :group => related_ids }
+      md5 = Digest::MD5.hexdigest( group.to_json )
+      puts "!!!!!!!!!!!!!!" + group.inspect
+      if (@current_group_hash != md5 && group.size > 0) || forced
+        response = { :group_id => md5, :group => group }
         @grouped.call( response ) if @grouped
       end
     end

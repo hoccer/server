@@ -73,8 +73,8 @@ module Hoccer
     end
     
     aget %r{#{CLIENTS}/peek$} do |uuid| 
-      puts params.inspect
       @current_client.grouped(params["group_id"]) do |group|
+        puts ">>>>>>>>>>>>>>>>>>>>>" + group.inspect
         status 200
         body   group.to_json
       end

@@ -65,8 +65,6 @@ module Hoccer
         block.call( response )
         
         content = JSON.parse( response[:content] )
-        
-        puts content.inspect
         ids = content["group"].map { |info| info["id"] }
         
         Client.find_all_by_uuids( ids ).each do |client|
@@ -87,13 +85,13 @@ module Hoccer
       end
     end
     
-    # def delete &block
-    #   async_group do |group|
-    #     em_delete("/clients/#{uuid}/delete") do |response|
-    #       block.call()
-    #     end
-    #   end
-    # end
+    def delete &block
+      async_group do |group|
+        em_delete("/clients/#{uuid}/delete") do |response|
+          block.call()
+        end
+      end
+    end
     
     def waiting?
       @waiting
@@ -120,7 +118,6 @@ module Hoccer
       async_group do |group| 
         if waiting?
           EM::Timer.new(60) do
-            puts "killing the connection"
             action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
           end
         else
@@ -159,7 +156,6 @@ module Hoccer
     end
     
     def update_grouped group, forced = false
-      puts " #{group.inspect}"
       md5 = Digest::MD5.hexdigest( group.to_json )
       if (@current_group_hash != md5 && group.size > 0) || forced
         response = { :group_id => md5, :group => group }

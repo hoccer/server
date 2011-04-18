@@ -133,41 +133,6 @@ module Hoccer
       end
     end
 
-    private
-    def ensure_indexable
-      return unless has_gps
-      begin
-        location = {
-          "longitude" => ( self.gps["longitude"] || self.gps[:longitude] ),
-          "latitude"  => ( self.gps["latitude"]  || self.gps[:latitude] )
-        }
-        self.gps = location.merge(self.gps)
-
-      rescue => e
-        puts "!!!!!!! Panic: #{e}"
-      end
-    end
-
-    def add_group_id
-      self[:group_id] = rand(Time.now.to_i)
-    end
-
-    def add_creation_time
-      self[:created_at] = Time.now.to_f
-    end
-
-    def normalize_bssids
-      return unless has_wifi
-      wifi = self.wifi.with_indifferent_access
-
-      bssids = wifi[:bssids]
-      return unless bssids
-      self.wifi[:bssids] = bssids.map do |bssid|
-        bssid.gsub(/\b([A-Fa-f0-9])\b/, '0\1').downcase
-      end
-      self.wifi.delete("bssids")
-    end
-
     def update_groups
       relevant_envs = self.nearby
 
@@ -185,11 +150,43 @@ module Hoccer
         foobar[:group_id] = new_group_id
         foobar.save
       end
-      if @grouped_envs and @grouped_envs.count > 1
-        puts "grouped <#{@grouped_envs.map {|e|  e.client_uuid rescue "<unknown>"} }>"
-      end
 
       reload
+    end
+
+    def add_group_id
+      self[:group_id] = rand(Time.now.to_i)
+    end
+    
+    private
+    def ensure_indexable
+      return unless has_gps
+      begin
+        location = {
+          "longitude" => ( self.gps["longitude"] || self.gps[:longitude] ),
+          "latitude"  => ( self.gps["latitude"]  || self.gps[:latitude] )
+        }
+        self.gps = location.merge(self.gps)
+
+      rescue => e
+        puts "!!!!!!! Panic: #{e}"
+      end
+    end
+
+    def add_creation_time
+      self[:created_at] = Time.now.to_f
+    end
+
+    def normalize_bssids
+      return unless has_wifi
+      wifi = self.wifi.with_indifferent_access
+
+      bssids = wifi[:bssids]
+      return unless bssids
+      self.wifi[:bssids] = bssids.map do |bssid|
+        bssid.gsub(/\b([A-Fa-f0-9])\b/, '0\1').downcase
+      end
+      self.wifi.delete("bssids")
     end
 
     def choose_best_location

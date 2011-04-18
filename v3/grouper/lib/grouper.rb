@@ -51,7 +51,27 @@ module Hoccer
     end
 
     delete %r{/clients/(.{36,36})/delete} do |uuid|
-      Environment.delete_all(:conditions => { :client_uuid =>  uuid })
+      environment = Environment.where(:client_uuid => uuid).first
+      
+      group = environment.group
+      group.each do |g|
+        g["group"] = 0
+        g.save
+      end
+
+      environment.destroy
+      
+      group.each do |g|
+        if g != environment && g["group"] == 0
+          puts "updating group"
+          g.add_group_id
+          g.save
+          g.update_groups
+        end
+      end
+      
+      status 200
+      body { "deleted" }
     end
 
     get %r{/clients/(.{36,36})/delete} do |uuid|

@@ -30,7 +30,6 @@ module Hoccer
       
       clients   = group.clients_with_action( name )
       waiters    = clients.select { |c| c.action[:role] == :receiver && c.action[:waiting] }
-      puts waiters.inspect
       
       waiters.each do |w| 
         w.action.response = [200, [ self[:payload] ] ]

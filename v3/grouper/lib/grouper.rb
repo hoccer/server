@@ -53,6 +53,8 @@ module Hoccer
 
     delete %r{/clients/(.{36,36})/delete} do |uuid|
       environment = Environment.where(:client_uuid => uuid).first
+      return unless environment
+      
       
       group = environment.group
       group.each do |g|

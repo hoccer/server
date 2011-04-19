@@ -38,6 +38,9 @@ module Hoccer
 
     get %r{/clients/(.{36,36})/group} do |uuid|
       client = Environment.newest uuid
+      
+      puts "!!!!!!!!!!!!!! #{client.group.inspect}"
+      
       if client && client.group
         client.group.to_json
       else
@@ -61,17 +64,22 @@ module Hoccer
 
       environment.destroy
       
+      updated_clients = []
       group.each do |g|
         if g != environment && g["group"] == 0
           puts "updating group"
           g.add_group_id
           g.save
           g.update_groups
+          
+          updated_clients << g["client_uuid"]
         end
       end
       
+      puts "returning #{updated_clients.to_json}"
+      
       status 200
-      body { "deleted" }
+      updated_clients.to_json
     end
 
     get %r{/clients/(.{36,36})/delete} do |uuid|

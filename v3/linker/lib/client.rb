@@ -88,7 +88,15 @@ module Hoccer
     def delete &block
       async_group do |group|
         em_delete("/clients/#{uuid}/delete") do |response|
-          block.call()
+          content = JSON.parse(response[:content])
+          block.call(content)
+          
+          changed_clients = Client.find_all_by_uuids(content)
+          changed_clients.each do |client|
+            client.async_group do |new_group|
+              client.update_grouped( new_group )
+            end
+          end
         end
       end
     end
@@ -116,12 +124,15 @@ module Hoccer
       )
       
       async_group do |group| 
+        puts "!!!!!!!!!! #{group.inspect}"
+        
         if waiting?
           EM::Timer.new(60) do
             action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
           end
         else
           @action.send_to_waiters( group ) if @action
+          
           @action.verify( group ) if @action
           if @action
             EM::Timer.new(group.latency + self.action.timeout) do
@@ -156,7 +167,10 @@ module Hoccer
     end
     
     def update_grouped group, forced = false
+      # return if group == nil
+      
       md5 = Digest::MD5.hexdigest( group.to_json )
+      
       if (@current_group_hash != md5 && group.size > 0) || forced
         response = { :group_id => md5, :group => group }
         @grouped.call( response ) if @grouped

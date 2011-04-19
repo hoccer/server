@@ -245,7 +245,7 @@ class TestRequest < Test::Unit::TestCase
     client_2 = create_client
     sleep 1
     response = t1.value
-
+    
     assert_equal 2, response["group"].count
     response_2 = client_2.peek
     assert_equal 2, response_2["group"].count
@@ -281,5 +281,17 @@ class TestRequest < Test::Unit::TestCase
     assert_equal 3, response_2["group"].count
   end
   
-  
+  test "returning when client is deleted" do
+    client_1 = create_client
+    client_2 = create_client
+    
+    t1 = Thread.new { client_1.peek }
+    response = t1.value
+    
+    t2 = Thread.new { client_1.peek( response["group_id"] ) }
+    client_2.delete
+    
+    response_2 = t2.value
+    assert_equal 1, response_2["group"].count
+  end
 end

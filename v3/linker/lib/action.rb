@@ -113,7 +113,5 @@ module Hoccer
     def success? sender, receiver, group, reevaluate
       sender.size == 1 && receiver.size >= 1 && (sender.size + receiver.size == group.size || reevaluate)
     end
-
   end
-
 end

@@ -50,7 +50,8 @@ module Hoccer
     end
 
     adelete %r{#{CLIENTS}/environment$} do |uuid|
-      em_delete("/clients/#{uuid}/delete") do |response|
+      @current_client.delete do |response|
+        puts "deleted #{response.inspect}"
         status 200
         body {"deleted"}
       end

@@ -38,9 +38,7 @@ module Hoccer
 
     get %r{/clients/(.{36,36})/group} do |uuid|
       client = Environment.newest uuid
-      
-      puts "!!!!!!!!!!!!!! #{client.group.inspect}"
-      
+            
       if client && client.group
         client.group.to_json
       else

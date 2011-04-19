@@ -192,7 +192,7 @@ class TestOneToMany < Test::Unit::TestCase
       assert_equal [{"inline" => "foobar"}], t2.value
     
       t3 = Thread.new {client_1.receive("one-to-many", :waiting => true) }
-      # t4 = Thread.new {client_1.receive("one-to-many")}
+
       sleep(10)
       Thread.kill(t3)
       assert_equal t3.value, nil

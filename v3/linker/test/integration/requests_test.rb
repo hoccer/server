@@ -289,7 +289,7 @@ class TestRequest < Test::Unit::TestCase
     response = t1.value
     
     t2 = Thread.new { client_1.peek( response["group_id"] ) }
-    client_2.delete
+    client_2.delete_environment
     
     response_2 = t2.value
     assert_equal 1, response_2["group"].count

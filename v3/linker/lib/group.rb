@@ -42,9 +42,7 @@ module Hoccer
     end
     
     def client_infos
-      puts @members.inspect
-      # puts "class #{@members.class}"
-      # return [] unless @member.is_a?(Array)
+      return [] if @members.is_a?(Hash)
       
       @members.map do |m|  
         { :id => m["client_uuid"], :name => m["client_name"] }

@@ -94,7 +94,7 @@ module Hoccer
           changed_clients = Client.find_all_by_uuids(content)
           changed_clients.each do |client|
             client.async_group do |new_group|
-              client.update_grouped( new_group )
+              client.update_grouped( new_group.client_infos )
             end
           end
         end

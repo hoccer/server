@@ -3,7 +3,52 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__)))
 require 'helper'
 
 class TestEnvironment < Test::Unit::TestCase
-  
+
+  def setup
+    $conn ||= Mongo::Connection.new
+    @db   = $conn['hoccer_accounts']
+    @coll = @db['accounts']
+
+    accounts = @coll.find(
+      'api_key' => {
+        '$in' => ['e101e890ea97012d6b6f00163e001ab0', 'b3b03410159c012e7b5a00163e001ab0']
+      }
+    ).to_a
+
+    if accounts.empty?
+
+      user_1 = {
+        "api_key"               => "e101e890ea97012d6b6f00163e001ab0",
+        "confirmation_sent_at"  => Time.now-3600,
+        "confirmation_token"    => nil,
+        "confirmed_at"          => Time.now-3000,
+        "email"                 => "foo@bar.com",
+        "encrypted_password"    => "$2a$10$nHhXCsjoKaxrWasIUdWrFeiWNz8lwNba2nQJMD6Ci/GTvgU/dU5Qi",
+        "password_salt"         => "$2a$10$nHhXCsjoKaxrWasIUdWrFe",
+        "shared_secret"         => "3kkLbF66ZqqJSV0NW3rUBxHSudA=",
+        "websites"              => [ "https://developer.hoccer.com" ],
+        "hoccer_compatible"     => true
+      }
+
+
+      user_2 = {
+        "api_key"               => "b3b03410159c012e7b5a00163e001ab0",
+        "confirmation_sent_at"  => Time.now-3600,
+        "confirmation_token"    => nil,
+        "confirmed_at"          => Time.now-3000,
+        "email"                 => "bar@foo.com",
+        "encrypted_password"    => "$2a$10$nHhXCsjoKaxrWasIUdWrFeiWNz8lwNba2nQJMD6Ci/GTvgU/dU5Qi",
+        "password_salt"         => "$2a$10$nHhXCsjoKaxrWasIUdWrFe",
+        "shared_secret"         => "3kkLbF66ZqqJSV0NW3rUBxHSudA=",
+        "websites"              => [ "https://developer.hoccer.com" ],
+        "hoccer_compatible"     => true
+      }
+
+      @coll.insert(user_1)
+      @coll.insert(user_2)
+    end
+  end
+
   def new_location
     @gps ||= [13, 52]
     @gps.map! { |element| element += 1 }
@@ -51,8 +96,8 @@ class TestEnvironment < Test::Unit::TestCase
       )
     )
 
-    assert env_1.hoccer_compatible?
-    assert env_2.hoccer_compatible?
+    assert env_1.hoccer_compatible?, "Should be hoccer-compatible but isn't"
+    assert env_2.hoccer_compatible?, "Should be hoccer-compatible but isn't"
 
     assert env_1.reload[:group_id], "should have a group id"
     assert env_2.reload[:group_id], "should have a group id"

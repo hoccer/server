@@ -168,7 +168,7 @@ module Hoccer
     
     def update_grouped group, forced = false
       # return if group == nil
-      
+
       md5 = Digest::MD5.hexdigest( group.to_json )
       
       if (@current_group_hash != md5 && group.size > 0) || forced

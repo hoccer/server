@@ -55,7 +55,6 @@ module Hoccer
       environment = Environment.where(:client_uuid => uuid).first
       return unless environment
       
-      
       group = environment.group
       group.each do |g|
         g["group"] = 0
@@ -67,7 +66,6 @@ module Hoccer
       updated_clients = []
       group.each do |g|
         if g != environment && g["group"] == 0
-          puts "updating group"
           g.add_group_id
           g.save
           g.update_groups

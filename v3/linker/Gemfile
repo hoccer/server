@@ -4,7 +4,7 @@ source "http://rubygems.org"
 gem "eventmachine"
 gem "sinatra"
 gem "sinatra-reloader"
-gem "async_sinatra", "0.2.3"
+gem "async_sinatra", "0.5"
 gem 'async-rack'
 gem 'rack-test'
 gem 'ruby-debug19'
@@ -14,3 +14,4 @@ gem 'bson_ext', '>= 1.1'
 gem 'em-mongo', '>= 0.2.13'
 gem 'mongo'
 gem 'hoccer-api', :git => "git@github.com:hoccer/ruby-api.git"
+#gem 'hoccer-api', :path => "/Users/robert/Programming/Hoccer/ruby-api"

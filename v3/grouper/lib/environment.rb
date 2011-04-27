@@ -16,6 +16,9 @@ module Hoccer
     field :group_id
     field :api_key
 
+    attr_accessor :grouped_envs
+
+
     before_create :add_group_id, :add_creation_time, :normalize_bssids, :choose_best_location
     before_save   :ensure_indexable
     after_create  :update_groups
@@ -27,7 +30,8 @@ module Hoccer
     def group
       Environment
         .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 30} })
-        .only(:client_uuid, :group_id, :latency ).to_a || []
+        .order_by([:client_uuid, :asc])
+        .only(:client_uuid, :group_id, :latency, :client_name ).to_a || []
     end
 
     def has_wifi
@@ -113,7 +117,7 @@ module Hoccer
 
     def hoccer_compatible?
       $db  ||= Mongo::Connection.new.db('hoccer_accounts')
-      coll = db.collection('accounts')
+      coll = $db.collection('accounts')
 
       0 < coll.find(
         :api_key            => api_key,
@@ -123,11 +127,36 @@ module Hoccer
 
     def hoccer_compatible_api_keys
       $db  ||= Mongo::Connection.new.db('hoccer_accounts')
-      coll = db.collection('accounts')
+      coll = $db.collection('accounts')
 
       coll.find({:hoccer_compatible => true}, :fields => :api_key).map do |k|
         k["api_key"]
       end
+    end
+
+    def update_groups
+      relevant_envs = self.nearby
+
+      @grouped_envs = relevant_envs.inject([]) do |result, element|
+        element.group.each do |group_env|
+          unless result.include?( group_env )
+            result << group_env
+          end
+        end
+        result
+      end
+
+      new_group_id = rand(Time.now.to_i)
+      ( @grouped_envs | relevant_envs ).each do |foobar|
+        foobar[:group_id] = new_group_id
+        foobar.save
+      end
+
+      reload
+    end
+
+    def add_group_id
+      self[:group_id] = rand(Time.now.to_i)
     end
 
     private
@@ -143,10 +172,6 @@ module Hoccer
       rescue => e
         puts "!!!!!!! Panic: #{e}"
       end
-    end
-
-    def add_group_id
-      self[:group_id] = rand(Time.now.to_i)
     end
 
     def add_creation_time
@@ -165,30 +190,6 @@ module Hoccer
       self.wifi.delete("bssids")
     end
 
-    def update_groups
-      relevant_envs = self.nearby
-
-      grouped_envs = relevant_envs.inject([]) do |result, element|
-        element.group.each do |group_env|
-          unless result.include?( group_env )
-            result << group_env
-          end
-        end
-        result
-      end
-
-      new_group_id = rand(Time.now.to_i)
-      ( grouped_envs | relevant_envs ).each do |foobar|
-        foobar[:group_id] = new_group_id
-        foobar.save
-      end
-      if grouped_envs and grouped_envs.count > 1
-        #puts "grouped <#{grouped_envs.map {|e|  e.client_uuid rescue "<unknown>"} }>"
-      end
-
-      reload
-    end
-
     def choose_best_location
       if has_network
         n = self.network.with_indifferent_access
@@ -199,6 +200,5 @@ module Hoccer
         end
       end
     end
-
   end
 end

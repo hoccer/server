@@ -1,6 +1,7 @@
 require 'sinatra/reloader'
-require 'action_store'
-require 'events'
+require 'action'
+require 'group'
+require 'client'
 require 'helper'
 
 CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
@@ -13,25 +14,15 @@ module Hoccer
       register Sinatra::Reloader
     end
 
-    helpers do
-      def logger
-        MuninLogger
-      end
-    end
-
     set :public, File.join(File.dirname(__FILE__), '..', '/public')
 
-    @@action_store  = ActionStore.new
-    @@evaluators    = {}
-
-    def initialize
-      super
-      @@evaluators['one-to-one']  = OneToOne.new @@action_store
-      @@evaluators['one-to-many'] = OneToMany.new @@action_store
+    before do
+      @current_client = Hoccer::Client.find_or_create( self )
+      @current_client.update_connection self
     end
 
     aget %r{#{CLIENTS}$} do |uuid|
-      em_get( "/clients/#{uuid}" ) do |response|
+      @current_client.info do |response|
         if response[:status] == 200
           body { response[:content] }
         else
@@ -42,84 +33,54 @@ module Hoccer
     end
 
     aput %r{#{CLIENTS}/environment$} do |uuid|
-      logger.info "202"
       authorized_request do |account|
-        request_body = request.body.read
-        request_hash = JSON.parse( request_body )
-        request_hash.merge!( :api_key => params["api_key"] )
-
-        puts "#{uuid} PUT: #{request_body}"
-        em_put( "/clients/#{uuid}/environment", request_hash.to_json ) do |response|
-          status 201
-          body { response[:content] }
+        @current_client.update_environment do |response|
+          if response[:status] == 200
+            status 201
+            content = JSON.parse( response[:content] )
+            body { content["hoccability"].to_json }
+          else
+            status 400
+            body { {:error => @current_client.error}.to_json }
+          end
         end
 
-        log_hoc( 
-          :type      => :environment,
-          :client_id => uuid, 
-          :doc       => request_hash 
-        )
-
-        if data = (request_hash["gps"] || request_hash["network"])
-          http = EM::Protocols::HttpClient.request(
-            :host    => "localhost",
-            :port    => 8090,
-            :verb    => 'PUT',
-            :request => "/hoc",
-            :content => data.to_json
-          )
-        end
+        @current_client.update_worldmap
       end
     end
 
     adelete %r{#{CLIENTS}/environment$} do |uuid|
-      em_delete("/clients/#{uuid}/delete") do |response|
+      @current_client.delete do |response|
+        puts "deleted #{response.inspect}"
         status 200
         body {"deleted"}
       end
     end
 
     aput %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
-      payload = JSON.parse( request.body.read )
-
-      action  = {
-        :mode     => action_name,
-        :type     => :sender,
-        :payload  => payload,
-        :request  => self,
-        :uuid     => uuid,
-        :api_key  => params["api_key"]
-      }
-
-      @@evaluators[action_name].add action
-      
-      log_hoc( 
-        :type      => :action, 
-        :method    => "PUT",
-        :client_id => uuid,
-        :doc       => action.reject { |k,v| k == :request }
-      )
-      
+      @current_client.add_action( action_name, :sender )
+      @current_client.success do |action|
+        status action.response[0]
+        body   action.response[1].to_json
+      end
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
-      action = {
-        :mode     => action_name,
-        :type     => :receiver,
-        :request  => self,
-        :uuid     => uuid,
-        :waiting  => ( params['waiting'] || false ),
-        :api_key  => params["api_key"]
-      }
-      @@evaluators[action_name].add action
-      
-      log_hoc(
-        :type      => :action, 
-        :method    => "GET",
-        :client_id => uuid,
-        :doc       => (action.reject{ |k,v| k == :request })
-      )
-      
+      @current_client.add_action( action_name, :receiver, !!params[:waiting] )
+      @current_client.success do |action|
+         status action.response[0]
+         body   action.response[1].to_json
+      end
+    end
+
+    aget %r{#{CLIENTS}/peek$} do |uuid|
+      @current_client.grouped(params["group_id"]) do |group|
+        status 200
+        content_type "application/json"
+        body   group.to_json
+
+        # @current_client.grouped nil
+      end
     end
 
     # javascript routes
@@ -140,7 +101,6 @@ module Hoccer
           :api_key => params["api_key"]
         }
 
-        puts "put body #{environment}"
         em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
           status 201
           headers "Access-Control-Allow-Origin" => "*"
@@ -150,46 +110,30 @@ module Hoccer
     end
 
     aget %r{#{CLIENTS}/action/send.js$} do |uuid|
-
-      puts params["payload"];
       if params["payload"]
         content = params["payload"]
         content['data'] = content['data'].values
       end
+      @current_client.body_content = content
 
-      puts content
+      @current_client.add_action( params[:mode], :sender )
+      @current_client.success do |action|
+        headers "Access-Control-Allow-Origin" => "*"
 
-      action  = {
-        :mode     => params["mode"],
-        :type     => :sender,
-        :payload  => content,
-        :request  => self,
-        :uuid     => uuid,
-        :jsonp_method => (params["jsonp"] || params["callback"]),
-        :api_key  => params["api_key"]
-      }
-
-      headers "Access-Control-Allow-Origin" => "*"
-
-      @@evaluators[params["mode"]].add action
+        status action.response[0]
+        body   { action.response[1].to_json }
+      end
     end
 
     aget %r{#{CLIENTS}/action/receive.js$} do |uuid|
-      action = {
-        :mode         => params["mode"],
-        :type         => :receiver,
-        :request      => self,
-        :uuid         => uuid,
-        :jsonp_method => (params["jsonp"] || params["callback"]),
-        :waiting      => (params["waiting"] || false),
-        :api_key      => params["api_key"]
-      }
+      @current_client.add_action( params[:mode], :receiver, true )
+      @current_client.success do |action|
+        headers "Access-Control-Allow-Origin" => "*"
 
-      headers "Access-Control-Allow-Origin" => "*"
-
-      @@evaluators[params["mode"]].add action
+        status action.response[0]
+        body   { action.response[1].to_json }
+      end
     end
-
   end
 
 end

@@ -20,17 +20,25 @@ module Hoccer
     put %r{/clients/(.{36,36})/environment} do |uuid|
       request_body  = request.body.read
       environment_data = JSON.parse( request_body )
-
+      
       if environment = Environment.first({ :conditions => {:client_uuid => uuid} })
         environment.destroy
       end
-      e = Environment.create( environment_data.merge!( :client_uuid => uuid ) )
+      env = Environment.create( environment_data.merge!( :client_uuid => uuid ) )
 
-      (Hoccability.analyze e).to_json
+      result = { 
+        :hoccability => Hoccability.analyze(env),
+        :group       => env.grouped_envs.map do |e| 
+          { :id => e.client_uuid, :name => e[:client_name] } 
+        end
+      }
+      
+      result.to_json
     end
 
     get %r{/clients/(.{36,36})/group} do |uuid|
       client = Environment.newest uuid
+            
       if client && client.group
         client.group.to_json
       else
@@ -44,7 +52,32 @@ module Hoccer
     end
 
     delete %r{/clients/(.{36,36})/delete} do |uuid|
-      Environment.delete_all(:conditions => { :client_uuid =>  uuid })
+      environment = Environment.where(:client_uuid => uuid).first
+      return unless environment
+      
+      group = environment.group
+      group.each do |g|
+        g["group"] = 0
+        g.save
+      end
+
+      environment.destroy
+      
+      updated_clients = []
+      group.each do |g|
+        if g != environment && g["group"] == 0
+          g.add_group_id
+          g.save
+          g.update_groups
+          
+          updated_clients << g["client_uuid"]
+        end
+      end
+      
+      puts "returning #{updated_clients.to_json}"
+      
+      status 200
+      updated_clients.to_json
     end
 
     get %r{/clients/(.{36,36})/delete} do |uuid|

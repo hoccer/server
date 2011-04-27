@@ -34,10 +34,10 @@ class TestGrouper < Test::Unit::TestCase
   end
 
   def assert_empty_environment
-    assert_equal 1, last_json_response[:devices], "lonely in the group"
-    assert_equal 0, last_json_response[:quality]
-    assert_equal Hoccability::NO_DATA, last_json_response[:coordinates]
-    assert_equal Hoccability::NO_DATA, last_json_response[:wifi]
+    assert_equal 1, last_json_response[:hoccability][:devices], "lonely in the group"
+    assert_equal 0, last_json_response[:hoccability][:quality]
+    assert_equal Hoccability::NO_DATA, last_json_response[:hoccability][:coordinates]
+    assert_equal Hoccability::NO_DATA, last_json_response[:hoccability][:wifi]
   end
 
   def test_getting_emtpy_environment_error
@@ -70,8 +70,8 @@ class TestGrouper < Test::Unit::TestCase
            :timestamp => Time.now.to_i - 10.seconds}
         }.to_json
 
-    assert_equal Hoccability::GOOD_DATA, last_json_response[:wifi]
-    assert_equal 1, last_json_response[:quality], "overall quality not so good because only wifi provided"
+    assert_equal Hoccability::GOOD_DATA, last_json_response[:hoccability][:wifi]
+    assert_equal 1, last_json_response[:hoccability][:quality], "overall quality not so good because only wifi provided"
   end
 
   def test_getting_maximal_quality_feedback
@@ -84,9 +84,9 @@ class TestGrouper < Test::Unit::TestCase
            :timestamp => Time.now.to_i - 14.seconds}
         }.to_json
 
-    assert_equal Hoccability::EXACT_DATA, last_json_response[:coordinates], "coords"
-    assert_equal Hoccability::GOOD_DATA, last_json_response[:wifi], "wifi"
-    assert_equal 3, last_json_response[:quality], "maximal overall quality"
+    assert_equal Hoccability::EXACT_DATA, last_json_response[:hoccability][:coordinates], "coords"
+    assert_equal Hoccability::GOOD_DATA, last_json_response[:hoccability][:wifi], "wifi"
+    assert_equal 3, last_json_response[:hoccability][:quality], "maximal overall quality"
   end
 
 end

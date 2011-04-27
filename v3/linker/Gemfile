@@ -8,7 +8,7 @@ gem "async_sinatra", "0.2.3"
 gem 'async-rack'
 gem 'rack-test'
 gem 'ruby-debug19'
-gem "thin"
+gem "thin", '>= 1.2.11'
 gem 'uuid'
 gem 'bson_ext', '>= 1.1'
 gem 'em-mongo', '>= 0.2.13'

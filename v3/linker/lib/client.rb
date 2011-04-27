@@ -20,7 +20,7 @@ module Hoccer
 
       @@clients[@uuid]  = self
     end
-    
+
     def update_connection connection
       @uuid             = connection.request.path_info.match(UUID_PATTERN)[0]
       @body_content     = nil
@@ -54,7 +54,7 @@ module Hoccer
 
     def self.find_or_create connection
       uuid = connection.request.path_info.match(UUID_PATTERN)[0]
-      
+
       @@clients[uuid] ||= Client.new( connection )
     end
 
@@ -63,10 +63,10 @@ module Hoccer
 
       em_put( "/clients/#{uuid}/environment", @environment.to_json ) do |response|
         block.call( response )
-        
+
         content = JSON.parse( response[:content] )
         ids = content["group"].map { |info| info["id"] }
-        
+
         Client.find_all_by_uuids( ids ).each do |client|
           client.update_grouped( content["group"] ) if client
         end
@@ -84,13 +84,13 @@ module Hoccer
         )
       end
     end
-    
+
     def delete &block
       async_group do |group|
         em_delete("/clients/#{uuid}/delete") do |response|
           content = JSON.parse(response[:content])
           block.call(content)
-          
+
           changed_clients = Client.find_all_by_uuids(content)
           changed_clients.each do |client|
             client.async_group do |new_group|
@@ -100,7 +100,7 @@ module Hoccer
         end
       end
     end
-    
+
     def waiting?
       @waiting
     end
@@ -122,22 +122,22 @@ module Hoccer
         :uuid     => uuid,
         :api_key  => environment[:api_key]
       )
-      
-      async_group do |group| 
+
+      async_group do |group|
         puts "!!!!!!!!!! #{group.inspect}"
-        
+
         if waiting?
           EM::Timer.new(60) do
             action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
           end
         else
           @action.send_to_waiters( group ) if @action
-          
+
           @action.verify( group ) if @action
           if @action
             EM::Timer.new(group.latency + self.action.timeout) do
               action.verify( group, true ) if self.action != nil
-          
+
               # action could be changed in function call above
               action.invalidate if self.action != nil
             end
@@ -145,36 +145,38 @@ module Hoccer
         end
       end
     end
-    
+
     def success &block
       @success = block
     end
-    
+
     def update
       @success.call( action ) if @success && @action
       @action = nil;
     end
-    
+
     def grouped hash = nil, &block
       @grouped              = block
       @current_group_hash   = hash
-      
+
       async_group { |group| update_grouped( group.client_infos ) }
-      
+
       @peek_timer = EM::Timer.new(60) do
         async_group { |group| update_grouped( group.client_infos, true ) }
       end
     end
-    
+
     def update_grouped group, forced = false
       # return if group == nil
+      #
+      sorted_group = group.sort { |m,n| m["id"] <=> n["id"] }
 
-      md5 = Digest::MD5.hexdigest( group.to_json )
-      
+      md5 = Digest::MD5.hexdigest( sorted_group.to_json )
+
       if (@current_group_hash != md5 && group.size > 0) || forced
-        response = { :group_id => md5, :group => group }
+        response = { :group_id => md5, :group => sorted_group }
         @grouped.call( response ) if @grouped
-        
+
         @peek_timer.cancel if @peek_timer
       end
     end

@@ -131,7 +131,7 @@ class TestEnvironment < Test::Unit::TestCase
 
     assert JSON.parse(env_1.group.to_json)
   end
-
+  
   test 'grouping clients with ultra precise locations standing near by' do
 
     location = new_location
@@ -177,6 +177,39 @@ class TestEnvironment < Test::Unit::TestCase
     assert_equal 3, env_2.group.count
     assert_equal 3, env_3.group.count
   end
+
+  test 'deleting client in group' do
+    env_1 = Environment.create(
+      new_environmnent( :longitude => 13.420, :latitude => 52.522, :accuracy => 35 )
+    )
+
+    env_2 = Environment.create(
+      new_environmnent( :longitude => 13.422, :latitude => 52.522, :accuracy => 35 )
+    )
+
+    env_3 = Environment.create(
+      new_environmnent( :longitude => 13.424, :latitude => 52.522, :accuracy => 35 )
+    )
+
+    assert_equal 2, env_1.nearby.size
+    assert env_1.nearby.include? env_1
+    assert env_1.nearby.include? env_2
+
+    env_1.reload
+    env_2.reload
+    env_3.reload
+
+    assert_equal 3, env_2.group.count
+    assert_equal 3, env_3.group.count
+    
+    env_2.delete
+    env_1.reload
+    env_3.reload
+
+    assert_equal 2, env_1.group.count
+    assert_equal 2, env_3.group.count    
+  end
+
 
   test 'not grouping clients' do
     location = new_location

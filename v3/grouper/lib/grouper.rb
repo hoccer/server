@@ -42,7 +42,7 @@ module Hoccer
       if client && client.group
         client.group.to_json
       else
-        halt 404, { :message => "Not Found" }.to_json
+        halt 200, [].to_json
       end
     end
 
@@ -56,25 +56,24 @@ module Hoccer
       return unless environment
       
       group = environment.group
-      group.each do |g|
-        g["group"] = 0
-        g.save
-      end
+      # group.each do |g|
+      #   g.save
+      # end
 
       environment.destroy
       
       updated_clients = []
       group.each do |g|
-        if g != environment && g["group"] == 0
-          g.add_group_id
-          g.save
-          g.update_groups
+        if g != environment # && g["group"] == 0
+          # g.add_group_id
+          # g.save
+          # g.update_groups
           
           updated_clients << g["client_uuid"]
         end
       end
       
-      puts "returning #{updated_clients.to_json}"
+      puts "!!!!!!!!!!!!!!!!!!!!!!!!!! returning #{updated_clients.to_json}"
       
       status 200
       updated_clients.to_json

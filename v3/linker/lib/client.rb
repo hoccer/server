@@ -124,8 +124,6 @@ module Hoccer
       )
 
       async_group do |group|
-        puts "!!!!!!!!!! #{group.inspect}"
-
         if waiting?
           EM::Timer.new(60) do
             action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
@@ -174,7 +172,11 @@ module Hoccer
       md5 = Digest::MD5.hexdigest( sorted_group.to_json )
 
       if (@current_group_hash != md5 && group.size > 0) || forced
-        response = { :group_id => md5, :group => sorted_group }
+        response = { 
+          :group_id => md5, 
+          :group => sorted_group 
+        }
+        
         @grouped.call( response ) if @grouped
 
         @peek_timer.cancel if @peek_timer

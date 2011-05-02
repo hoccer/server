@@ -39,8 +39,6 @@ module Hoccer
         return self.all_in_group
       end
       
-      
-      puts ">>>>>>>>>>>>>>>>>>>>>>>>"
       envs = Environment
         .where({
           :group_id => self[:group_id], 

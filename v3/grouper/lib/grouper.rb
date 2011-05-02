@@ -56,25 +56,15 @@ module Hoccer
       return unless environment
       
       group = environment.group
-      # group.each do |g|
-      #   g.save
-      # end
-
       environment.destroy
       
       updated_clients = []
       group.each do |g|
-        if g != environment # && g["group"] == 0
-          # g.add_group_id
-          # g.save
-          # g.update_groups
-          
+        if g != environment
           updated_clients << g["client_uuid"]
         end
       end
-      
-      puts "!!!!!!!!!!!!!!!!!!!!!!!!!! returning #{updated_clients.to_json}"
-      
+            
       status 200
       updated_clients.to_json
     end

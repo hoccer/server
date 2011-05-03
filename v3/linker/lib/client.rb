@@ -92,6 +92,7 @@ module Hoccer
             content = JSON.parse(response[:content])
           rescue
             puts "coult not parse #{response[:content]}"
+            content = []
           end
           block.call(content)
 

@@ -35,16 +35,20 @@ module Hoccer
     end
     
     def group
-      if self[:selected_clients].nil? 
+      
+      if self[:selected_clients].nil? || self[:selected_clients].empty?
         return self.all_in_group
       end
       
       envs = Environment
         .where({
           :group_id => self[:group_id], 
-          :created_at => { "$gt" => Time.now.to_i - 30 },
-          :selected_clients => self[:client_uuid]
+          :created_at => { "$gt" => Time.now.to_i - 30 }
          })
+        .any_of( 
+            { :selected_clients => { "$exists"  => false } },
+            { :selected_clients => self[:client_uuid] }
+         )
         .any_in(  :client_uuid => self[:selected_clients]  )
         .order_by([:client_uuid, :asc])
         .only(:client_uuid, :group_id, :latency, :client_name, :selected_clients ).to_a || []

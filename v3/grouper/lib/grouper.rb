@@ -65,7 +65,7 @@ module Hoccer
       environment = Environment.where(:client_uuid => uuid).first
       return unless environment
       
-      group = environment.group
+      group = environment.all_in_group
       environment.destroy
       
       updated_clients = []

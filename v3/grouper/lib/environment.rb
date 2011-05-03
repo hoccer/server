@@ -35,7 +35,7 @@ module Hoccer
     end
     
     def group
-      if self[:selected_clients].nil? || self[:selected_clients].empty? 
+      if self[:selected_clients].nil? 
         return self.all_in_group
       end
       

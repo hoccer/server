@@ -111,6 +111,13 @@ module Hoccer
         block.call( group )
       end
     end
+    
+    def async_selected_group &block
+      em_get("/clients/#{uuid}/selected_group") do |response|
+        group = Group.new( response[:content] )
+        block.call( group )
+      end
+    end
 
     def add_action name, role, waiting = false
       @waiting = waiting
@@ -123,7 +130,7 @@ module Hoccer
         :api_key  => environment[:api_key]
       )
 
-      async_group do |group|
+      async_selected_group do |group|
         if waiting?
           EM::Timer.new(60) do
             action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?

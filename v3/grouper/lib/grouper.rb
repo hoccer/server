@@ -39,13 +39,23 @@ module Hoccer
     get %r{/clients/(.{36,36})/group} do |uuid|
       client = Environment.newest uuid
             
-      if client && client.group
-        client.group.to_json
+      if client && client.all_in_group
+        client.all_in_group.to_json
       else
         halt 200, [].to_json
       end
     end
-
+    
+    get %r{/clients/(.{36,36})/selected_group} do |uuid|
+      client = Environment.newest uuid
+            
+      if client && client.group
+        client.group.to_json
+      else
+        halt 200, [].to_json
+      end    
+    end
+    
     get %r{/clients/(.{36,36})$} do |uuid|
       environment = Environment.where(:client_uuid => uuid).first
       environment ? environment.to_json : 404

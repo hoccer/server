@@ -88,7 +88,11 @@ module Hoccer
     def delete &block
       async_group do |group|
         em_delete("/clients/#{uuid}/delete") do |response|
-          content = JSON.parse(response[:content])
+          begin 
+            content = JSON.parse(response[:content])
+          rescue
+            puts "coult not parse #{response[:content]}"
+          end
           block.call(content)
 
           changed_clients = Client.find_all_by_uuids(content)

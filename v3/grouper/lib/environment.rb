@@ -20,7 +20,7 @@ module Hoccer
 
 
     before_create :add_group_id, :add_creation_time, :normalize_bssids, :choose_best_location
-    before_save   :ensure_indexable
+    before_save   :ensure_indexable, :remove_empty_selected_list
     after_create  :update_groups
 
     def self.newest uuid
@@ -46,7 +46,7 @@ module Hoccer
           :created_at => { "$gt" => Time.now.to_i - 30 }
          })
         .any_of( 
-            { :selected_clients => { "$exists"  => false } },
+            { :selected_clients => nil },
             { :selected_clients => self[:client_uuid] }
          )
         .any_in(  :client_uuid => self[:selected_clients]  )
@@ -183,6 +183,13 @@ module Hoccer
     end
 
     private
+    
+    def remove_empty_selected_list
+      if self[:selected_clients].nil? || self[:selected_clients].empty?
+        self.remove_attribute(:selected_clients) 
+      end
+    end
+    
     def ensure_indexable
       return unless has_gps
       begin

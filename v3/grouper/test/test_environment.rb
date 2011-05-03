@@ -180,7 +180,7 @@ class TestEnvironment < Test::Unit::TestCase
     
     env_3 = Environment.create(
       new_environmnent().merge({
-        :client_uuid => '3',
+        :client_uuid => '3'
       })
     )
     
@@ -193,6 +193,38 @@ class TestEnvironment < Test::Unit::TestCase
     assert_equal 3, env_3.group.count
   end
   
+  test 'grouping selected clients with empty selected clients list' do
+    env_1 = Environment.create(
+      new_environmnent().merge({
+        :client_uuid => '1',
+        :selected_clients => ['2']
+      })
+    )
+
+    env_2 = Environment.create(
+      new_environmnent().merge({
+        :client_uuid => '2',
+        :selected_clients => ['1', '3']
+      })
+    )
+    
+    env_3 = Environment.create(
+      new_environmnent().merge({
+        :client_uuid => '3',
+        :selected_clients => []
+      })
+    )
+    
+    env_1.reload
+    env_2.reload
+    env_3.reload
+
+    assert_equal 2, env_1.group.count
+    assert_equal 3, env_2.group.count
+    assert_equal 3, env_3.group.count
+  end
+
+
 
   test 'grouping clients with ultra precise locations standing near by' do
 

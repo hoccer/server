@@ -4,6 +4,7 @@ require 'group'
 require 'client'
 require 'helper'
 
+UUID    = "([a-zA-Z0-9\-]{36,36})"
 CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
 
 module Hoccer
@@ -83,6 +84,14 @@ module Hoccer
       end
     end
 
+    apost %r{#{CLIENTS}/messages} do |uuid|
+      # @current_client.send_body_to( "1234-1231-1233-1231-1232" )
+      
+      @current_client.queue_message( { :hallo => "world" } )
+      status 201
+      body { { :message => "ok"}.to_json }
+    end
+    
     # javascript routes
     aget %r{#{CLIENTS}/environment.js$} do |uuid|
       authorized_request do

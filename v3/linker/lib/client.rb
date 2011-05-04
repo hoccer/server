@@ -156,6 +156,39 @@ module Hoccer
       end
     end
 
+    def send_body_to receiver
+      puts "body_to"
+      client = Client.find receiver_uuid
+      puts "can haz client #{client}"
+      
+      client.queue_message( { :hallo => "Welt" } ) unless client.nil?
+    end
+
+    def queue_message message
+      $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
+      collection  = $db.collection('messages')
+      
+      doc = {
+        :timestamp      => Time.now,
+        :client_uuid    => @uuid,
+        :message        => message
+      }
+      
+      collection.insert( doc )
+      self.send_messages
+    end
+
+    def send_messages
+      $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
+      collection  = $db.collection('messages')
+
+      if ()
+      
+      collection.find( { :client_uuid => @uuid, :timestamp => { "$gt" => @timestamp } } ) do |res|
+      end
+    end
+
+    # callbacks
     def success &block
       @success = block
     end
@@ -166,8 +199,8 @@ module Hoccer
     end
 
     def grouped hash = nil, &block
-      @grouped              = block
-      @current_group_hash   = hash
+      @timestamp   = hash
+      @grouped     = block
 
       async_group { |group| update_grouped( group.client_infos ) }
 
@@ -177,13 +210,11 @@ module Hoccer
     end
 
     def update_grouped group, forced = false
-      # return if group == nil
-      #
       sorted_group = group.sort { |m,n| m["id"] <=> n["id"] }
 
       md5 = Digest::MD5.hexdigest( sorted_group.to_json )
 
-      if (@current_group_hash != md5 && group.size > 0) || forced
+      if (@timestamp != md5 && group.size > 0) || forced
         response = { 
           :group_id => md5, 
           :group => sorted_group 

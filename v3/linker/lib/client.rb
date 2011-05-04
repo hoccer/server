@@ -63,8 +63,12 @@ module Hoccer
 
       em_put( "/clients/#{uuid}/environment", @environment.to_json ) do |response|
         block.call( response )
-
-        content = JSON.parse( response[:content] )
+        begin 
+          content = JSON.parse( response[:content] )
+        rescue
+          content = { "group" => [] }
+        end
+        
         ids = content["group"].map { |info| info["id"] }
 
         Client.find_all_by_uuids( ids ).each do |client|

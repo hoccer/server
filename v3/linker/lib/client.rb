@@ -61,7 +61,7 @@ module Hoccer
     def update_environment &block
       @environment.merge!( parse_body )
       
-      puts "environment #{uuid} #{environment.inpect}" 
+      puts "environment #{uuid} #{environment.inspect}" 
       
       em_put( "/clients/#{uuid}/environment", @environment.to_json ) do |response|
         block.call( response )

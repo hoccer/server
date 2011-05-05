@@ -147,7 +147,7 @@ module Hoccer
         headers "Access-Control-Allow-Origin" => "*"
 
         status action.response[0]
-        body   { action.response[1].to_json }
+        body { action.response[1].to_json }
       end
     end
   end

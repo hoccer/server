@@ -195,11 +195,10 @@ module Hoccer
       
       puts query
       collection.find( query, { :order => [:timestamp, :desc] } ) do |res|
-        puts res.inspect
         if res.size > 0
           data = {
             :timestamp => res.first["timestamp"],
-            :messages   => res.map { |data| data["message"] }
+            :messages  => res.map { |data| data["message"] }
           }
           
           @on_message.call( data )

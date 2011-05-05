@@ -4,8 +4,8 @@ require 'group'
 require 'client'
 require 'helper'
 
-UUID    = "([a-zA-Z0-9\-]{36,36})"
-CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
+UUID_REGEXP = "([a-zA-Z0-9\-]{36,36})"
+CLIENTS     = "/clients/([a-zA-Z0-9\-]{36,36})"
 
 module Hoccer
   class App < Sinatra::Base
@@ -84,14 +84,21 @@ module Hoccer
       end
     end
 
-    apost %r{#{CLIENTS}/messages} do |uuid|
-      # @current_client.send_body_to( "1234-1231-1233-1231-1232" )
+    apost %r{#{CLIENTS}/#{UUID_REGEXP}/messages} do |uuid, receiver_uuid|      
+      @current_client.send_body_to( receiver_uuid )
       
-      @current_client.queue_message( { :hallo => "world" } )
       status 201
       body { { :message => "ok"}.to_json }
     end
     
+    aget %r{#{CLIENTS}/messages} do |uuid|
+      @current_client.on_message do |data| 
+        status 200
+        content_type "application/json"
+        body data.to_json
+      end
+    end
+
     # javascript routes
     aget %r{#{CLIENTS}/environment.js$} do |uuid|
       authorized_request do

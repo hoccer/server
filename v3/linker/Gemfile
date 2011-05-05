@@ -13,5 +13,5 @@ gem 'uuid'
 gem 'bson_ext', '>= 1.1'
 gem 'em-mongo', '>= 0.2.13'
 gem 'mongo'
-gem 'hoccer-api', :git => "git@github.com:hoccer/ruby-api.git"
-#gem 'hoccer-api', :path => "/Users/robert/Programming/Hoccer/ruby-api"
+#gem 'hoccer-api', :git => "git@github.com:hoccer/ruby-api.git"
+gem 'hoccer-api', :path => "/Users/robert/Programming/Hoccer/ruby-api"

@@ -160,12 +160,10 @@ module Hoccer
       end
     end
 
-    def send_body_to receiver
-      puts "body_to"
+    def send_body_to receiver_uuid
       client = Client.find receiver_uuid
-      puts "can haz client #{client}"
       
-      client.queue_message( { :hallo => "Welt" } ) unless client.nil?
+      client.queue_message( parse_body ) unless client.nil?
     end
 
     def queue_message message
@@ -173,7 +171,7 @@ module Hoccer
       collection  = $db.collection('messages')
       
       doc = {
-        :timestamp      => Time.now,
+        :timestamp      => Time.now.to_i,
         :client_uuid    => @uuid,
         :message        => message
       }
@@ -186,13 +184,30 @@ module Hoccer
       $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
       collection  = $db.collection('messages')
 
-      if ()
+      unless @timestamp.nil?
+        query = { :client_uuid => @uuid, :timestamp => { "$gt" => @timestamp } }
+      else
+        query = { :client_uuid => @uuid }
+      end
       
-      collection.find( { :client_uuid => @uuid, :timestamp => { "$gt" => @timestamp } } ) do |res|
+      collection.find( query, { :order => [:timestamp, :desc] } ) do |res|
+        if res.size > 0
+          data = {
+            :timestamp => res.first["timestamp"],
+            :message   => res.map { |data| data["message"] }
+          }
+          
+          @on_message.call( data )
+        end
       end
     end
 
     # callbacks
+    def on_message timestamp = nil,  &block
+      @on_message = block
+      @timestamp  = timestamp
+    end
+    
     def success &block
       @success = block
     end
@@ -203,8 +218,8 @@ module Hoccer
     end
 
     def grouped hash = nil, &block
-      @timestamp   = hash
-      @grouped     = block
+      @hash    = hash
+      @grouped = block
 
       async_group { |group| update_grouped( group.client_infos ) }
 
@@ -218,7 +233,7 @@ module Hoccer
 
       md5 = Digest::MD5.hexdigest( sorted_group.to_json )
 
-      if (@timestamp != md5 && group.size > 0) || forced
+      if (@hash != md5 && group.size > 0) || forced
         response = { 
           :group_id => md5, 
           :group => sorted_group 

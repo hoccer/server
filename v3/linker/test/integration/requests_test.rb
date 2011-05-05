@@ -273,7 +273,7 @@ class TestRequest < Test::Unit::TestCase
     response = t1.value
     assert_equal 2, response["group"].count
     
-    t2 = Thread.new { client_1.peek response["group_id"]}
+    t2 = Thread.new { client_1.peek response["group_id"] }
     sleep 3
     client_3 = create_client
     

@@ -224,7 +224,7 @@ class TestEnvironment < Test::Unit::TestCase
     assert_equal 3, env_3.group.count
   end
 
-
+  
 
   test 'grouping clients with ultra precise locations standing near by' do
 

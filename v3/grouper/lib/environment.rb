@@ -29,7 +29,7 @@ module Hoccer
 
     def all_in_group
       Environment
-        .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 30} })
+        .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 40} })
         .order_by([:client_uuid, :asc])
         .only(:client_uuid, :group_id, :latency, :client_name, :selected_clients ).to_a || []
     end
@@ -43,7 +43,7 @@ module Hoccer
       envs = Environment
         .where({
           :group_id => self[:group_id], 
-          :created_at => { "$gt" => Time.now.to_i - 30 }
+          :created_at => { "$gt" => Time.now.to_i - 40 }
          })
         .any_of( 
             { :selected_clients => nil },

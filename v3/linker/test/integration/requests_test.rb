@@ -303,11 +303,40 @@ class TestRequest < Test::Unit::TestCase
     client_2 = create_client
     
     t1 = Thread.new { client_1.get_messages }
-    client_2.post_message( client_1.uuid, {:hello => "robert" } )
+    client_2.post_message( client_1.uuid, { :hello => "robert" } )
     
     response = t1.value
-    puts response.inspect
+        
+    assert_equal 1, response["messages"].size
+    assert_equal "robert", response["messages"][0]["hello"]    
     
+    t2 = Thread.new { client_1.get_messages response[ "timestamp" ] }
+    client_2.post_message( client_1.uuid, { :hello => "john" } )
+    response_2 = t2.value
+    
+    assert_equal 1, response_2["messages"].size
+    assert_equal "john", response_2["messages"][0]["hello"]
+  end
+
+  test "getting messages after delay" do
+    client_1 = create_client
+    client_2 = create_client
+    
+    t1 = Thread.new { client_1.get_messages }
+    client_2.post_message( client_1.uuid, { :hello => "robert" } )
+    
+    response = t1.value
+    
+    assert_equal 1, response["messages"].size
+    assert_equal "robert", response["messages"][0]["hello"]    
+    
+    client_2.post_message( client_1.uuid, { :hello => "john" } )
+    
+    sleep(3)
+    response_2 = client_1.get_messages response[ "timestamp" ] 
+    
+    assert_equal 1, response_2["messages"].size
+    assert_equal "john", response_2["messages"][0]["hello"]
   end
   
 end

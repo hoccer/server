@@ -92,7 +92,7 @@ module Hoccer
     end
     
     aget %r{#{CLIENTS}/messages} do |uuid|
-      @current_client.on_message do |data| 
+      @current_client.on_message( params["timestamp"] ) do |data| 
         status 200
         content_type "application/json"
         body data.to_json

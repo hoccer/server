@@ -167,34 +167,39 @@ module Hoccer
     end
 
     def queue_message message
+      puts "queue message #{Time.now.to_f}"
+      
       $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
       collection  = $db.collection('messages')
       
       doc = {
-        :timestamp      => Time.now.to_i,
+        :timestamp      => Time.now.to_f,
         :client_uuid    => @uuid,
         :message        => message
       }
       
       collection.insert( doc )
-      self.send_messages
+      
+      deliver_messages
     end
 
-    def send_messages
+    def deliver_messages
       $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
       collection  = $db.collection('messages')
 
       unless @timestamp.nil?
-        query = { :client_uuid => @uuid, :timestamp => { "$gt" => @timestamp } }
+        query = { :client_uuid => @uuid, :timestamp => { "$gt" => @timestamp.to_f } }
       else
         query = { :client_uuid => @uuid }
       end
       
+      puts query
       collection.find( query, { :order => [:timestamp, :desc] } ) do |res|
+        puts res.inspect
         if res.size > 0
           data = {
             :timestamp => res.first["timestamp"],
-            :message   => res.map { |data| data["message"] }
+            :messages   => res.map { |data| data["message"] }
           }
           
           @on_message.call( data )
@@ -205,7 +210,9 @@ module Hoccer
     # callbacks
     def on_message timestamp = nil,  &block
       @on_message = block
-      @timestamp  = timestamp
+      @timestamp  = timestamp  || Time.now.to_f
+      
+      deliver_messages
     end
     
     def success &block

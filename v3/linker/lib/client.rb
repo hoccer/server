@@ -16,8 +16,7 @@ module Hoccer
     @@clients = {}
 
     def initialize connection
-      @uuid             = connection.request.path_info.match(UUID_PATTERN)[0]
-
+      @uuid             = connection.request.path_info.match(UUID_PATTERN)[0]      
       @@clients[@uuid]  = self
     end
 
@@ -138,8 +137,12 @@ module Hoccer
         :uuid     => uuid,
         :api_key  => environment[:api_key]
       )
-
+      
       async_selected_group do |group|
+        group.clients.each do |client|
+          client.queue_message( { :type => "action" } )
+        end
+        
         if waiting?
           EM::Timer.new(60) do
             action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
@@ -165,8 +168,8 @@ module Hoccer
       
       client.queue_message( parse_body ) unless client.nil?
     end
-
-    def queue_message message      
+    
+    def queue_message message  
       $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
       collection  = $db.collection('messages')
       
@@ -176,6 +179,8 @@ module Hoccer
         :message        => message
       }
       
+      puts "queueing #{doc}"    
+      
       collection.insert( doc )
       
       deliver_messages
@@ -184,27 +189,36 @@ module Hoccer
     def deliver_messages
       $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
       collection  = $db.collection('messages')
-
-      query = { :client_uuid => @uuid }
-      query[:timestamp] = { "$gt" => @timestamp.to_f } } unless @timestamp.nil?
       
+      puts "deliver message with #{@on_message}"
+      return unless @on_message
+      
+      query = { :client_uuid => @uuid }
+      query[:timestamp] = { "$gt" => @timestamp.to_f }
+      puts "query #{query}"
       collection.find( query, { :order => [:timestamp, :desc] } ) do |res|
+        puts "result #{res} #{@on_message}"
         if res.size > 0
           data = {
             :timestamp => res.first["timestamp"],
             :messages  => res.map { |data| data["message"] }
           }
           
-          @on_message.call( data )
+          puts "performed query #{query} \nresult #{data}"
+          
+          @on_message.call( data ) unless @on_message.nil?
+          @on_message = nil;
         end
       end
     end
 
     # callbacks
     def on_message timestamp = nil,  &block
-      @on_message = block
-      @timestamp  = timestamp  || Time.now.to_f
       
+      puts "timestamp #{timestamp.nil?}"
+      @timestamp  = timestamp.nil? ? Time.now.to_f : timestamp
+      puts "timestamp #{@timestamp}"
+      @on_message = block
       deliver_messages
     end
     
@@ -217,31 +231,33 @@ module Hoccer
       @action = nil;
     end
 
-    def grouped hash = nil, &block
-      @hash    = hash
-      @grouped = block
-
+    def grouped timestamp = nil, &block
+      @hash = nil if timestamp.nil?
+      
+      on_message timestamp, &block
       async_group { |group| update_grouped( group.client_infos ) }
 
-      @peek_timer = EM::Timer.new(60) do
-        async_group { |group| update_grouped( group.client_infos, true ) }
-      end
+      # @peek_timer = EM::Timer.new(60) do
+      #   async_group { |group| update_grouped( group.client_infos, true ) }
+      # end
     end
 
     def update_grouped group, forced = false
       sorted_group = group.sort { |m,n| m["id"] <=> n["id"] }
 
       md5 = Digest::MD5.hexdigest( sorted_group.to_json )
-
+      
       if (@hash != md5 && group.size > 0) || forced
         response = { 
+          :type  => :regrouped,
           :group_id => md5, 
           :group => sorted_group 
         }
         
-        @grouped.call( response ) if @grouped
+        @hash = md5
+        queue_message response
 
-        @peek_timer.cancel if @peek_timer
+        # @peek_timer.cancel if @peek_timer
       end
     end
   end

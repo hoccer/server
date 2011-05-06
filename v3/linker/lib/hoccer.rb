@@ -75,7 +75,7 @@ module Hoccer
     end
 
     aget %r{#{CLIENTS}/peek$} do |uuid|
-      @current_client.grouped(params["group_id"]) do |group|
+      @current_client.grouped(params["timestamp"]) do |group|
         status 200
         content_type "application/json"
         body   group.to_json
@@ -144,7 +144,7 @@ module Hoccer
     aget %r{#{CLIENTS}/action/receive.js$} do |uuid|
       @current_client.add_action( params[:mode], :receiver, true )
       @current_client.success do |action|
-        headers "Access-Control-Allow-Origin" => "*"
+        headers "Access-Control-Allow-Origin" => "*" 
 
         status action.response[0]
         body { action.response[1].to_json }

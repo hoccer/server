@@ -166,9 +166,7 @@ module Hoccer
       client.queue_message( parse_body ) unless client.nil?
     end
 
-    def queue_message message
-      puts "queue message #{Time.now.to_f}"
-      
+    def queue_message message      
       $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
       collection  = $db.collection('messages')
       
@@ -187,13 +185,9 @@ module Hoccer
       $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
       collection  = $db.collection('messages')
 
-      unless @timestamp.nil?
-        query = { :client_uuid => @uuid, :timestamp => { "$gt" => @timestamp.to_f } }
-      else
-        query = { :client_uuid => @uuid }
-      end
+      query = { :client_uuid => @uuid }
+      query[:timestamp] = { "$gt" => @timestamp.to_f } } unless @timestamp.nil?
       
-      puts query
       collection.find( query, { :order => [:timestamp, :desc] } ) do |res|
         if res.size > 0
           data = {

@@ -237,66 +237,66 @@ class TestRequest < Test::Unit::TestCase
         :gps => { :timestamp => 1289456, :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     )
   end
-  # 
-  # test "grouping and notifying clients" do
-  #   client_1 = create_client
-  # 
-  #   t1 = Thread.new { client_1.peek }
-  #   response = t1.value
-  #   t1 = Thread.new { client_1.peek response["group_id"] }
-  #   
-  #   client_2 = create_client
-  #   sleep 1
-  #   response = t1.value
-  #   
-  #   assert_equal 2, response["group"].count
-  #   response_2 = client_2.peek
-  #   assert_equal 2, response_2["group"].count
-  # end
-  # 
-  # test "grouping and notifying clients with waiting" do
-  #   client_1 = create_client
-  # 
-  #   t1 = Thread.new { client_1.peek }
-  #   response = t1.value
-  #   t1 = Thread.new { client_1.peek response["group_id"] }
-  #   
-  #   sleep 10
-  #   client_2 = create_client
-  #   
-  #   response = t1.value
-  #   assert_equal 2, response["group"].count
-  # end
-  # 
-  # test "not returning when group has no update" do
-  #   client_1 = create_client
-  #   client_2 = create_client
-  #     
-  #   t1 = Thread.new { client_1.peek }
-  #   response = t1.value
-  #   assert_equal 2, response["group"].count
-  #   
-  #   t2 = Thread.new { client_1.peek response["group_id"]}
-  #   sleep 3
-  #   client_3 = create_client
-  #   
-  #   response_2 = t2.value
-  #   assert_equal 3, response_2["group"].count
-  # end
-  # 
-  # test "returning when client is deleted" do
-  #   client_1 = create_client
-  #   client_2 = create_client
-  #   
-  #   t1 = Thread.new { client_1.peek }
-  #   response = t1.value
-  #   
-  #   t2 = Thread.new { client_1.peek( response["group_id"] ) }
-  #   client_2.delete_environment
-  #   
-  #   response_2 = t2.value
-  #   assert_equal 1, response_2["group"].count
-  # end
+  
+  test "grouping and notifying clients" do
+    client_1 = create_client
+  
+    t1 = Thread.new { client_1.peek }
+    response = t1.value
+    t1 = Thread.new { client_1.peek response["timestamp"] }
+    
+    client_2 = create_client
+    sleep 1
+    response = t1.value
+    
+    assert_equal 2, response["messages"].first["group"].count
+    response_2 = client_2.peek
+    assert_equal 2, response_2["messages"].first["group"].count
+  end
+  
+  test "grouping and notifying clients with waiting" do
+    client_1 = create_client
+  
+    t1 = Thread.new { client_1.peek }
+    response = t1.value
+    t1 = Thread.new { client_1.peek response["timestamp"] }
+    
+    sleep 10
+    client_2 = create_client
+    
+    response = t1.value
+    assert_equal 2, response["messages"].first["group"].count
+  end
+  
+  test "not returning when group has no update" do
+    client_1 = create_client
+    client_2 = create_client
+      
+    t1 = Thread.new { client_1.peek }
+    response = t1.value
+    assert_equal 2, response["messages"].first["group"].count
+    
+    t2 = Thread.new { client_1.peek response["timestamp"]}
+    sleep 3
+    client_3 = create_client
+    
+    response_2 = t2.value
+    assert_equal 3, response_2["messages"].first["group"].count
+  end
+  
+  test "returning when client is deleted" do
+    client_1 = create_client
+    client_2 = create_client
+    
+    t1 = Thread.new { client_1.peek }
+    response = t1.value
+    
+    t2 = Thread.new { client_1.peek( response["timestamp"] ) }
+    client_2.delete_environment
+    
+    response_2 = t2.value
+    assert_equal 1, response_2["messages"].first["group"].count
+  end
   
   test "message passing" do
     client_1 = create_client

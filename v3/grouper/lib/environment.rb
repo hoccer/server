@@ -20,18 +20,41 @@ module Hoccer
 
 
     before_create :add_group_id, :add_creation_time, :normalize_bssids, :choose_best_location
-    before_save   :ensure_indexable
+    before_save   :ensure_indexable, :remove_empty_selected_list
     after_create  :update_groups
 
     def self.newest uuid
       Environment.where(:client_uuid => uuid).desc(:created_at).first
     end
 
-    def group
+    def all_in_group
       Environment
-        .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 30} })
+        .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 40} })
         .order_by([:client_uuid, :asc])
-        .only(:client_uuid, :group_id, :latency, :client_name ).to_a || []
+        .only(:client_uuid, :group_id, :latency, :client_name, :selected_clients ).to_a || []
+    end
+    
+    def group
+      
+      if self[:selected_clients].nil? || self[:selected_clients].empty?
+        return self.all_in_group
+      end
+      
+      envs = Environment
+        .where({
+          :group_id => self[:group_id], 
+          :created_at => { "$gt" => Time.now.to_i - 40 }
+         })
+        .any_of( 
+            { :selected_clients => nil },
+            { :selected_clients => self[:client_uuid] }
+         )
+        .any_in(  :client_uuid => self[:selected_clients]  )
+        .order_by([:client_uuid, :asc])
+        .only(:client_uuid, :group_id, :latency, :client_name, :selected_clients ).to_a || []
+      
+      envs << self unless envs.empty?
+      envs
     end
 
     def has_wifi
@@ -138,7 +161,7 @@ module Hoccer
       relevant_envs = self.nearby
 
       @grouped_envs = relevant_envs.inject([]) do |result, element|
-        element.group.each do |group_env|
+        element.all_in_group.each do |group_env|
           unless result.include?( group_env )
             result << group_env
           end
@@ -160,6 +183,13 @@ module Hoccer
     end
 
     private
+    
+    def remove_empty_selected_list
+      if self[:selected_clients].nil? || self[:selected_clients].empty?
+        self.remove_attribute(:selected_clients) 
+      end
+    end
+    
     def ensure_indexable
       return unless has_gps
       begin

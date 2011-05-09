@@ -39,13 +39,23 @@ module Hoccer
     get %r{/clients/(.{36,36})/group} do |uuid|
       client = Environment.newest uuid
             
+      if client && client.all_in_group
+        client.all_in_group.to_json
+      else
+        halt 200, [].to_json
+      end
+    end
+    
+    get %r{/clients/(.{36,36})/selected_group} do |uuid|
+      client = Environment.newest uuid
+            
       if client && client.group
         client.group.to_json
       else
-        halt 404, { :message => "Not Found" }.to_json
-      end
+        halt 200, [].to_json
+      end    
     end
-
+    
     get %r{/clients/(.{36,36})$} do |uuid|
       environment = Environment.where(:client_uuid => uuid).first
       environment ? environment.to_json : 404
@@ -55,27 +65,16 @@ module Hoccer
       environment = Environment.where(:client_uuid => uuid).first
       return unless environment
       
-      group = environment.group
-      group.each do |g|
-        g["group"] = 0
-        g.save
-      end
-
+      group = environment.all_in_group
       environment.destroy
       
       updated_clients = []
       group.each do |g|
-        if g != environment && g["group"] == 0
-          g.add_group_id
-          g.save
-          g.update_groups
-          
+        if g != environment
           updated_clients << g["client_uuid"]
         end
       end
-      
-      puts "returning #{updated_clients.to_json}"
-      
+            
       status 200
       updated_clients.to_json
     end

@@ -60,11 +60,17 @@ module Hoccer
 
     def update_environment &block
       @environment.merge!( parse_body )
-
+      
+      puts "environment #{uuid} #{environment.inspect}" 
+      
       em_put( "/clients/#{uuid}/environment", @environment.to_json ) do |response|
         block.call( response )
-
-        content = JSON.parse( response[:content] )
+        begin 
+          content = JSON.parse( response[:content] )
+        rescue
+          content = { "group" => [] }
+        end
+        
         ids = content["group"].map { |info| info["id"] }
 
         Client.find_all_by_uuids( ids ).each do |client|
@@ -88,7 +94,12 @@ module Hoccer
     def delete &block
       async_group do |group|
         em_delete("/clients/#{uuid}/delete") do |response|
-          content = JSON.parse(response[:content])
+          begin 
+            content = JSON.parse(response[:content])
+          rescue
+            puts "coult not parse #{response[:content]}"
+            content = []
+          end
           block.call(content)
 
           changed_clients = Client.find_all_by_uuids(content)
@@ -111,6 +122,13 @@ module Hoccer
         block.call( group )
       end
     end
+    
+    def async_selected_group &block
+      em_get("/clients/#{uuid}/selected_group") do |response|
+        group = Group.new( response[:content] )
+        block.call( group )
+      end
+    end
 
     def add_action name, role, waiting = false
       @waiting = waiting
@@ -123,9 +141,7 @@ module Hoccer
         :api_key  => environment[:api_key]
       )
 
-      async_group do |group|
-        puts "!!!!!!!!!! #{group.inspect}"
-
+      async_selected_group do |group|
         if waiting?
           EM::Timer.new(60) do
             action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
@@ -174,7 +190,11 @@ module Hoccer
       md5 = Digest::MD5.hexdigest( sorted_group.to_json )
 
       if (@current_group_hash != md5 && group.size > 0) || forced
-        response = { :group_id => md5, :group => sorted_group }
+        response = { 
+          :group_id => md5, 
+          :group => sorted_group 
+        }
+        
         @grouped.call( response ) if @grouped
 
         @peek_timer.cancel if @peek_timer

@@ -34,7 +34,7 @@ module Hoccer
         @body_content || JSON.parse( @body_buffer )
       rescue => e
         @errors = e.message
-        false
+        {}
       end
     end
 
@@ -60,17 +60,17 @@ module Hoccer
 
     def update_environment &block
       @environment.merge!( parse_body )
-      
-      puts "environment #{uuid} #{environment.inspect}" 
-      
+
+      puts "environment #{uuid} #{environment.inspect}"
+
       em_put( "/clients/#{uuid}/environment", @environment.to_json ) do |response|
         block.call( response )
-        begin 
+        begin
           content = JSON.parse( response[:content] )
         rescue
           content = { "group" => [] }
         end
-        
+
         ids = content["group"].map { |info| info["id"] }
 
         Client.find_all_by_uuids( ids ).each do |client|
@@ -94,7 +94,7 @@ module Hoccer
     def delete &block
       async_group do |group|
         em_delete("/clients/#{uuid}/delete") do |response|
-          begin 
+          begin
             content = JSON.parse(response[:content])
           rescue
             puts "coult not parse #{response[:content]}"
@@ -122,7 +122,7 @@ module Hoccer
         block.call( group )
       end
     end
-    
+
     def async_selected_group &block
       em_get("/clients/#{uuid}/selected_group") do |response|
         group = Group.new( response[:content] )
@@ -190,11 +190,11 @@ module Hoccer
       md5 = Digest::MD5.hexdigest( sorted_group.to_json )
 
       if (@current_group_hash != md5 && group.size > 0) || forced
-        response = { 
-          :group_id => md5, 
-          :group => sorted_group 
+        response = {
+          :group_id => md5,
+          :group => sorted_group
         }
-        
+
         @grouped.call( response ) if @grouped
 
         @peek_timer.cancel if @peek_timer

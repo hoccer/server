@@ -32,7 +32,7 @@ module Hoccer
     end
 
     def clients
-      Client.find_all_by_uuids( @members.map { |m| m['client_uuid'] } ) rescue []
+      Client.find_all_by_uuids( @members.map { |m| m['client_uuid'] } ) #rescue []
     end
 
     def clients_with_action name

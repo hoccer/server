@@ -16,7 +16,7 @@ module Hoccer
       else
         max_latency = 3
       end
-      
+
       max_latency
     end
 
@@ -24,27 +24,27 @@ module Hoccer
       @members.size
     end
 
-    def size_without_waiters 
-      clients.inject(0) do |sum, element| 
+    def size_without_waiters
+      clients.inject(0) do |sum, element|
         sum += 1 unless element.waiting?
         sum
       end
     end
-    
+
     def clients
-      Client.find_all_by_uuids( @members.map { |m| m['client_uuid'] } )
+      Client.find_all_by_uuids( @members.map { |m| m['client_uuid'] } ) rescue []
     end
 
-    def clients_with_action name      
+    def clients_with_action name
       clients.select do |c|
-        c.action != nil && c.action.name == name
+        ( c.action != nil && c.action.name == name ) rescue false
       end
     end
-    
+
     def client_infos
       return [] if @members.is_a?(Hash)
-      
-      @members.map do |m|  
+
+      @members.map do |m|
         { :id => m["client_uuid"], :name => m["client_name"] }
       end
     end

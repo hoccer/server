@@ -190,36 +190,39 @@ module Hoccer
       $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
       collection  = $db.collection('messages')
       
-      puts "deliver message with #{@on_message}"
       return unless @on_message
       
       query = { :client_uuid => @uuid }
       query[:timestamp] = { "$gt" => @timestamp.to_f }
-      puts "query #{query}"
       collection.find( query, { :order => [:timestamp, :desc] } ) do |res|
-        puts "result #{res} #{@on_message}"
         if res.size > 0
           data = {
             :timestamp => res.first["timestamp"],
             :messages  => res.map { |data| data["message"] }
           }
           
-          puts "performed query #{query} \nresult #{data}"
-          
           @on_message.call( data ) unless @on_message.nil?
           @on_message = nil;
+          
+          @message_timer.cancel unless @message_timer.nil?
+          @message_timer = nil
+          
+          cleanup
         end
       end
     end
 
     # callbacks
     def on_message timestamp = nil,  &block
-      
-      puts "timestamp #{timestamp.nil?}"
       @timestamp  = timestamp.nil? ? Time.now.to_f : timestamp
-      puts "timestamp #{@timestamp}"
       @on_message = block
+
       deliver_messages
+      
+      @message_timer = EM::Timer.new(60) do
+        data = {:timestamp => Time.now.to_f, :message => [] }
+        @on_message.call( data ) unless @on_message.nil?
+      end
     end
     
     def success &block
@@ -229,6 +232,8 @@ module Hoccer
     def update
       @success.call( action ) if @success && @action
       @action = nil;
+      
+      cleanup
     end
 
     def grouped timestamp = nil, &block
@@ -236,10 +241,6 @@ module Hoccer
       
       on_message timestamp, &block
       async_group { |group| update_grouped( group.client_infos ) }
-
-      # @peek_timer = EM::Timer.new(60) do
-      #   async_group { |group| update_grouped( group.client_infos, true ) }
-      # end
     end
 
     def update_grouped group, forced = false
@@ -255,10 +256,15 @@ module Hoccer
         }
         
         @hash = md5
-        queue_message response
-
-        # @peek_timer.cancel if @peek_timer
+        queue_message( response )
       end
     end
+    
+    def cleanup 
+      # if @success.nil? && @on_message.nil?
+      #   @@clients[@uuid] = nil
+      # end
+    end
+    
   end
 end

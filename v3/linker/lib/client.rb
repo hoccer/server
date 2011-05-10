@@ -90,6 +90,19 @@ module Hoccer
         )
       end
     end
+    
+    def log_action action_name, api_key
+      EM.next_tick do
+        $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
+        collection  = $db.collection('api_stats')
+        doc = {
+          :api_key    => api_key,
+          :action     => action_name,
+          :timestamp  => Time.now
+        }
+        collection.insert( doc )
+      end
+    end
 
     def delete &block
       async_group do |group|
@@ -167,8 +180,12 @@ module Hoccer
     end
 
     def update
-      @success.call( action ) if @success && @action
-      @action = nil;
+      unless @action.nil?
+        log_action( action.name, @environment[:api_key] )
+        
+        @success.call( action ) if @success && @action
+        @action = nil;
+      end
     end
 
     def grouped hash = nil, &block

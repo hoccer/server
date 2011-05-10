@@ -180,8 +180,12 @@ module Hoccer
     end
 
     def update
-      @success.call( action ) if @success && @action
-      @action = nil;
+      unless @action.nil?
+        log_action( action.name, @environment[:api_key] )
+        
+        @success.call( action ) if @success && @action
+        @action = nil;
+      end
     end
 
     def grouped hash = nil, &block

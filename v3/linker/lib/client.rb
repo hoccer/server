@@ -190,14 +190,20 @@ module Hoccer
       $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
       collection  = $db.collection('messages')
       
-      return unless @on_message
+      if @on_message.nil? 
+        puts "can't deliver to #{@uuid}"
+        return
+      end
       
       query = { :client_uuid => @uuid }
       query[:timestamp] = { "$gt" => @timestamp.to_f }
+      
+      puts "query #{query.inspect}"
+      
       collection.find( query, { :order => [:timestamp, :desc] } ) do |res|
         if res.size > 0
           data = {
-            :timestamp => res.first["timestamp"],
+            :message_timestamp => res.first["timestamp"],
             :messages  => res.map { |data| data["message"] }
           }
           
@@ -220,7 +226,7 @@ module Hoccer
       deliver_messages
       
       @message_timer = EM::Timer.new(60) do
-        data = {:timestamp => Time.now.to_f, :message => [] }
+        data = {:message_timestamp => Time.now.to_f, :message => [] }
         @on_message.call( data ) unless @on_message.nil?
       end
     end

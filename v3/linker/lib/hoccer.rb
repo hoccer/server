@@ -42,7 +42,7 @@ module Hoccer
             body { content["hoccability"].to_json }
           else
             status 400
-            body { {:error => @current_client.error}.to_json }
+            body { { :error => @current_client.error}.to_json }
           end
         end
 
@@ -75,7 +75,7 @@ module Hoccer
     end
 
     aget %r{#{CLIENTS}/peek$} do |uuid|
-      @current_client.grouped(params["timestamp"]) do |group|
+      @current_client.grouped( params["message_timestamp"] ) do |group|
         status 200
         content_type "application/json"
         body   group.to_json
@@ -92,7 +92,7 @@ module Hoccer
     end
     
     aget %r{#{CLIENTS}/messages} do |uuid|
-      @current_client.on_message( params["timestamp"] ) do |data| 
+      @current_client.on_message( params["message_timestamp"] ) do |data| 
         status 200
         content_type "application/json"
         body data.to_json

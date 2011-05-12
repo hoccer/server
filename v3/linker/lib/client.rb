@@ -86,7 +86,7 @@ module Hoccer
           :port => 8090,
           :verb => 'PUT',
           :request => "/hoc",
-          :content => @environment.to_json
+          :content => data.to_json
         )
       end
     end

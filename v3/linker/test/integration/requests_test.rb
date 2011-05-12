@@ -243,7 +243,7 @@ class TestRequest < Test::Unit::TestCase
   
     t1 = Thread.new { client_1.peek }
     response = t1.value
-    t1 = Thread.new { client_1.peek response["timestamp"] }
+    t1 = Thread.new { client_1.peek response["message_timestamp"] }
     
     client_2 = create_client
     sleep 1
@@ -259,7 +259,7 @@ class TestRequest < Test::Unit::TestCase
   
     t1 = Thread.new { client_1.peek }
     response = t1.value
-    t1 = Thread.new { client_1.peek response["timestamp"] }
+    t1 = Thread.new { client_1.peek response["message_timestamp"] }
     
     sleep 10
     client_2 = create_client
@@ -276,7 +276,7 @@ class TestRequest < Test::Unit::TestCase
     response = t1.value
     assert_equal 2, response["messages"].first["group"].count
     
-    t2 = Thread.new { client_1.peek response["timestamp"]}
+    t2 = Thread.new { client_1.peek response["message_timestamp"]}
     sleep 3
     client_3 = create_client
     
@@ -291,7 +291,7 @@ class TestRequest < Test::Unit::TestCase
     t1 = Thread.new { client_1.peek }
     response = t1.value
     
-    t2 = Thread.new { client_1.peek( response["timestamp"] ) }
+    t2 = Thread.new { client_1.peek( response["message_timestamp"] ) }
     client_2.delete_environment
     
     response_2 = t2.value
@@ -311,7 +311,7 @@ class TestRequest < Test::Unit::TestCase
     assert_equal 1, response["messages"].size
     assert_equal "robert", response["messages"][0]["hello"]    
     
-    t2 = Thread.new { client_1.get_messages response[ "timestamp" ] }
+    t2 = Thread.new { client_1.get_messages response[ "message_timestamp" ] }
     client_2.post_message( client_1.uuid, { :hello => "john" } )
     response_2 = t2.value
     
@@ -335,7 +335,7 @@ class TestRequest < Test::Unit::TestCase
     client_2.post_message( client_1.uuid, { :hello => "john" } )
     
     sleep(3)
-    response_2 = client_1.get_messages response[ "timestamp" ] 
+    response_2 = client_1.get_messages response[ "message_timestamp" ] 
     
     assert_equal 1, response_2["messages"].size
     assert_equal "john", response_2["messages"][0]["hello"]
@@ -347,7 +347,7 @@ class TestRequest < Test::Unit::TestCase
     t1 = Thread.new { client_1.peek }
     response = t1.value
     
-    t1 = Thread.new { client_1.peek response["timestamp"] }
+    t1 = Thread.new { client_1.peek response["message_timestamp"] }
     
     client_2 = create_client
     sleep 1
@@ -368,7 +368,7 @@ class TestRequest < Test::Unit::TestCase
     
     response = client_1.peek
     
-    t = Thread.new { client_1.peek( response["timestamp"] ) }
+    t = Thread.new { client_1.peek( response["message_timestamp"] ) }
     sleep 0.2
     t2 = Thread.new { client_2.share("one-to-many", { :hello => "world" }) }
     

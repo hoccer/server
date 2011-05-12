@@ -94,7 +94,7 @@ module Hoccer
           begin 
             content = JSON.parse(response[:content])
           rescue
-            puts "coult not parse #{response[:content]}"
+            puts "could not parse #{response[:content]}"
             content = []
           end
           block.call(content)
@@ -202,11 +202,14 @@ module Hoccer
       
       collection.find( query, { :order => [:timestamp, :desc] } ) do |res|
         if res.size > 0
+          puts "result #{res.inspect}"
+          
           data = {
-            :message_timestamp => res.first["timestamp"],
+            :message_timestamp => res.first["timestamp"].to_s,
             :messages  => res.map { |data| data["message"] }
           }
           
+          puts "!!!!!!!!!!!!!! returning #{data}"
           @on_message.call( data ) unless @on_message.nil?
           @on_message = nil;
           
@@ -226,7 +229,7 @@ module Hoccer
       deliver_messages
       
       @message_timer = EM::Timer.new(60) do
-        data = {:message_timestamp => Time.now.to_f, :message => [] }
+        data = { :message_timestamp => Time.now.to_f.to_s, :message => [] }
         @on_message.call( data ) unless @on_message.nil?
       end
     end

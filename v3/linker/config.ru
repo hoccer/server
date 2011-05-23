@@ -7,7 +7,6 @@ class Logger
     "#{msg}\n"
   end
 end
-MuninLogger = Logger.new('log/munin.log')
 
 require 'init'
 

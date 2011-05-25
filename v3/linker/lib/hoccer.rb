@@ -61,15 +61,15 @@ module Hoccer
       @current_client.add_action( action_name, :sender )
       @current_client.success do |action|
         status action.response[0]
-        body   action.response[1].to_json
+        body { action.response[1].to_json }
       end
     end
 
     aget %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
       @current_client.add_action( action_name, :receiver, !!params[:waiting] )
       @current_client.success do |action|
-         status action.response[0]
-         body   action.response[1].to_json
+        status action.response[0]
+        body { action.response[1].to_json }
       end
     end
 

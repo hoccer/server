@@ -90,7 +90,7 @@ module Hoccer
         )
       end
     end
-    
+
     def log_action action_name, api_key
       EM.next_tick do
         $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
@@ -182,7 +182,7 @@ module Hoccer
     def update
       unless @action.nil?
         log_action( action.name, @environment[:api_key] )
-        
+
         @success.call( action ) if @success && @action
         @action = nil;
       end

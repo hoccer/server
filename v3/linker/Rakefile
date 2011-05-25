@@ -1,20 +1,51 @@
 require 'rake'
 require 'rake/testtask'
+require 'mongo'
 
 namespace :test do
 
-Rake::TestTask.new(:functional) do |t|
-  t.libs << "test"
-  t.test_files = FileList['test/functional/*_test.rb']
+  Rake::TestTask.new(:functional) do |t|
+    t.libs << "test"
+    t.test_files = FileList['test/functional/*_test.rb']
 
-  t.verbose = true
+    t.verbose = true
+  end
+
+  Rake::TestTask.new(:integration) do |t|
+    t.libs << "test"
+    t.test_files = FileList['test/integration/*_test.rb']
+
+    t.verbose = true
+  end
+
 end
 
-Rake::TestTask.new(:integration) do |t|
-  t.libs << "test"
-  t.test_files = FileList['test/integration/*_test.rb']
+namespace :db do
+  desc "Setup Database Indices"
+  task :setup_indices do
+    valid_environments = %w( development test production )
 
-  t.verbose = true
-end
+    unless valid_environments.include?( ENV['HOCCER_ENV'] )
+      raise(
+        ArgumentError,
+        "HOCCER_ENV was not specified or invalid"
+      )
+    end
 
+    indices = {
+      "gps"         => "2d",
+      "wifi.bssids" => 1,
+      "client_uuid" => 1,
+      "group_id"    => 1,
+      "created_at"  => 1
+    }
+
+    @conn = Mongo::Connection.new
+    @db   = @conn["hoccer_#{ENV['HOCCER_ENV']}"]
+    @coll = @db['environments']
+
+    indices.each do |index|
+      @coll.ensure_index( [index.to_a] )
+    end
+  end
 end

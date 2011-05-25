@@ -1,6 +1,5 @@
 source "http://rubygems.org"
 
-#gem "eventmachine", "0.12.11", :git => "git://github.com/eventmachine/eventmachine.git"
 gem "eventmachine"
 gem "sinatra"
 gem "sinatra-reloader"
@@ -13,5 +12,4 @@ gem 'uuid'
 gem 'bson_ext', '>= 1.1'
 gem 'em-mongo', '>= 0.2.13'
 gem 'mongo'
-gem 'hoccer-api', :git => "git@github.com:hoccer/ruby-api.git"
-#gem 'hoccer-api', :path => "/Users/robert/Programming/Hoccer/ruby-api"
+gem 'hoccer-api'

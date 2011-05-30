@@ -19,8 +19,8 @@ module Hoccer
     attr_accessor :grouped_envs
 
 
-    before_create :add_group_id, :add_creation_time, :normalize_bssids, :choose_best_location
-    before_save   :ensure_indexable, :remove_empty_selected_list
+    before_create :add_group_id, :add_creation_time, :normalize_bssids
+    before_save   :choose_best_location, :ensure_indexable, :remove_empty_selected_list
     after_create  :update_groups
 
     def self.newest uuid
@@ -33,17 +33,17 @@ module Hoccer
         .order_by([:client_uuid, :asc])
         .only(:client_uuid, :group_id, :latency, :client_name, :selected_clients ).to_a || []
     end
-    
+
     def group
-      
+
       envs = nil
       if self[:selected_clients].nil? || self[:selected_clients].empty?
         envs = Environment
           .where({
-            :group_id => self[:group_id], 
+            :group_id => self[:group_id],
             :created_at => { "$gt" => Time.now.to_i - 40 }
            })
-           .any_of( 
+           .any_of(
                { :selected_clients => nil },
                { :selected_clients => self[:client_uuid] }
             )
@@ -52,20 +52,20 @@ module Hoccer
       else
         envs = Environment
           .where({
-            :group_id => self[:group_id], 
+            :group_id => self[:group_id],
             :created_at => { "$gt" => Time.now.to_i - 40 }
            })
-          .any_of( 
+          .any_of(
               { :selected_clients => nil },
               { :selected_clients => self[:client_uuid] }
            )
           .any_in(  :client_uuid => self[:selected_clients]  )
           .order_by([:client_uuid, :asc])
           .only(:client_uuid, :group_id, :latency, :client_name, :selected_clients ).to_a || []
-          
+
           envs << self unless envs.empty?
       end
-      
+
       envs
     end
 
@@ -195,13 +195,13 @@ module Hoccer
     end
 
     private
-    
+
     def remove_empty_selected_list
       if self[:selected_clients].nil? || self[:selected_clients].empty?
-        self.remove_attribute(:selected_clients) 
+        self.remove_attribute(:selected_clients)
       end
     end
-    
+
     def ensure_indexable
       return unless has_gps
       begin

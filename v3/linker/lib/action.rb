@@ -1,3 +1,5 @@
+require 'uri'
+
 module Hoccer
   class Action < Hash
 
@@ -58,6 +60,8 @@ module Hoccer
         data = sender.map { |s| s.action[:payload] }
 
         clients.each { |x| x.action.response = [200, data] }
+        
+        on_success( data, sender, receiver )
       end
     end
 
@@ -75,7 +79,30 @@ module Hoccer
         c.action.response = [409, {"message" => "conflict"}]
       end
     end
-
+    
+    def on_success payload, senders, receivers 
+      puts payload.inspect
+      
+      data = payload.first["data"][0]
+      
+      type = data["type"]
+      return if not type == "text/x-hoclet"
+      
+      uri = URI.parse(data["content"])
+      
+      http = EM::Protocols::HttpClient.request(
+        :host => uri.host,
+        :port => uri.port,
+        :verb => 'POST',
+        :request => "#{uri.path}/transaction",
+        :content => {
+          :sender   => senders.first.uuid, 
+          :receiver => receivers.first.uuid
+        }.to_json
+      )
+      
+    end
+    
     private
   end
 

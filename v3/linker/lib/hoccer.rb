@@ -98,8 +98,9 @@ module Hoccer
             :bssids    => params["bssids"],
             :timestamp => Time.now.to_i
           },
-          :api_key => params["api_key"]
-        }
+          :api_key => params["api_key"],
+          :client_name => params["client_name"]
+	}
 
         em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
           status 201
@@ -135,5 +136,4 @@ module Hoccer
       end
     end
   end
-
 end

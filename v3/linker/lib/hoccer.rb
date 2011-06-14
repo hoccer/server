@@ -103,8 +103,8 @@ module Hoccer
           :client_name => params["client_name"],
 	  :selected_clients => params["selected_clients"]
 	}
-	puts "envup #{environment}"
-        em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
+        
+	em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
           status 201
           headers "Access-Control-Allow-Origin" => "*"
           body { environment.to_json }

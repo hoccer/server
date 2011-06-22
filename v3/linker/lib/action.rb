@@ -87,22 +87,19 @@ module Hoccer
       if payload.first && payload.first["data"] && payload.first["data"][0] 
         data = payload.first["data"][0]
       
-      uri = URI.parse(data["content"])
+        uri = URI.parse(data["content"])
     
-      puts "path #{uri.path}" 
-      http = EM::Protocols::HttpClient.request(
-#        :host => uri.host,
-#        :port => uri.port,
-	:host => 'localhost',
-	:port => 9413,
-        :verb => 'POST',
-        :request => "#{uri.path}/transaction",
-        :content => {
+        http = EM::Protocols::HttpClient.request(
+	        :host => 'localhost',
+	        :port => 9413,
+          :verb => 'POST',
+          :request => "#{uri.path}/transaction",
+          :content => {
           :sender   => senders.first.uuid, 
           :receiver => receivers.first.uuid
-        }.to_json
-      )
-    
+          }.to_json
+        )
+      end
     end
     
     private

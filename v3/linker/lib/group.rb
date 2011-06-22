@@ -41,11 +41,15 @@ module Hoccer
       end
     end
 
-    def client_infos
+    def client_infos uuid
       return [] if @members.is_a?(Hash)
 
       @members.map do |m|
-        { :id => m["client_uuid"], :name => m["client_name"] }
+        if uuid == m["client_uuid"]
+          { :id => m["client_uuid"], :name => m["client_name"] }
+        else
+          { :id => m["anonymized"], :name => m["client_name"] }
+        end
       end
     end
   end

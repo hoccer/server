@@ -63,9 +63,6 @@ module Hoccer
 
       puts "environment #{uuid} #{environment.inspect}"
       
-      
-      
-
       em_put( "/clients/#{uuid}/environment", @environment.to_json ) do |response|
         block.call( response )
         begin
@@ -121,7 +118,7 @@ module Hoccer
           changed_clients = Client.find_all_by_uuids(content)
           changed_clients.each do |client|
             client.async_group do |new_group|
-              client.update_grouped( new_group.client_infos )
+              client.update_grouped( new_group.client_infos( uuid ) )
             end
           end
         end
@@ -195,10 +192,10 @@ module Hoccer
       @grouped              = block
       @current_group_hash   = hash
 
-      async_group { |group| update_grouped( group.client_infos ) }
+      async_group { |group| update_grouped( group.client_infos( uuid ) ) }
 
       @peek_timer = EM::Timer.new(60) do
-        async_group { |group| update_grouped( group.client_infos, true ) }
+        async_group { |group| update_grouped( group.client_infos( uuid ), true ) }
       end
     end
 

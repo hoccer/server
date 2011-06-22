@@ -83,24 +83,26 @@ module Hoccer
     def on_success payload, senders, receivers 
       puts payload.inspect
       
-      data = payload.first["data"][0]
       
-      type = data["type"]
-      return if not type == "text/x-hoclet"
+      if payload.first && payload.first["data"] && payload.first["data"][0] 
+        data = payload.first["data"][0]
       
-      uri = URI.parse(data["content"])
+        type = data["type"]
+        return if not type == "text/x-hoclet"
       
-      http = EM::Protocols::HttpClient.request(
-        :host => uri.host,
-        :port => uri.port,
-        :verb => 'POST',
-        :request => "#{uri.path}/transaction",
-        :content => {
-          :sender   => senders.first.uuid, 
-          :receiver => receivers.first.uuid
-        }.to_json
-      )
+        uri = URI.parse(data["content"])
       
+        http = EM::Protocols::HttpClient.request(
+          :host => uri.host,
+          :port => uri.port,
+          :verb => 'POST',
+          :request => "#{uri.path}/transaction",
+          :content => {
+            :sender   => senders.first.uuid, 
+            :receiver => receivers.first.uuid
+          }.to_json
+        )
+      end
     end
     
     private

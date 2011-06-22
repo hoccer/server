@@ -87,28 +87,37 @@ module Hoccer
     # javascript routes
     aget %r{#{CLIENTS}/environment.js$} do |uuid|
       authorized_request do
-        environment = {
-          :gps => {
-            :latitude   => params["latitude"].to_f,
-            :longitude  => params["longitude"].to_f,
-            :accuracy   => params["accuracy"].to_f,
-            :timestamp  => params["timestamp"].to_f
-          },
+        method = params["method"].to_s
+        if (method == "delete")  
+	  @current_client.delete do |response|
+            puts "deleted #{response.inspect}"
+            status 200
+            body {"deleted"}
+          end
+	else
+	  environment = {
+            :gps => {
+              :latitude   => params["latitude"].to_f,
+              :longitude  => params["longitude"].to_f,
+              :accuracy   => params["accuracy"].to_f,
+              :timestamp  => params["timestamp"].to_f
+            },
 
-          :wifi => {
-            :bssids    => params["bssids"],
-            :timestamp => Time.now.to_i
-          },
-          :api_key => params["api_key"],
-          :client_name => params["client_name"],
-	  :selected_clients => params["selected_clients"]
-	}
+            :wifi => {
+              :bssids    => params["bssids"],
+              :timestamp => Time.now.to_i
+            },
+            :api_key => params["api_key"],
+            :client_name => params["client_name"],
+    	    :selected_clients => params["selected_clients"]
+	  }
         
-	em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
-          status 201
-          headers "Access-Control-Allow-Origin" => "*"
-          body { environment.to_json }
-        end
+	  em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
+            status 201
+            headers "Access-Control-Allow-Origin" => "*"
+            body { environment.to_json }
+          end
+      	end
       end
     end
 

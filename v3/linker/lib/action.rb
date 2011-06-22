@@ -89,10 +89,13 @@ module Hoccer
       return if not type == "text/x-hoclet"
       
       uri = URI.parse(data["content"])
-      
+    
+      puts "path #{uri.path}" 
       http = EM::Protocols::HttpClient.request(
-        :host => uri.host,
-        :port => uri.port,
+#        :host => uri.host,
+#        :port => uri.port,
+	:host => 'localhost',
+	:port => 9413,
         :verb => 'POST',
         :request => "#{uri.path}/transaction",
         :content => {
@@ -100,7 +103,7 @@ module Hoccer
           :receiver => receivers.first.uuid
         }.to_json
       )
-      
+    
     end
     
     private

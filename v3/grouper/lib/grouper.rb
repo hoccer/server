@@ -21,6 +21,12 @@ module Hoccer
       request_body  = request.body.read
       environment_data = JSON.parse( request_body )
       
+      if environment_data["selected_clients"]
+        environment_data["selected_clients"] = environment_data["selected_clients"].map do |hash|
+          Lookup.reverse_lookup(hash)
+        end
+      end
+      
       if environment = Environment.first({ :conditions => {:client_uuid => uuid} })
         environment.destroy
       end
@@ -44,7 +50,6 @@ module Hoccer
       client = Environment.newest uuid
             
       if client && client.all_in_group
-        puts ">>>>>>>>>>>>>>>>>>>>>>>>>" + client.all_in_group.inspect
         g = client.all_in_group.map do |e| 
           { 
             :client_uuid => e.client_uuid,
@@ -53,7 +58,6 @@ module Hoccer
           }
         end
         
-        puts "<<<<<<<<<<<<<<<<<<<<<<<<<" + g.inspect
         g.to_json
       else
         halt 200, [].to_json

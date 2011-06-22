@@ -3,6 +3,7 @@ require 'uuid'
 require 'mongoid'
 require 'grouper'
 require 'environment'
+require 'lookup'
 require 'hoccability'
 require 'ruby-debug'
 

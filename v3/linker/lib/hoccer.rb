@@ -150,7 +150,7 @@ module Hoccer
     aget %r{#{CLIENTS}/action/peek.js$} do |uuid|
       @current_client.grouped(params[:group_id]) do |group|
         headers "Access-Control-Allow-Origin" => "*"
-	status 200
+	      status 200
         
         body { group.to_json }
         # @current_client.grouped nil

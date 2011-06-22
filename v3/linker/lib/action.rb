@@ -83,10 +83,9 @@ module Hoccer
     def on_success payload, senders, receivers 
       puts payload.inspect
       
-      data = payload.first["data"][0]
       
-      type = data["type"]
-      return if not type == "text/x-hoclet"
+      if payload.first && payload.first["data"] && payload.first["data"][0] 
+        data = payload.first["data"][0]
       
       uri = URI.parse(data["content"])
     

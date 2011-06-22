@@ -76,7 +76,7 @@ module Hoccer
     aget %r{#{CLIENTS}/peek$} do |uuid|
       @current_client.grouped(params["group_id"]) do |group|
         puts "peek #{group}"
-	status 200
+	      status 200
         content_type "application/json"
         body { group.to_json }
 
@@ -101,15 +101,15 @@ module Hoccer
           },
           :api_key => params["api_key"],
           :client_name => params["client_name"],
-	  :selected_clients => params["selected_clients"]
-	}
-        
-	em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
-          status 201
-          headers "Access-Control-Allow-Origin" => "*"
-          body { environment.to_json }
-        end
+	        :selected_clients => params["selected_clients"]
+	      }
       end
+    end
+    
+	  em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
+      status 201
+      headers "Access-Control-Allow-Origin" => "*"
+      body { environment.to_json }
     end
 
     aget %r{#{CLIENTS}/action/send.js$} do |uuid|

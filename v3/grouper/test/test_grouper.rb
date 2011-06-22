@@ -2,6 +2,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__)))
 
 require 'lib/grouper.rb'
+require 'rubygems'
 require 'test/unit'
 require 'rack/test'
 require 'helper'

@@ -86,7 +86,8 @@ module Hoccer
       
       if payload.first && payload.first["data"] && payload.first["data"][0] 
         data = payload.first["data"][0]
-      
+        return unless data["type"] == "text/x-hoclet"
+        
         uri = URI.parse(data["content"])
     
         http = EM::Protocols::HttpClient.request(

@@ -204,7 +204,7 @@ module Hoccer
       # return if group == nil
       
       group_array = group.client_infos( uuid )
-      sorted_group = group_array.sort { |m,n| m["id"] <=> n["id"] }
+      sorted_group = group_array.sort { |m,n| m["name"] <=> n["name"] }
 
       md5 = Digest::MD5.hexdigest( sorted_group.to_json )
 

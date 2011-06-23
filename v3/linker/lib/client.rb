@@ -75,7 +75,7 @@ module Hoccer
 
         Client.find_all_by_uuids( ids ).each do |client|
           group = Group.new(content['group'])
-          client.update_grouped( group.client_infos( uuid )) if client
+          client.update_grouped( group ) if client
         end
       end
     end
@@ -119,7 +119,7 @@ module Hoccer
           changed_clients = Client.find_all_by_uuids(content)
           changed_clients.each do |client|
             client.async_group do |new_group|
-              client.update_grouped( new_group.client_infos( uuid ) )
+              client.update_grouped( new_group )
             end
           end
         end
@@ -193,17 +193,18 @@ module Hoccer
       @grouped              = block
       @current_group_hash   = hash
 
-      async_group { |group| update_grouped( group.client_infos( uuid ) ) }
+      async_group { |group| update_grouped( group ) }
 
       @peek_timer = EM::Timer.new(60) do
-        async_group { |group| update_grouped( group.client_infos( uuid ), true ) }
+        async_group { |group| update_grouped( group, true ) }
       end
     end
 
     def update_grouped group, forced = false
       # return if group == nil
-      #
-      sorted_group = group.sort { |m,n| m["id"] <=> n["id"] }
+      
+      group_array = group.client_infos( uuid )
+      sorted_group = group_array.sort { |m,n| m["id"] <=> n["id"] }
 
       md5 = Digest::MD5.hexdigest( sorted_group.to_json )
 

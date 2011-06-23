@@ -3,7 +3,11 @@ module Hoccer
   class Group
 
     def initialize response
-      @members = JSON.parse( response )
+      if response.is_a? Array
+        @members = response
+      else 
+        @members = JSON.parse( response )
+      end
     end
 
     def latency

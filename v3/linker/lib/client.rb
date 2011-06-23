@@ -71,7 +71,7 @@ module Hoccer
           content = { "group" => [] }
         end
 
-        ids = content["group"].map { |info| info["id"] }
+        ids = content["group"].map { |info| info["client_uuid"] }
 
         Client.find_all_by_uuids( ids ).each do |client|
           client.update_grouped( content["group"] ) if client

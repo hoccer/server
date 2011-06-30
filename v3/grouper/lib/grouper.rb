@@ -38,7 +38,7 @@ module Hoccer
           { 
             :client_uuid => e.client_uuid, 
             :anonymized => Lookup.lookup_uuid(e.client_uuid), 
-            :client_name => e[:client_name] 
+            :client_name => e[:client_name]
           } 
         end
       }
@@ -51,11 +51,15 @@ module Hoccer
             
       if client && client.all_in_group
         g = client.all_in_group.map do |e| 
-          { 
+          info = { 
             :client_uuid => e.client_uuid,
             :anonymized => Lookup.lookup_uuid(e.client_uuid), 
-            :client_name => e[:client_name] 
+            :client_name => e[:client_name],
           }
+          if e[:pubkey]
+            info[:public_key_hash]= Digest::SHA256.hexdigest(e[:pubkey])[0..7]
+          end
+          info
         end
         
         g.to_json

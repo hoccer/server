@@ -41,6 +41,10 @@ module Hoccer
     def info &block
       em_get( "/clients/#{uuid}" ) { |response| block.call( response ) }
     end
+    
+    def publickey hashid, &block
+      em_get( "/clients/#{uuid}/#{hashid}/publickey" ) { |response| block.call( response ) }
+    end
 
     def self.find uuid
       @@clients[uuid]

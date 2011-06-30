@@ -82,6 +82,13 @@ module Hoccer
       environment = Environment.where(:client_uuid => uuid).first
       environment ? environment.to_json : 404
     end
+    
+    get %r{/clients/(.{36,36})/(.+)/publickey$} do |uuid, hashid|
+      clientid = Lookup.reverse_lookup(hashid)
+      environment = Environment.where(:client_uuid => clientid).first
+      publickey = environment[:pubkey]
+      publickey ? publickey : 404
+    end
 
     delete %r{/clients/(.{36,36})/delete} do |uuid|
       environment = Environment.where(:client_uuid => uuid).first

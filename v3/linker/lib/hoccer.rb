@@ -83,6 +83,14 @@ module Hoccer
         # @current_client.grouped nil
       end
     end
+    
+    aget %r{#{CLIENTS}/([a-eA-E0-9]{40,40})/publickey$} do |uuid, hashid|
+      @current_client.publickey(hashid) do |publickey|
+        status 200
+        content_type "text/plain"
+        body {publickey} 
+      end
+    end
 
     # javascript routes
     aget %r{#{CLIENTS}/environment.js$} do |uuid|

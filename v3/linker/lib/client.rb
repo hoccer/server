@@ -43,6 +43,7 @@ module Hoccer
     end
     
     def publickey hashid, &block
+	puts "/clients/#{uuid}/#{hashid}/publickey"
       em_get( "/clients/#{uuid}/#{hashid}/publickey" ) { |response| block.call( response ) }
     end
 

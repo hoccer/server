@@ -84,11 +84,12 @@ module Hoccer
       end
     end
     
-    aget %r{#{CLIENTS}/([a-eA-E0-9]{40,40})/publickey$} do |uuid, hashid|
+    aget %r{#{CLIENTS}/([a-eA-E0-9]{8,8})/publickey$} do |uuid, hashid|
       @current_client.publickey(hashid) do |publickey|
-        status 200
+        puts "get publickey for hash #{hashid}"
+	status 200
         content_type "text/plain"
-        body {publickey} 
+        body {publickey}
       end
     end
 

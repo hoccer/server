@@ -83,8 +83,8 @@ module Hoccer
       environment ? environment.to_json : 404
     end
     
-    get %r{/clients/(.{36,36})/(.+)/publickey$} do |uuid, hashid|
-      clientid = Lookup.reverse_lookup(hashid)
+    get %r{/clients/(.{36,36})/(.{8,8})/publickey$} do |uuid, hashid|
+      clientid = Lookup.reverse_lookup(uuid)
       environment = Environment.where(:client_uuid => clientid).first
       publickey = environment[:pubkey]
       publickey ? publickey : 404

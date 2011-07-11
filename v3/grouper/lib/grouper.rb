@@ -39,13 +39,13 @@ module Hoccer
             :client_uuid => e.client_uuid, 
             :anonymized => Lookup.lookup_uuid(e.client_uuid), 
             :client_name => e[:client_name]
-          } 
+          }
         end
       }
-      
       result.to_json
     end
-
+    
+    
     get %r{/clients/(.{36,36})/group} do |uuid|
       client = Environment.newest uuid
             
@@ -57,7 +57,7 @@ module Hoccer
             :client_name => e[:client_name],
           }
           if e[:pubkey]
-            info[:public_key_hash]= Digest::SHA256.hexdigest(e[:pubkey])[0..7]
+            info[:public_key_hash]= e[:pub_key_hash]
           end
           info
         end
@@ -84,8 +84,7 @@ module Hoccer
     end
     
     get %r{/clients/(.{36,36})/(.{8,8})/publickey$} do |uuid, hashid|
-      clientid = Lookup.reverse_lookup(uuid)
-      environment = Environment.where(:client_uuid => clientid).first
+      environment = Environment.where(:pub_key_hash => hashid).first
       publickey = environment[:pubkey]
       publickey ? publickey : 404
     end

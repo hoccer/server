@@ -38,7 +38,8 @@ module Hoccer
           { 
             :client_uuid => e.client_uuid, 
             :anonymized => Lookup.lookup_uuid(e.client_uuid), 
-            :client_name => e[:client_name]
+            :client_name => e[:client_name],     
+            :public_key_hash => e[:pub_key_hash]
           }
         end
       }

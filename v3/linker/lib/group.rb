@@ -12,7 +12,7 @@ module Hoccer
 
     def latency
       if 1 < @members.size && @members.any? { |x| x["latency"] }
-        latencies = @members.map { |x| ( x["latency"] || 3 ) }
+        latencies = @members.map { |x| ( x["latency"] || 3000 ) }
         max_latency = latencies.max / 1000
         if max_latency > 6
           max_latency = 6

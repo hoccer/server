@@ -19,6 +19,7 @@ module Hoccer
     before do
       @current_client = Hoccer::Client.find_or_create( self )
       @current_client.update_connection self
+      puts "before request= #{request.request_method} #{request.path_info}"
     end
 
     aget %r{#{CLIENTS}$} do |uuid|
@@ -84,8 +85,10 @@ module Hoccer
       end
     end
     
-    aget %r{#{CLIENTS}/([a-eA-E0-9]{8,8})/publickey$} do |uuid, hashid|
+    aget %r{#{CLIENTS}/([a-fA-F0-9]{8,8})/publickey$} do |uuid, hashid|
+      puts "get pubkeyhash= #{hashid}"
       @current_client.publickey(hashid) do |response|
+      puts "got pubkeyhash= #{hashid}"
 	      status 200
         content_type "text/plain"
         body {response[:content]}

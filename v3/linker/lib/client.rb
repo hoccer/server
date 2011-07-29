@@ -94,6 +94,7 @@ module Hoccer
           :request => "/hoc",
           :content => data.to_json
         )
+	puts "WORLDMAPUPDATE"
       end
     end
 

@@ -120,7 +120,8 @@ module Hoccer
             },
             :api_key => params["api_key"],
             :client_name => params["client_name"],
-    	    :selected_clients => params["selected_clients"]
+    	    :selected_clients => params["selected_clients"],
+	    :pubkey => params["pubkey"]
 	  }
         
 	  em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
@@ -165,6 +166,16 @@ module Hoccer
         
         body { group.to_json }
         # @current_client.grouped nil
+      end
+    end
+
+    aget %r{#{CLIENTS}/([a-fA-F0-9]{8,8})/publickey.js$} do |uuid, hashid|
+      puts "get pubkeyhash= #{hashid}"
+      @current_client.publickey(hashid) do |response|
+      puts "got pubkeyhash= #{hashid}"
+              status 200
+        content_type "text/plain"
+        body {response[:content]}
       end
     end
 

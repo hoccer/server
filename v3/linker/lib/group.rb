@@ -49,11 +49,16 @@ module Hoccer
       return [] if @members.is_a?(Hash)
 
       @members.map do |m|
-        if uuid == m["client_uuid"]
-          { :id => m["client_uuid"], :name => m["client_name"] }
-        else
-          { :id => m["anonymized"], :name => m["client_name"] }
+        client = {:name => m["client_name"]}
+        if m["public_key_hash"]
+          client[:pubkey] = m["public_key_hash"]
         end
+        if uuid == m["client_uuid"]
+          client[:id] = m["client_uuid"] 
+        else
+          client[:id] = m["anonymized"] 
+        end
+        client
       end
     end
   end

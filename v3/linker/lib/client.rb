@@ -41,6 +41,11 @@ module Hoccer
     def info &block
       em_get( "/clients/#{uuid}" ) { |response| block.call( response ) }
     end
+    
+    def publickey hashid, &block
+	    puts "HIER HIER HIER /clients/#{uuid}/#{hashid}/publickey"
+      em_get( "/clients/#{uuid}/#{hashid}/publickey" ) { |response| block.call( response ) }
+    end
 
     def self.find uuid
       @@clients[uuid]
@@ -89,6 +94,7 @@ module Hoccer
           :request => "/hoc",
           :content => data.to_json
         )
+	puts "WORLDMAPUPDATE"
       end
     end
 

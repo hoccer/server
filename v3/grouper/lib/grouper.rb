@@ -38,24 +38,29 @@ module Hoccer
           { 
             :client_uuid => e.client_uuid, 
             :anonymized => Lookup.lookup_uuid(e.client_uuid), 
-            :client_name => e[:client_name] 
-          } 
+            :client_name => e[:client_name],     
+            :public_key_hash => e[:pub_key_hash]
+          }
         end
       }
-      
       result.to_json
     end
-
+    
+    
     get %r{/clients/(.{36,36})/group} do |uuid|
       client = Environment.newest uuid
             
       if client && client.all_in_group
         g = client.all_in_group.map do |e| 
-          { 
+          info = { 
             :client_uuid => e.client_uuid,
             :anonymized => Lookup.lookup_uuid(e.client_uuid), 
-            :client_name => e[:client_name] 
+            :client_name => e[:client_name],
           }
+          if e[:pubkey]
+            info[:public_key_hash]= e[:pub_key_hash]
+          end
+          info
         end
         
         g.to_json
@@ -77,6 +82,12 @@ module Hoccer
     get %r{/clients/(.{36,36})$} do |uuid|
       environment = Environment.where(:client_uuid => uuid).first
       environment ? environment.to_json : 404
+    end
+    
+    get %r{/clients/(.{36,36})/(.{8,8})/publickey$} do |uuid, hashid|
+      environment = Environment.where(:pub_key_hash => hashid).first
+      publickey = environment[:pubkey]
+      publickey ? publickey : 404
     end
 
     delete %r{/clients/(.{36,36})/delete} do |uuid|

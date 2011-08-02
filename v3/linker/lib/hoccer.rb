@@ -19,6 +19,7 @@ module Hoccer
     before do
       @current_client = Hoccer::Client.find_or_create( self )
       @current_client.update_connection self
+      puts "before request= #{request.request_method} #{request.path_info}"
     end
 
     aget %r{#{CLIENTS}$} do |uuid|
@@ -76,11 +77,21 @@ module Hoccer
     aget %r{#{CLIENTS}/peek$} do |uuid|
       @current_client.grouped(params["group_id"]) do |group|
         puts "peek #{group}"
-	status 200
+	      status 200
         content_type "application/json"
         body { group.to_json }
 
         # @current_client.grouped nil
+      end
+    end
+    
+    aget %r{#{CLIENTS}/([a-fA-F0-9]{8,8})/publickey$} do |uuid, hashid|
+      puts "get pubkeyhash= #{hashid}"
+      @current_client.publickey(hashid) do |response|
+      puts "got pubkeyhash= #{hashid}"
+	      status 200
+        content_type "text/plain"
+        body {response[:content]}
       end
     end
 

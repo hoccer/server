@@ -216,7 +216,6 @@ module Hoccer
         puts "!!!!!!! Panic: #{e}"
       end
     end
-    __END__
 
     def add_creation_time
       self[:created_at] = Time.now.to_f

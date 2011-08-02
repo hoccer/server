@@ -39,7 +39,7 @@ module Hoccer
             :client_uuid => e.client_uuid, 
             :anonymized => Lookup.lookup_uuid(e.client_uuid), 
             :client_name => e[:client_name],     
-            :public_key_hash => e[:pub_key_hash]
+            :pubkey_id => e[:pubkey_id]
           }
         end
       }
@@ -58,7 +58,7 @@ module Hoccer
             :client_name => e[:client_name],
           }
           if e[:pubkey]
-            info[:public_key_hash]= e[:pub_key_hash]
+            info[:pubkey_id]= e[:pubkey_id]
           end
           info
         end
@@ -85,7 +85,7 @@ module Hoccer
     end
     
     get %r{/clients/(.{36,36})/(.{8,8})/publickey$} do |uuid, hashid|
-      environment = Environment.where(:pub_key_hash => hashid).first
+      environment = Environment.where(:pubkey_id => hashid).first
       publickey = environment[:pubkey]
       publickey ? publickey : 404
     end

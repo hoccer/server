@@ -215,6 +215,7 @@ module Hoccer
       rescue => e
         puts "!!!!!!! Panic: #{e}"
       end
+    end
     __END__
 
     def add_creation_time

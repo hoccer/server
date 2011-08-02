@@ -15,13 +15,13 @@ module Hoccer
     field :network,     :type => Hash
     field :group_id
     field :api_key
-    field :pub_key_hash
+    field :pubkey_id
 
     attr_accessor :grouped_envs
 
 
     before_create :add_group_id, :add_creation_time, :normalize_bssids
-    before_save   :choose_best_location, :ensure_indexable, :remove_empty_selected_list, :add_pub_key_hash
+    before_save   :choose_best_location, :ensure_indexable, :remove_empty_selected_list, :add_pubkey_id
     after_create  :update_groups
 
     def self.newest uuid
@@ -32,7 +32,7 @@ module Hoccer
       Environment
         .where({:group_id => self[:group_id], :created_at => {"$gt" => Time.now.to_i - 40} })
         .order_by([:client_uuid, :asc])
-        .only(:client_uuid, :group_id, :latency, :client_name, :selected_clients, :pubkey, :pub_key_hash ).to_a || []
+        .only(:client_uuid, :group_id, :latency, :client_name, :selected_clients, :pubkey, :pubkey_id ).to_a || []
     end
 
     def group
@@ -49,7 +49,7 @@ module Hoccer
                { :selected_clients => self[:client_uuid] }
             )
           .order_by([:client_uuid, :asc])
-          .only(:client_uuid, :group_id, :latency, :client_name, :selected_clients, :pubkey, :pub_key_hash ).to_a || []
+          .only(:client_uuid, :group_id, :latency, :client_name, :selected_clients, :pubkey, :pubkey_id ).to_a || []
       else
         envs = Environment
           .where({
@@ -62,7 +62,7 @@ module Hoccer
            )
           .any_in(  :client_uuid => self[:selected_clients]  )
           .order_by([:client_uuid, :asc])
-          .only(:client_uuid, :group_id, :latency, :client_name, :selected_clients, :pubkey, :pub_key_hash ).to_a || []
+          .only(:client_uuid, :group_id, :latency, :client_name, :selected_clients, :pubkey, :pubkey_id ).to_a || []
 
           envs << self unless envs.empty?
       end
@@ -215,15 +215,15 @@ module Hoccer
       rescue => e
         puts "!!!!!!! Panic: #{e}"
       end
-    end
+    __END__
 
     def add_creation_time
       self[:created_at] = Time.now.to_f
     end
     
-    def add_pub_key_hash
+    def add_pubkey_id
       if self[:pubkey]
-        self[:pub_key_hash] = Digest::SHA256.hexdigest(self[:pubkey])[0..7]
+        self[:pubkey_id] = Digest::SHA256.hexdigest(self[:pubkey])[0..7]
       end
     end
 

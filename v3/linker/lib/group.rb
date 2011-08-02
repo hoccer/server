@@ -50,8 +50,8 @@ module Hoccer
 
       @members.map do |m|
         client = {:name => m["client_name"]}
-        if m["public_key_hash"]
-          client[:pubkey] = m["public_key_hash"]
+        if m["pubkey_id"]
+          client[:pubkey_id] = m["pubkey_id"]
         end
         if uuid == m["client_uuid"]
           client[:id] = m["client_uuid"] 

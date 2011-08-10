@@ -2,6 +2,8 @@ module Hoccer
 
   class Group
 
+    # should be initialized with json data received from grouper
+
     def initialize response
       if response.is_a? Array
         @members = response
@@ -9,6 +11,10 @@ module Hoccer
         @members = JSON.parse( response )
       end
     end
+
+    # group latency
+    # maximum of the latencies of group members, but at most 6s
+    # default 3s (if no client latencies are known)
 
     def latency
       if 1 < @members.size && @members.any? { |x| x["latency"] }
@@ -28,6 +34,8 @@ module Hoccer
       @members.size
     end
 
+    # number of group members not trying to receive data with the waiting parameter set
+
     def size_without_waiters
       clients.inject(0) do |sum, element|
         sum += 1 unless element.waiting?
@@ -35,15 +43,23 @@ module Hoccer
       end
     end
 
+    # objects representing the group's member clients
+
     def clients
       Client.find_all_by_uuids( @members.map { |m| m['client_uuid'] } ) #rescue []
     end
+
+    # clients in group currently attempting to perform an action of a given type (e.g. one-to-one)
 
     def clients_with_action name
       clients.select do |c|
         ( c.action != nil && c.action.name == name ) rescue false
       end
     end
+
+    # get information about clients in group
+    # client name, hash id for public key (if existing), id (uuid for self, hash returned by the grouper for other clients)
+    # (part of answer to peek request)
 
     def client_infos uuid
       return [] if @members.is_a?(Hash)

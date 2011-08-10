@@ -16,11 +16,15 @@ module Hoccer
 
     set :public, File.join(File.dirname(__FILE__), '..', '/public')
 
+    # when receiving a request, first find or create the object representing the current client
+
     before do
       @current_client = Hoccer::Client.find_or_create( self )
       @current_client.update_connection self
       puts "before request= #{request.request_method} #{request.path_info}"
     end
+
+    # GET request to receive client info
 
     aget %r{#{CLIENTS}$} do |uuid|
       @current_client.info do |response|
@@ -33,8 +37,11 @@ module Hoccer
       end
     end
 
+    # PUT request to set environment data for client (location etc.)
+    # returns hoccability
+
     aput %r{#{CLIENTS}/environment$} do |uuid|
-      authorized_request do |account|
+      authorized_request do |account| # check valid api key / signature
         @current_client.update_environment do |response|
           if response[:status] == 200
             status 201
@@ -46,9 +53,13 @@ module Hoccer
           end
         end
 
+        # updating the world map for every environment update
+
         @current_client.update_worldmap
       end
     end
+
+    # DELETE request to sign off current client
 
     adelete %r{#{CLIENTS}/environment$} do |uuid|
       @current_client.delete do |response|
@@ -58,6 +69,9 @@ module Hoccer
       end
     end
 
+    # PUT request to share data with other clients
+    # action_name can be one-to-one or one-to-many
+
     aput %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
       @current_client.add_action( action_name, :sender )
       @current_client.success do |action|
@@ -66,6 +80,10 @@ module Hoccer
       end
     end
 
+    # GET request to receive data from other clients
+    # action_name can be one-to-one or one-to-many
+    # optional parameter "waiting" to keep the connection open
+
     aget %r{#{CLIENTS}/action/([\w-]+)$} do |uuid, action_name|
       @current_client.add_action( action_name, :receiver, !!params[:waiting] )
       @current_client.success do |action|
@@ -73,6 +91,8 @@ module Hoccer
         body { action.response[1].to_json }
       end
     end
+
+    # GET request to receive information about the client's group
 
     aget %r{#{CLIENTS}/peek$} do |uuid|
       @current_client.grouped(params["group_id"]) do |group|
@@ -85,6 +105,8 @@ module Hoccer
       end
     end
     
+    # GET request to receive the public key associated with a hash id
+
     aget %r{#{CLIENTS}/([a-fA-F0-9]{8,8})/publickey$} do |uuid, hashid|
       puts "get pubkeyhash= #{hashid}"
       @current_client.publickey(hashid) do |response|

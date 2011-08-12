@@ -40,7 +40,7 @@ module Hoccer
       begin
         @body_content || JSON.parse( @body_buffer )
       rescue => e
-        @errors = e.message
+        @error = e.message
         false
       end
     end

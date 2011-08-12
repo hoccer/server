@@ -41,7 +41,7 @@ module Hoccer
         @body_content || JSON.parse( @body_buffer )
       rescue => e
         @errors = e.message
-        {}
+        false
       end
     end
 
@@ -85,8 +85,16 @@ module Hoccer
     def update_environment &block
 
       # get environment data from request body
+      # if data could not be parsed, return with error
 
-      @environment.merge!( parse_body )
+      parsed_environment = parse_body
+
+      unless parsed_environment
+         block.call( { :status => 400 } )
+         return
+      end
+
+      @environment.merge!( parsed_environment )
 
       puts "environment #{uuid} #{environment.inspect}"
 
@@ -209,6 +217,13 @@ module Hoccer
         :uuid     => uuid,
         :api_key  => environment[:api_key]
       )
+
+      # if payload could not be parsed, return with error
+
+      unless action[:payload]
+        action.response = [400, {:error => self[:error] }.to_json]
+        return
+      end
 
       # get the client's current selected group from the grouper
 

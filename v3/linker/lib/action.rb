@@ -123,7 +123,7 @@ module Hoccer
     # when data was successfully transferred
 
     def on_success payload, senders, receivers 
-      puts payload.inspect
+      puts "payload sent: #{payload.inspect}"
       
       # if content was a hoclet, send information about transfer
       

@@ -293,7 +293,7 @@ module Hoccer
       # get sorted list of clients in group and calculate hash
       
       group_array = group.client_infos( uuid )
-      puts group_array.inspect
+      puts "update group: #{group_array.inspect}"
       sorted_group = group_array.sort { |m,n| m[:id] <=> n[:id] }
 
       md5 = Digest::MD5.hexdigest( sorted_group.to_json )

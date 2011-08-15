@@ -220,7 +220,7 @@ module Hoccer
 
       # if payload could not be parsed, return with error
 
-      unless action[:payload]
+      unless action[:payload] || action[:role] == :receiver
         action.response = [400, {:error => self[:error] }.to_json]
         return
       end

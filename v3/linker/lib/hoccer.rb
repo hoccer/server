@@ -113,7 +113,7 @@ module Hoccer
       puts "got pubkeyhash= #{hashid}"
 	      status 200
         content_type "text/plain"
-        body {response[:content]}
+        body { { :pubkey => response[:content]}.to_json}
       end
     end
 

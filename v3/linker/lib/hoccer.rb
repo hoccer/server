@@ -194,10 +194,11 @@ module Hoccer
     aget %r{#{CLIENTS}/([a-fA-F0-9]{8,8})/publickey.js$} do |uuid, hashid|
       puts "get pubkeyhash= #{hashid}"
       @current_client.publickey(hashid) do |response|
-      puts "got pubkeyhash= #{hashid}"
+      puts "got pubkeyhash.js= #{hashid}"
+	headers "Access-Control-Allow-Origin" => "*"
               status 200
         content_type "text/plain"
-        body {response[:content]}
+        body {response[:content].to_json}
       end
     end
 

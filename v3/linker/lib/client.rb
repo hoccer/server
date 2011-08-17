@@ -218,16 +218,13 @@ module Hoccer
         :api_key  => environment[:api_key]
       )
 
-      # if payload could not be parsed, return with error
-
-      unless action[:payload] || action[:role] == :receiver
-        action.response = [400, {:error => self[:error] }.to_json]
-        return
-      end
-
       # get the client's current selected group from the grouper
 
       async_selected_group do |group|
+
+        # if payload could not be parsed, return with error
+
+        action.response = [400, {:error => self[:error] }.to_json] unless action[:payload] || action[:role] == :receiver
 
         # if waiting is set, wait 60s for another client to send data (which terminates the action)
 

@@ -224,7 +224,7 @@ module Hoccer
 
         # if payload could not be parsed, return with error
 
-        action.response = [400, {:error => self[:error] }.to_json] unless action[:payload] || action[:role] == :receiver
+        action.response = [400, {:error => self.error}.to_json] unless action[:payload] || action[:role] == :receiver
 
         # if waiting is set, wait 60s for another client to send data (which terminates the action)
 

@@ -54,7 +54,6 @@ module Hoccer
     # pass request for public key to grouper
 
     def publickey hashid, &block
-	    puts "HIER HIER HIER /clients/#{uuid}/#{hashid}/publickey"
       em_get( "/clients/#{uuid}/#{hashid}/publickey" ) { |response| block.call( response ) }
     end
 
@@ -96,7 +95,7 @@ module Hoccer
 
       @environment.merge!( parsed_environment )
 
-      puts "environment #{uuid} #{environment.inspect}"
+      puts "environment update for client #{uuid}: #{environment.inspect}"
 
       # pass request to grouper
       
@@ -111,6 +110,8 @@ module Hoccer
         # for all clients in the same group (as returned by the grouper): update group info (if client is peeking)
 
         ids = content["group"].map { |info| info["client_uuid"] }
+
+        puts "updated clients after environment update for client #{uuid}: #{ids.inspect}"
 
         Client.find_all_by_uuids( ids ).each do |client|
           group = Group.new(content['group'])
@@ -131,7 +132,6 @@ module Hoccer
           :request => "/hoc",
           :content => data.to_json
         )
-	puts "WORLDMAPUPDATE"
       end
     end
 
@@ -162,7 +162,7 @@ module Hoccer
           begin
             content = JSON.parse(response[:content])
           rescue
-            puts "coult not parse #{response[:content]}"
+            puts "could not parse grouper response to delete request: #{response[:content]}"
             content = []
           end
           block.call(content)
@@ -231,6 +231,7 @@ module Hoccer
         if waiting?
           EM::Timer.new(60) do
             action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
+            puts "timeout for waiting client #{uuid}" unless @action.nil?
           end
         else
 
@@ -305,12 +306,13 @@ module Hoccer
       # get sorted list of clients in group and calculate hash
       
       group_array = group.client_infos( uuid )
-      puts "update group: #{group_array.inspect}"
       sorted_group = group_array.sort { |m,n| m[:id] <=> n[:id] }
 
       md5 = Digest::MD5.hexdigest( sorted_group.to_json )
 
       # if group has changed or the method is called with the forced parameter
+
+      puts "forced group update for client #{uuid} after 60s" if forced
 
       if (@current_group_hash != md5 && group.size > 0) || forced
 

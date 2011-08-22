@@ -54,6 +54,8 @@ module Hoccer
         w.action.response = [200, [ self[:payload] ] ]
       end
 
+      on_success( [ self[:payload] ], [ client ] , waiters )
+
       # if payload was sent, ensure no timeout response is given to the sending client when no further receivers are found later
 
       @content_sent = true unless waiters.size == 0

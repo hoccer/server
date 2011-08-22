@@ -237,6 +237,10 @@ module Hoccer
       # create new group id and assign to all clients in the new group
 
       new_group_id = rand(Time.now.to_i)
+
+      group_uuids = @grouped_envs.map { |e| e.client_uuid }
+      puts "creating new group with id #{new_group_id} and clients #{group_uuids.inspect}"
+
       ( @grouped_envs | relevant_envs ).each do |foobar|
         foobar[:group_id] = new_group_id
         foobar.save

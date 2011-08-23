@@ -47,9 +47,14 @@ module Hoccer
 
       # set responses (terminates the waiting clients' actions)
 
+      waiter_uuids = waiters.map { |w| w.uuid }
+      puts "payload sent from client #{uuid} to waiting clients #{waiter_uuids.inspect}: #{self[:payload].inspect}" unless waiters.size == 0
+
       waiters.each do |w|
         w.action.response = [200, [ self[:payload] ] ]
       end
+
+      on_success( [ self[:payload] ], [ client ] , waiters )
 
       # if payload was sent, ensure no timeout response is given to the sending client when no further receivers are found later
 
@@ -75,7 +80,10 @@ module Hoccer
       sender    = clients.select { |c| c.action[:role] == :sender }
       receiver  = clients.select { |c| c.action[:role] == :receiver && !c.action[:waiting] }
 
-      puts "verifying group (#{group.size}) with #{clients.size} actions with #{sender.size} senders and #{receiver.size} receivers"
+      receiver_uuids = receiver.map { |r| r.uuid }
+      sender_uuids = sender.map { |s| s.uuid }
+
+      puts "verifying transaction of type #{name}. senders: #{sender_uuids.inspect}, receivers: #{receiver_uuids.inspect}"
 
       # return if no others are found
 
@@ -95,6 +103,8 @@ module Hoccer
 
         data = sender.map { |s| s.action[:payload] }
 
+        puts "payload sent from client #{sender[0].uuid} to clients #{receiver_uuids.inspect}: #{data.inspect}"
+
         clients.each { |x| x.action.response = [200, data] }
         
         on_success( data, sender, receiver )
@@ -107,7 +117,7 @@ module Hoccer
       if @content_sent
         self.response = [200, [ self[:payload] ] ]
       else
-        puts "timeout for #{uuid}"
+        puts "timeout for client #{uuid}"
         self.response = [204, {"message" => "timeout"}]
       end
     end
@@ -115,6 +125,9 @@ module Hoccer
     # terminate actions with conflict response
 
     def conflict clients
+      client_uuids = clients.map { |c| c.uuid }
+      puts "conflict for clients #{client_uuids.inspect}"
+
       clients.each do |c|
         c.action.response = [409, {"message" => "conflict"}]
       end
@@ -123,7 +136,6 @@ module Hoccer
     # when data was successfully transferred
 
     def on_success payload, senders, receivers 
-      puts "payload sent: #{payload.inspect}"
       
       # if content was a hoclet, send information about transfer
       

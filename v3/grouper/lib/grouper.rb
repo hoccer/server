@@ -4,6 +4,10 @@ module Hoccer
   class Grouper < Sinatra::Base
     set :show_exceptions, false # we render our own errors
 
+    before do
+      puts "before request= #{request.request_method} #{request.path_info}"
+    end
+
     error do
       e = request.env['sinatra.error'];
       "#{e.class}: #{e.message}\n"
@@ -25,6 +29,8 @@ module Hoccer
 
       request_body  = request.body.read
       environment_data = JSON.parse( request_body )
+
+      puts "environment update for client #{uuid}: #{environment_data.inspect}"
 
       # replace hash ids of selected clients with uuids
 
@@ -54,6 +60,7 @@ module Hoccer
           }
         end
       }
+      puts "returning data for client #{uuid} after environment update: #{result.inspect}"
       result.to_json
     end
     
@@ -84,8 +91,10 @@ module Hoccer
           info
         end
         
+        puts "returning group of client #{uuid}: #{g.inspect}"
         g.to_json
       else
+        puts "returning group of client #{uuid}: []"
         halt 200, [].to_json # if group is empty
       end
     end
@@ -97,8 +106,10 @@ module Hoccer
       client = Environment.newest uuid
             
       if client && client.group
+        puts "returning selected group of client #{uuid}: #{client.group.inspect}"
         client.group.to_json
       else
+        puts "returning selected group of client #{uuid}: []"
         halt 200, [].to_json
       end    
     end
@@ -107,7 +118,13 @@ module Hoccer
 
     get %r{/clients/(.{36,36})$} do |uuid|
       environment = Environment.where(:client_uuid => uuid).first
-      environment ? environment.to_json : 404
+      if environment
+        puts "returning environment data for client #{uuid}"
+        environment.to_json
+      else
+        puts "no environment data found for client #{uuid}"
+        404
+      end
     end
 
     # GET request to receive the public key associated with a hash id
@@ -115,7 +132,13 @@ module Hoccer
     get %r{/clients/(.{36,36})/(.{8,8})/publickey$} do |uuid, hashid|
       environment = Environment.where(:pubkey_id => hashid).first
       publickey = environment[:pubkey]
-      publickey ? publickey : 404
+      if publickey
+        puts "returning public key for hash id #{hashid}: #{publickey.inspect}"
+        publickey
+      else
+        puts "no public key found for hash id #{hashid}"
+        404
+      end
     end
 
     # DELETE request to sign off client
@@ -140,6 +163,8 @@ module Hoccer
           updated_clients << g["client_uuid"]
         end
       end
+
+      puts "client #{uuid} deleted. updated clients: #{updated_clients.inspect}"
             
       status 200
       updated_clients.to_json

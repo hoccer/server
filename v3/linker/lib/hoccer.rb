@@ -29,8 +29,10 @@ module Hoccer
     aget %r{#{CLIENTS}$} do |uuid|
       @current_client.info do |response|
         if response[:status] == 200
+          puts "returning client info: #{response[:content].inspect}"
           body { response[:content] }
         else
+          puts "returning client info failed: client #{uuid} not found}"
           status 404
           body { {:error => "Client with uuid #{uuid} was not found"}.to_json }
         end
@@ -48,6 +50,7 @@ module Hoccer
             content = JSON.parse( response[:content] )
             body { content["hoccability"].to_json }
           else
+            puts "environment update for client #{uuid} failed. parser returned error: #{@current_client.error}"
             status 400
             body { {:error => @current_client.error}.to_json }
           end
@@ -63,7 +66,7 @@ module Hoccer
 
     adelete %r{#{CLIENTS}/environment$} do |uuid|
       @current_client.delete do |response|
-        puts "deleted #{response.inspect}"
+        puts "client #{uuid} deleted. updated clients: #{response.inspect}"
         status 200
         body {"deleted"}
       end
@@ -96,7 +99,7 @@ module Hoccer
 
     aget %r{#{CLIENTS}/peek$} do |uuid|
       @current_client.grouped(params["group_id"]) do |group|
-        puts "peek #{group}"
+        puts "responding to peek from client #{uuid}: #{group}"
 	      status 200
         content_type "application/json"
         body { group.to_json }
@@ -108,10 +111,9 @@ module Hoccer
     # GET request to receive the public key associated with a hash id
 
     aget %r{#{CLIENTS}/([a-fA-F0-9]{8,8})/publickey$} do |uuid, hashid|
-      puts "get pubkeyhash= #{hashid}"
       @current_client.publickey(hashid) do |response|
-      puts "got pubkeyhash= #{hashid}"
-	      status 200
+        puts "returning public key for hash #{hashid} to client #{uuid}"
+	status 200
         content_type "text/plain"
         body { { :pubkey => response[:content]}.to_json}
       end
@@ -123,7 +125,7 @@ module Hoccer
         method = params["method"].to_s
         if (method == "delete")  
 	  @current_client.delete do |response|
-            puts "deleted #{response.inspect}"
+            puts "client #{uuid} deleted. updated clients: #{response.inspect}"
             status 200
             body {"deleted"}
           end
@@ -183,6 +185,7 @@ module Hoccer
 
     aget %r{#{CLIENTS}/action/peek.js$} do |uuid|
       @current_client.grouped(params[:group_id]) do |group|
+        puts "responding to peek from client #{uuid}: #{group}"
         headers "Access-Control-Allow-Origin" => "*"
 	      status 200
         
@@ -192,11 +195,10 @@ module Hoccer
     end
 
     aget %r{#{CLIENTS}/([a-fA-F0-9]{8,8})/publickey.js$} do |uuid, hashid|
-      puts "get pubkeyhash= #{hashid}"
       @current_client.publickey(hashid) do |response|
-      puts "got pubkeyhash.js= #{hashid}"
 	headers "Access-Control-Allow-Origin" => "*"
-              status 200
+        puts "returning public key for hash #{hashid} to client #{uuid}"
+        status 200
         content_type "text/plain"
         body {response[:content].to_json}
       end

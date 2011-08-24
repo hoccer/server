@@ -5,7 +5,7 @@ module Hoccer
     set :show_exceptions, false # we render our own errors
 
     before do
-      puts "before request= #{request.request_method} #{request.path_info}"
+      logs "before request= #{request.request_method} #{request.path_info}"
     end
 
     error do
@@ -30,7 +30,7 @@ module Hoccer
       request_body  = request.body.read
       environment_data = JSON.parse( request_body )
 
-      puts "environment update for client #{uuid}: #{environment_data.inspect}"
+      logs "environment update for client #{uuid}: #{environment_data.inspect}"
 
       # replace hash ids of selected clients with uuids
 
@@ -60,7 +60,7 @@ module Hoccer
           }
         end
       }
-      puts "returning data for client #{uuid} after environment update: #{result.inspect}"
+      logs "returning data for client #{uuid} after environment update: #{result.inspect}"
       result.to_json
     end
     
@@ -91,10 +91,10 @@ module Hoccer
           info
         end
         
-        puts "returning group of client #{uuid}: #{g.inspect}"
+        logs "returning group of client #{uuid}: #{g.inspect}"
         g.to_json
       else
-        puts "returning group of client #{uuid}: []"
+        logs "returning group of client #{uuid}: []"
         halt 200, [].to_json # if group is empty
       end
     end
@@ -106,10 +106,10 @@ module Hoccer
       client = Environment.newest uuid
             
       if client && client.group
-        puts "returning selected group of client #{uuid}: #{client.group.inspect}"
+        logs "returning selected group of client #{uuid}: #{client.group.inspect}"
         client.group.to_json
       else
-        puts "returning selected group of client #{uuid}: []"
+        logs "returning selected group of client #{uuid}: []"
         halt 200, [].to_json
       end    
     end
@@ -119,10 +119,10 @@ module Hoccer
     get %r{/clients/(.{36,36})$} do |uuid|
       environment = Environment.where(:client_uuid => uuid).first
       if environment
-        puts "returning environment data for client #{uuid}"
+        logs "returning environment data for client #{uuid}"
         environment.to_json
       else
-        puts "no environment data found for client #{uuid}"
+        logs "no environment data found for client #{uuid}"
         404
       end
     end
@@ -133,10 +133,10 @@ module Hoccer
       environment = Environment.where(:pubkey_id => hashid).first
       publickey = environment[:pubkey]
       if publickey
-        puts "returning public key for hash id #{hashid}: #{publickey.inspect}"
+        logs "returning public key for hash id #{hashid}: #{publickey.inspect}"
         publickey
       else
-        puts "no public key found for hash id #{hashid}"
+        logs "no public key found for hash id #{hashid}"
         404
       end
     end
@@ -164,7 +164,7 @@ module Hoccer
         end
       end
 
-      puts "client #{uuid} deleted. updated clients: #{updated_clients.inspect}"
+      logs "client #{uuid} deleted. updated clients: #{updated_clients.inspect}"
             
       status 200
       updated_clients.to_json
@@ -178,5 +178,12 @@ module Hoccer
       @groups = Environment.only(:group_id).group
       erb :debug
     end
+
+    # write in log with timestamp
+
+    def logs message
+      puts "#{Time.now}: #{message}"
+    end
+
   end
 end

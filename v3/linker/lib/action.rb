@@ -48,7 +48,7 @@ module Hoccer
       # set responses (terminates the waiting clients' actions)
 
       waiter_uuids = waiters.map { |w| w.uuid }
-      puts "payload sent from client #{uuid} to waiting clients #{waiter_uuids.inspect}: #{self[:payload].inspect}" unless waiters.size == 0
+      logs "payload sent from client #{uuid} to waiting clients #{waiter_uuids.inspect}: #{self[:payload].inspect}" unless waiters.size == 0
 
       waiters.each do |w|
         w.action.response = [200, [ self[:payload] ] ]
@@ -83,7 +83,7 @@ module Hoccer
       receiver_uuids = receiver.map { |r| r.uuid }
       sender_uuids = sender.map { |s| s.uuid }
 
-      puts "verifying transaction of type #{name}. senders: #{sender_uuids.inspect}, receivers: #{receiver_uuids.inspect}"
+      logs "verifying transaction of type #{name}. senders: #{sender_uuids.inspect}, receivers: #{receiver_uuids.inspect}"
 
       # return if no others are found
 
@@ -103,7 +103,7 @@ module Hoccer
 
         data = sender.map { |s| s.action[:payload] }
 
-        puts "payload sent from client #{sender[0].uuid} to clients #{receiver_uuids.inspect}: #{data.inspect}"
+        logs "payload sent from client #{sender[0].uuid} to clients #{receiver_uuids.inspect}: #{data.inspect}"
 
         clients.each { |x| x.action.response = [200, data] }
         
@@ -117,7 +117,7 @@ module Hoccer
       if @content_sent
         self.response = [200, [ self[:payload] ] ]
       else
-        puts "timeout for client #{uuid}"
+        logs "timeout for client #{uuid}"
         self.response = [204, {"message" => "timeout"}]
       end
     end
@@ -126,7 +126,7 @@ module Hoccer
 
     def conflict clients
       client_uuids = clients.map { |c| c.uuid }
-      puts "conflict for clients #{client_uuids.inspect}"
+      logs "conflict for clients #{client_uuids.inspect}"
 
       clients.each do |c|
         c.action.response = [409, {"message" => "conflict"}]

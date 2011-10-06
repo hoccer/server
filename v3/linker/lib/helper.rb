@@ -113,3 +113,9 @@ def log_hoc options
 
   collection.insert( doc )
 end
+
+# write in log with timestamp
+
+def logs message
+  puts "#{Time.now}: #{message}"
+end

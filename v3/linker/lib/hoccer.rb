@@ -145,13 +145,14 @@ module Hoccer
             :api_key => params["api_key"],
             :client_name => params["client_name"],
     	    :selected_clients => params["selected_clients"],
-	    :pubkey => params["pubkey"]
+	    :pubkey => params["pubkey"].tr(' ','+')
 	  }
         
 	  em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
             status 201
             headers "Access-Control-Allow-Origin" => "*"
             body { environment.to_json }
+	    puts "#{environment.to_json}"
           end
       	end
       end

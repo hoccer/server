@@ -95,7 +95,7 @@ module Hoccer
 
       @environment.merge!( parsed_environment )
 
-      logs "environment update for client #{uuid}: #{environment.inspect}"
+      puts "environment update for client #{uuid}: #{environment.inspect}"
 
       # pass request to grouper
       
@@ -111,7 +111,7 @@ module Hoccer
 
         ids = content["group"].map { |info| info["client_uuid"] }
 
-        logs "updated clients after environment update for client #{uuid}: #{ids.inspect}"
+        puts "updated clients after environment update for client #{uuid}: #{ids.inspect}"
 
         Client.find_all_by_uuids( ids ).each do |client|
           group = Group.new(content['group'])
@@ -162,7 +162,7 @@ module Hoccer
           begin
             content = JSON.parse(response[:content])
           rescue
-            logs "could not parse grouper response to delete request: #{response[:content]}"
+            puts "could not parse grouper response to delete request: #{response[:content]}"
             content = []
           end
           block.call(content)
@@ -231,7 +231,7 @@ module Hoccer
         if waiting?
           EM::Timer.new(60) do
             action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
-            logs "timeout for waiting client #{uuid}" unless @action.nil?
+            puts "timeout for waiting client #{uuid}" unless @action.nil?
           end
         else
 
@@ -312,7 +312,7 @@ module Hoccer
 
       # if group has changed or the method is called with the forced parameter
 
-      logs "forced group update for client #{uuid} after 60s" if forced
+      puts "forced group update for client #{uuid} after 60s" if forced
 
       if (@current_group_hash != md5 && group.size > 0) || forced
 

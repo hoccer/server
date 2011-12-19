@@ -186,7 +186,7 @@ module Hoccer
 
     aget %r{#{CLIENTS}/action/peek.js$} do |uuid|
       @current_client.grouped(params[:group_id]) do |group|
-        logs "responding to peek from client #{uuid}: #{group}"
+        puts "responding to peek from client #{uuid}: #{group}"
         headers "Access-Control-Allow-Origin" => "*"
 	      status 200
         
@@ -198,7 +198,7 @@ module Hoccer
     aget %r{#{CLIENTS}/([a-fA-F0-9]{8,8})/publickey.js$} do |uuid, hashid|
       @current_client.publickey(hashid) do |response|
 	headers "Access-Control-Allow-Origin" => "*"
-        logs "returning public key for hash #{hashid} to client #{uuid}"
+        puts "returning public key for hash #{hashid} to client #{uuid}"
         status 200
         content_type "text/plain"
         body {response[:content].to_json}

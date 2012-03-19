@@ -32,7 +32,7 @@ namespace :db do
       )
     end
 
-    indices = {
+    env_indices = {
       "gps"         => "2d",
       "wifi.bssids" => 1,
       "client_uuid" => 1,
@@ -40,12 +40,23 @@ namespace :db do
       "created_at"  => 1
     }
 
+    lookup_indices = {
+      "uuid" => 1,
+      "hash" => 1
+    }
+
     @conn = Mongo::Connection.new
     @db   = @conn["hoccer_#{ENV['HOCCER_ENV']}"]
-    @coll = @db['environments']
 
-    indices.each do |index|
+    @coll = @db['environments']
+    env_indices.each do |index|
       @coll.ensure_index( [index.to_a] )
     end
+
+    @coll = @db['hoccer_lookups']
+    lookup_indices.each do |index|
+      @coll.ensure_index( [index.to_a] )
+    end
+
   end
 end

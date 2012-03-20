@@ -3,6 +3,7 @@ require 'ruby-debug'
 module Hoccer
   class Client
 
+    # XXX remove this once XXX below cleared
     UUID_PATTERN = /[a-zA-Z0-9\-]{36,36}/
 
     attr_accessor :environment,
@@ -15,13 +16,14 @@ module Hoccer
 
     @@clients = {}
 
-    def initialize connection
-      @uuid             = connection.request.path_info.match(UUID_PATTERN)[0]
+    def initialize uuid
+      @uuid             = uuid
 
       @@clients[@uuid]  = self
     end
 
     def update_connection connection
+      # XXX why do we update the UUID here? this should never have an effect.
       @uuid             = connection.request.path_info.match(UUID_PATTERN)[0]
       @body_content     = nil
       @body_buffer      = connection.request.body.read
@@ -52,10 +54,8 @@ module Hoccer
       end
     end
 
-    def self.find_or_create connection
-      uuid = connection.request.path_info.match(UUID_PATTERN)[0]
-
-      @@clients[uuid] ||= Client.new( connection )
+    def self.find_or_create uuid
+      @@clients[uuid] ||= Client.new( uuid )
     end
 
     def update_environment &block

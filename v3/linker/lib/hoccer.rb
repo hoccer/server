@@ -16,8 +16,11 @@ module Hoccer
 
     set :public, File.join(File.dirname(__FILE__), '..', '/public')
 
+    UUID_PATTERN = /[a-zA-Z0-9\-]{36,36}/
+
     before do
-      @current_client = Hoccer::Client.find_or_create( self )
+      uuid = self.request.path_info.match(UUID_PATTERN)[0]
+      @current_client = Hoccer::Client.find_or_create( uuid )
       @current_client.update_connection self
     end
 

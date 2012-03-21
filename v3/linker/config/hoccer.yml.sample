@@ -1,7 +1,7 @@
 development:
   database: hoccer_development
   grouper_host: localhost
-  grouper_port: 9410
+  grouper_port: 9411
 
 production:
   database: hoccer_development

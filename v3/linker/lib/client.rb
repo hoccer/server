@@ -189,7 +189,6 @@ module Hoccer
 
     def async_group &block
       em_get( "/clients/#{uuid}/group") do |response|
-        puts "response now is #{response}"
         group = Group.new( response[:content] )
         block.call( group )
       end
@@ -225,7 +224,6 @@ module Hoccer
 
         # if payload could not be parsed, return with error
 
-        puts "action is #{@action}"
         encoded_error = {:error => self.error}.to_json
         if @action
           @action.response = [400, encoded_error] unless @action[:payload] || @action[:role] == :receiver

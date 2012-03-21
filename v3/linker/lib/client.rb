@@ -189,6 +189,7 @@ module Hoccer
 
     def async_group &block
       em_get( "/clients/#{uuid}/group") do |response|
+        puts "response now is #{response}"
         group = Group.new( response[:content] )
         block.call( group )
       end
@@ -224,13 +225,17 @@ module Hoccer
 
         # if payload could not be parsed, return with error
 
-        action.response = [400, {:error => self.error}.to_json] unless action[:payload] || action[:role] == :receiver
+        puts "action is #{@action}"
+        encoded_error = {:error => self.error}.to_json
+        if @action
+          @action.response = [400, encoded_error] unless @action[:payload] || @action[:role] == :receiver
+        end
 
         # if waiting is set, wait 60s for another client to send data (which terminates the action)
 
         if waiting?
           EM::Timer.new(60) do
-            action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
+            @action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
             puts "timeout for waiting client #{uuid}" unless @action.nil?
           end
         else
@@ -252,11 +257,11 @@ module Hoccer
               # find compatible senders/receivers
               # if successful, send content and terminate
 
-              action.verify( group, true ) if self.action != nil
+              @action.verify( group, true ) if self.action != nil
 
               # if action was again not terminated, quit (timeout or sent only to waiters)
 
-              action.invalidate if self.action != nil
+              @action.invalidate if self.action != nil
             end
           end
         end

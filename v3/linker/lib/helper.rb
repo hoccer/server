@@ -1,3 +1,5 @@
+# passing requests to the grouper
+
 def em_request method, path, content, &block
   http = EM::Protocols::HttpClient.request(
     :host => Hoccer.config["grouper_host"],
@@ -29,6 +31,8 @@ def method_missing symbol, *args, &block
   end
 end
 
+# halt with error
+
 def halt_with_error code, message = ""
   ahalt(
     code,
@@ -36,6 +40,8 @@ def halt_with_error code, message = ""
     {:error => message}.to_json
   )
 end
+
+# helper functions for checking signature
 
 def protocol_and_host
   scheme = request.env["HTTP_X_FORWARDED_PROTO"] || request.scheme
@@ -52,10 +58,12 @@ def request_uri
   end
 end
 
+# check for valid api key and signature before executing block
+
 def authorized_request &block
   referrer = env['HTTP_ORIGIN']
 
-  if ENV["RACK_ENV"] == "production"
+  if ENV["RACK_ENV"] == "production" # production only
     EM.next_tick do
       $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
       collection  = $db.collection('accounts')
@@ -82,6 +90,9 @@ def authorized_request &block
   end
 end
 
+# log action in database
+# defined identically in client.rb, remove one
+
 def log_action action_name, api_key
   EM.next_tick do
     $db         ||= EM::Mongo::Connection.new.db( Hoccer.config["database"] )
@@ -101,4 +112,10 @@ def log_hoc options
   doc = options.merge({:timestamp => Time.now})
 
   collection.insert( doc )
+end
+
+# write in log with timestamp
+
+def logs message
+  puts "#{Time.now}: #{message}"
 end

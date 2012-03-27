@@ -1,0 +1,3 @@
+[submodule "v3/filecache"]
+	path = v3/filecache
+	url = git@github.com:hoccer/filecache_node

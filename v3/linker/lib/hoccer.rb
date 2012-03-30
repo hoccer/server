@@ -5,7 +5,6 @@ require 'client'
 require 'helper'
 
 CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
-UUID_PATTERN = /[a-zA-Z0-9\-]{36,36}/
 
 module Hoccer
   class App < Sinatra::Base
@@ -17,10 +16,12 @@ module Hoccer
 
     set :public, File.join(File.dirname(__FILE__), '..', '/public')
 
-    # when receiving a client request, first find or
-    # create the object representing the current client
+    UUID_PATTERN = /[a-zA-Z0-9\-]{36,36}/
 
-    before %r{#{CLIENTS}$} do |uuid|
+    # when receiving a request, first find or create the object representing the current client
+
+    before do
+      uuid = self.request.path_info.match(UUID_PATTERN)[0]
       @current_client = Hoccer::Client.find_or_create( uuid )
       @current_client.update_connection self
       logs "before request= #{request.request_method} #{request.path_info}"

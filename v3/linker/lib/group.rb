@@ -1,5 +1,11 @@
 module Hoccer
 
+  # This class represents the group of a SPECIFIC CLIENT.
+  #
+  # This information originates from the grouper and is managed
+  # by the Client class for each of its instances.
+  #
+
   class Group
 
     # should be initialized with json data received from grouper

@@ -4,9 +4,17 @@ require 'group'
 require 'client'
 require 'helper'
 
+# Pattern for common prefix of client requests.
+
 CLIENTS = "/clients/([a-zA-Z0-9\-]{36,36})"
 
 module Hoccer
+
+  # Root of the application.
+  #
+  # This is where requests enter the linker.
+  #
+
   class App < Sinatra::Base
     register Sinatra::Async
 
@@ -15,8 +23,6 @@ module Hoccer
     end
 
     set :public, File.join(File.dirname(__FILE__), '..', '/public')
-
-    UUID_PATTERN = /[a-zA-Z0-9\-]{36,36}/
 
     # when receiving a client request of some kind, first find
     # or create the object representing the current client

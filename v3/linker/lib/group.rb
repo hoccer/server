@@ -13,7 +13,7 @@ module Hoccer
     def initialize response
       if response.is_a? Array
         @members = response
-      else 
+      else
         @members = JSON.parse( response )
       end
     end

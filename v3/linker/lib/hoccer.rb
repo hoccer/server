@@ -24,6 +24,12 @@ module Hoccer
 
     set :public, File.join(File.dirname(__FILE__), '..', '/public')
 
+    # say hello when spoken to
+
+    get "/" do
+      "This is the Hoccer Linker in the #{HOCCER_ENV} environment."
+    end
+
     # when receiving a client request of some kind, first find
     # or create the object representing the current client
 

@@ -7,6 +7,10 @@ require 'lookup'
 require 'hoccability'
 require 'ruby-debug'
 
+HOCCER_ENV = ENV["RACK_ENV"]
+
+puts ">>>>>>>>>> Hoccer Grouper for #{HOCCER_ENV.upcase} <<<<<<<<<<"
+
 def load_config env
   file_name = File.join(File.dirname(__FILE__), "config", "mongoid.yml")
   @settings = YAML.load_file( file_name )
@@ -16,19 +20,4 @@ def load_config env
   end
 end
 
-configure :production do
-  puts ">>>>>>>>>>>>>>>> PRODUCTION <<<<<<<<<<<<<<<<<"
-  load_config "production"
-end
-
-configure :development do
-  puts ">>>>>>>>>>>>>>>> DEVELOPMENT <<<<<<<<<<<<<<<<<"
-  load_config "development"
-end
-
-configure :test do
-  puts ">>>>>>>>>>>>>>>> TEST <<<<<<<<<<<<<<<<<"
-  load_config "test"
-end
-
-
+load_config HOCCER_ENV

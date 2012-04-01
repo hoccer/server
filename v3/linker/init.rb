@@ -9,8 +9,13 @@ require 'sinatra/async'
 require 'sinatra/async/test'
 require 'uuid'
 require 'json'
+require 'sinatra'
 require 'hoccer'
 require 'thin'
+
+HOCCER_ENV = ENV["RACK_ENV"]
+
+puts ">>>>>>>>>> Hoccer Linker for #{HOCCER_ENV.upcase} <<<<<<<<<<"
 
 class Numeric
   def to_rad
@@ -22,12 +27,11 @@ def config_file_path
   File.join( File.dirname(__FILE__), 'config', 'hoccer.yml')
 end
 
-def load_config
-  # puts ">>>>>>>>>>>>>>>> #{ENV["RACK_ENV"].upcase} <<<<<<<<<<<<<<<<<"
+def load_config env
   Hoccer.instance_eval do
     def config
       begin
-        @config ||= YAML.load_file( config_file_path )[ENV["RACK_ENV"]]
+        @config ||= YAML.load_file( config_file_path )[env]
       rescue
         raise "Unable to load config/hoccer.yml"
       end
@@ -35,4 +39,4 @@ def load_config
   end
 end
 
-load_config
+load_config HOCCER_ENV

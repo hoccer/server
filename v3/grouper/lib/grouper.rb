@@ -17,8 +17,10 @@ module Hoccer
       { :message => "Not Found" }.to_json
     end
 
+    # say hello when spoken to
+
     get "/" do
-      "I'm the grouper!"
+      "This is the Hoccer Grouper in the #{HOCCER_ENV} environment."
     end
 
     # PUT request to set environment data for client (location etc.)

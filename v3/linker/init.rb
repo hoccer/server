@@ -26,11 +26,11 @@ def config_file_path
   File.join( File.dirname(__FILE__), 'config', 'hoccer.yml')
 end
 
-def load_config env
+def load_config
   Hoccer.instance_eval do
     def config
       begin
-        @config ||= YAML.load_file( config_file_path )[env]
+        @config ||= YAML.load_file( config_file_path )[HOCCER_ENV]
       rescue
         raise "Unable to load config/hoccer.yml"
       end
@@ -38,4 +38,4 @@ def load_config env
   end
 end
 
-load_config HOCCER_ENV
+load_config

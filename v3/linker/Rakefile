@@ -25,10 +25,10 @@ namespace :db do
   task :setup_indices do
     valid_environments = %w( development test production )
 
-    unless valid_environments.include?( ENV['HOCCER_ENV'] )
+    unless valid_environments.include?( ENV['RACK_ENV'] )
       raise(
         ArgumentError,
-        "HOCCER_ENV was not specified or invalid"
+        "RACK_ENV was not specified or invalid"
       )
     end
 
@@ -46,7 +46,7 @@ namespace :db do
     }
 
     @conn = Mongo::Connection.new
-    @db   = @conn["hoccer_#{ENV['HOCCER_ENV']}"]
+    @db   = @conn["hoccer_#{ENV['RACK_ENV']}"]
 
     @coll = @db['environments']
     env_indices.each do |index|

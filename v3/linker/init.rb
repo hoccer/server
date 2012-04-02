@@ -9,7 +9,6 @@ require 'sinatra/async'
 require 'sinatra/async/test'
 require 'uuid'
 require 'json'
-require 'sinatra'
 require 'hoccer'
 require 'thin'
 

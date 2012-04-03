@@ -61,7 +61,7 @@ class Test::Unit::TestCase
 
 
   def create_client
-    client = LinccerClient.new :host => "127.0.0.1", :port => 9410
+    client = LinccerClient.new :host => "127.0.0.1", :port => 9710
     client.update_environment({
         :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })

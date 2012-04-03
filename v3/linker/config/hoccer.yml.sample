@@ -1,14 +1,25 @@
-development:
-  database: hoccer_development
+production:
+  database: hoccer_production
   grouper_host: localhost
   grouper_port: 9411
 
-production:
+experimental:
+  database: hoccer_experimental
+  grouper_host: localhost
+  grouper_port: 9511
+
+testing:
+  database: hoccer_testing
+  grouper_host: localhost
+  grouper_port: 9611
+
+development:
   database: hoccer_development
   grouper_host: localhost
-  grouper_port: 9293
+  grouper_port: 9711
 
 test:
-  database: hoccer_development
+  database: hoccer_test
   grouper_host: localhost
-  grouper_port: 9293
+  grouper_port: 9811
+ 

@@ -21,7 +21,7 @@ class TestRequest < Test::Unit::TestCase
   end
 
   test "updating the environment" do
-    client = LinccerClient.new :host => "127.0.0.1", :port => 9410
+    client = LinccerClient.new :host => "127.0.0.1", :port => 9710
     assert_not_nil client.uuid
 
     response = client.update_environment({
@@ -33,7 +33,7 @@ class TestRequest < Test::Unit::TestCase
   end
 
   test "lonesome client tries to share" do
-    client = LinccerClient.new :host => "127.0.0.1", :port => 9410
+    client = LinccerClient.new :host => "127.0.0.1", :port => 9710
     client.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
@@ -48,7 +48,7 @@ class TestRequest < Test::Unit::TestCase
   end
 
   test "lonesome client tries to receive" do
-    client = LinccerClient.new :host => "127.0.0.1", :port => 9410
+    client = LinccerClient.new :host => "127.0.0.1", :port => 9710
     client.update_environment({
       :gps => { :latitude => 52.22, :longitude => 28.74, :accuracy => 100 }
     })
@@ -59,12 +59,12 @@ class TestRequest < Test::Unit::TestCase
   end
 
   test "two clients one share but no receive action" do
-    client_1 = LinccerClient.new :host => "127.0.0.1", :port => 9410
+    client_1 = LinccerClient.new :host => "127.0.0.1", :port => 9710
     client_1.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
     })
 
-    client_2 = LinccerClient.new :host => "127.0.0.1", :port => 9410
+    client_2 = LinccerClient.new :host => "127.0.0.1", :port => 9710
 
     client_2.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
@@ -82,8 +82,8 @@ class TestRequest < Test::Unit::TestCase
   end
 
   test "two clients one receive but no share action" do
-    client_1 = LinccerClient.new :host => "127.0.0.1", :port => 9410
-    client_2 = LinccerClient.new :host => "127.0.0.1", :port => 9410
+    client_1 = LinccerClient.new :host => "127.0.0.1", :port => 9710
+    client_2 = LinccerClient.new :host => "127.0.0.1", :port => 9710
 
     client_1.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
@@ -105,8 +105,8 @@ class TestRequest < Test::Unit::TestCase
   end
 
   test "two clients sharing and then receiving successfully" do
-    client_1 = LinccerClient.new :host => "127.0.0.1", :port => 9410
-    client_2 = LinccerClient.new :host => "127.0.0.1", :port => 9410
+    client_1 = LinccerClient.new :host => "127.0.0.1", :port => 9710
+    client_2 = LinccerClient.new :host => "127.0.0.1", :port => 9710
 
     client_1.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }
@@ -136,8 +136,8 @@ class TestRequest < Test::Unit::TestCase
 
 
   test "two clients receiving and then sharing successfully" do
-    client_1 = LinccerClient.new :host => "127.0.0.1", :port => 9410
-    client_2 = LinccerClient.new :host => "127.0.0.1", :port => 9410
+    client_1 = LinccerClient.new :host => "127.0.0.1", :port => 9710
+    client_2 = LinccerClient.new :host => "127.0.0.1", :port => 9710
 
     client_1.update_environment({
       :gps => { :latitude => 12.22, :longitude => 18.74, :accuracy => 100 }

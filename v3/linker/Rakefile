@@ -23,7 +23,7 @@ end
 namespace :db do
   desc "Setup Database Indices"
   task :setup_indices do
-    valid_environments = %w( development test production )
+    valid_environments = %w( production experimental testing development )
 
     unless valid_environments.include?( ENV['RACK_ENV'] )
       raise(

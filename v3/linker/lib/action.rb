@@ -141,7 +141,9 @@ module Hoccer
       
       if payload.first && payload.first["data"] && payload.first["data"][0] 
         data = payload.first["data"][0]
-        return unless data["type"] == "text/x-hoclet"
+        unless data["type"] == "text/x-hoclet"
+          return
+        end
         
         uri = URI.parse(data["content"])
     

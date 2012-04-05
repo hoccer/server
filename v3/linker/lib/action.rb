@@ -106,7 +106,7 @@ module Hoccer
         puts "payload sent from client #{sender[0].uuid} to clients #{receiver_uuids.inspect}: #{data.inspect}"
 
         clients.each { |x| x.action.response = [200, data] }
-        
+
         on_success( data, sender, receiver )
       end
     end
@@ -132,34 +132,34 @@ module Hoccer
         c.action.response = [409, {"message" => "conflict"}]
       end
     end
-    
+
     # when data was successfully transferred
 
-    def on_success payload, senders, receivers 
-      
+    def on_success payload, senders, receivers
+
       # if content was a hoclet, send information about transfer
-      
-      if payload.first && payload.first["data"] && payload.first["data"][0] 
+
+      if payload.first && payload.first["data"] && payload.first["data"][0]
         data = payload.first["data"][0]
         unless data["type"] == "text/x-hoclet"
           return
         end
-        
+
         uri = URI.parse(data["content"])
-    
+
         http = EM::Protocols::HttpClient.request(
-	        :host => 'localhost',
-	        :port => 9413,
+          :host => 'localhost',
+          :port => 9413,
           :verb => 'POST',
           :request => "#{uri.path}/transaction",
           :content => {
-          :sender   => senders.first.uuid, 
+          :sender   => senders.first.uuid,
           :receiver => receivers.first.uuid
           }.to_json
         )
       end
     end
-    
+
     private
   end
 

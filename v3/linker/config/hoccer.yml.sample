@@ -2,33 +2,25 @@ production:
   database: hoccer_production
   grouper_host: localhost
   grouper_port: 9411
-  hoclet_host: localhost
-  hoclet_port: 9413
+  worldmap_host: localhost
+  worldmap_port: 8090
 
 experimental:
   database: hoccer_experimental
   grouper_host: localhost
   grouper_port: 9511
-  hoclet_host: localhost
-  hoclet_port: 9513
 
 testing:
   database: hoccer_testing
   grouper_host: localhost
   grouper_port: 9611
-  hoclet_host: localhost
-  hoclet_port: 9613
 
 development:
   database: hoccer_development
   grouper_host: localhost
   grouper_port: 9711
-  hoclet_host: localhost
-  hoclet_port: 9713
 
 test:
   database: hoccer_test
   grouper_host: localhost
   grouper_port: 9811
-  hoclet_host: localhost
-  hoclet_port: 9813

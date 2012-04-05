@@ -125,13 +125,7 @@ module Hoccer
 
     def update_worldmap
       if data = (@environment["gps"] || @environment["network"])
-        http = EM::Protocols::HttpClient.request(
-          :host => "localhost",
-          :port => 8090,
-          :verb => 'PUT',
-          :request => "/hoc",
-          :content => data.to_json
-        )
+        worldmap_request "PUT", "/hoc", data.to_json
       end
     end
 

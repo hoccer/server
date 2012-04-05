@@ -72,6 +72,45 @@ def hoclet_request method, path, content, &block
   end
 end
 
+# passing requests to the worldmap server
+
+def worldmap_request method, path, content, &block
+
+  # get configuration
+  host = Hoccer.config["worldmap_host"]
+  port = Hoccer.config["worldmap_port"]
+
+  # bail out if worldmap is disabled
+  if host.nil? || host == "" || port.nil? || port == ""
+    return
+  end
+
+  # compose request
+  http = EM::Protocols::HttpClient.request(
+    :host => host,
+    :port => port,
+    :verb => method ||= "PUT",
+    :request => path ||= "/",
+    :content => content
+  )
+
+  puts "request to worldmap server: #{http.method} #{http.request} #{http.content}"
+
+  # when done...
+  http.callback do |response|
+    # log the response
+    code = response[:code]
+    content = response[:content]
+    puts "response from hoclet server: #{code} #{content}"
+
+    # call back if provided
+    unless block.nil?
+      block.call( response )
+    end
+  end
+end
+
+
 # halt with error
 
 def halt_with_error code, message = ""

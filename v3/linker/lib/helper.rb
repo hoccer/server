@@ -31,6 +31,46 @@ def method_missing symbol, *args, &block
   end
 end
 
+# passing requests to the hoclet server
+
+def hoclet_request method, path, content, &block
+
+  # get configuration
+  host = Hoccer.config["hoclet_host"]
+  port = Hoccer.config["hoclet_port"]
+
+  # bail out if hoclets are disabled
+  if host.nil? || host == "" || port.nil? || port == ""
+    return
+  end
+
+  # compose request to hoclet server
+  http = EM::Protocols::HttpClient.request(
+    :host => host,
+    :port => port,
+    :verb => method ||= "POST",
+    :request => path ||= "/",
+    :content => content
+  )
+
+  # log the request
+  puts "request to hoclet server: #{http.method} #{http.request} #{http.content}"
+
+  # when done...
+  http.callback do |response|
+
+    # log the response
+    code = response[:code]
+    content = response[:content]
+    puts "response from hoclet server: #{code} #{content}"
+
+    # call back if required
+    unless block.nil?
+      block.call( response )
+    end
+  end
+end
+
 # halt with error
 
 def halt_with_error code, message = ""

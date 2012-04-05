@@ -147,16 +147,12 @@ module Hoccer
 
         uri = URI.parse(data["content"])
 
-        http = EM::Protocols::HttpClient.request(
-          :host => 'localhost',
-          :port => 9413,
-          :verb => 'POST',
-          :request => "#{uri.path}/transaction",
-          :content => {
+        transaction = {
           :sender   => senders.first.uuid,
           :receiver => receivers.first.uuid
-          }.to_json
-        )
+        }.to_json
+
+        hoclet_request "POST", "#{uri.path}/transaction", transaction
       end
     end
 

@@ -41,6 +41,7 @@ def hoclet_request method, path, content, &block
 
   # bail out if hoclets are disabled
   if host.nil? || host == "" || port.nil? || port == ""
+    puts "ignoring hoclet transaction: not configured"
     return
   end
 

@@ -115,14 +115,12 @@ module Hoccer
     aget %r{#{CLIENTS}/peek$} do |uuid|
       @current_client.grouped(params["group_id"]) do |group|
         logs "responding to peek from client #{uuid}: #{group}"
-	      status 200
+        status 200
         content_type "application/json"
         body { group.to_json }
-
-        # @current_client.grouped nil
       end
     end
-    
+
     # GET request to receive the public key associated with a hash id
 
     aget %r{#{CLIENTS}/([a-fA-F0-9]{8,8})/publickey$} do |uuid, hashid|
@@ -201,12 +199,10 @@ module Hoccer
 
     aget %r{#{CLIENTS}/action/peek.js$} do |uuid|
       @current_client.grouped(params[:group_id]) do |group|
-        puts "responding to peek from client #{uuid}: #{group}"
+        logs "responding to peek from client #{uuid}: #{group}"
         headers "Access-Control-Allow-Origin" => "*"
-	      status 200
-        
+        status 200
         body { group.to_json }
-        # @current_client.grouped nil
       end
     end
 

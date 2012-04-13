@@ -63,8 +63,7 @@ class TestRequest < Test::Unit::TestCase
 
     result = client.peek
 
-    puts "peek result: #{result}"
-
+    assert_equal 0, result["group"].count
   end
 
   test "two clients one share but no receive action" do

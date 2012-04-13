@@ -58,6 +58,15 @@ class TestRequest < Test::Unit::TestCase
     client.delete_environment
   end
 
+  test "lonesome client peeks before sending environment" do
+    client = LinccerClient.new :host => "127.0.0.1", :port => 9710
+
+    result = client.peek
+
+    puts "peek result: #{result}"
+
+  end
+
   test "two clients one share but no receive action" do
     client_1 = LinccerClient.new :host => "127.0.0.1", :port => 9710
     client_1.update_environment({

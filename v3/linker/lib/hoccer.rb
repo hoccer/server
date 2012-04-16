@@ -151,16 +151,24 @@ module Hoccer
               :timestamp  => params["timestamp"].to_f
             },
 
-            :wifi => {
-              :bssids    => params["bssids"],
-              :timestamp => Time.now.to_i
-            },
-
             :api_key => params["api_key"],
             :client_name => params["client_name"],
-            :selected_clients => params["selected_clients"],
-            :pubkey => params["pubkey"].tr(' ','+')
           }
+
+          unless params["bssids"].nil?
+            environment[:wifi] = {
+              :bssids    => params["bssids"],
+              :timestamp => Time.now.to_i
+            }
+          end
+
+          unless params["pubkey"].nil?
+            environment[:pubkey] = params["pubkey"].tr(' ','+')
+          end
+
+          unless params["selected_clients"].nil?
+            environment[:selected_clients] = params["selected_clients"]
+          end
 
           em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
             status 201

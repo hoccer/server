@@ -136,14 +136,14 @@ module Hoccer
     aget %r{#{CLIENTS}/environment.js$} do |uuid|
       authorized_request do
         method = params["method"].to_s
-        if (method == "delete")  
-	  @current_client.delete do |response|
+        if (method == "delete")
+          @current_client.delete do |response|
             logs "client #{uuid} deleted. updated clients: #{response.inspect}"
             status 200
             body {"deleted"}
           end
-	else
-	  environment = {
+        else
+          environment = {
             :gps => {
               :latitude   => params["latitude"].to_f,
               :longitude  => params["longitude"].to_f,
@@ -155,19 +155,20 @@ module Hoccer
               :bssids    => params["bssids"],
               :timestamp => Time.now.to_i
             },
+
             :api_key => params["api_key"],
             :client_name => params["client_name"],
-    	    :selected_clients => params["selected_clients"],
-	    :pubkey => params["pubkey"].tr(' ','+')
-	  }
-        
-	  em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
+            :selected_clients => params["selected_clients"],
+            :pubkey => params["pubkey"].tr(' ','+')
+          }
+
+          em_put( "/clients/#{uuid}/environment", environment.to_json ) do |response|
             status 201
             headers "Access-Control-Allow-Origin" => "*"
             body { environment.to_json }
-	    puts "#{environment.to_json}"
+            puts "#{environment.to_json}"
           end
-      	end
+        end
       end
     end
 

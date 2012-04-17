@@ -51,21 +51,24 @@ module Hoccer
 
       # return hoccability and group info
 
-      result = { 
+      result = {
         :hoccability => Hoccability.analyze(env),
-        :group       => env.grouped_envs.map do |e| 
-          { 
-            :client_uuid => e.client_uuid, 
+        :group       => env.grouped_envs.map do |e|
+          member = {
+            :client_uuid => e.client_uuid,
             :anonymized => Lookup.lookup_uuid(e.client_uuid), # hash id belonging to uuid
-            :client_name => e[:client_name],     
-            :pubkey_id => e[:pubkey_id]
+            :client_name => e[:client_name],
           }
+          if e[:pubkey_id]
+            member[:pubkey_id] = e[:pubkey_id]
+          end
+          member
         end
       }
       logs "returning data for client #{uuid} after environment update: #{result.inspect}"
       result.to_json
     end
-    
+
     # GET request to receive group information for client
     # (all clients grouped together based on proximity with environment updates in the last 40s)
 

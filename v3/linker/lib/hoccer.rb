@@ -126,7 +126,7 @@ module Hoccer
     aget %r{#{CLIENTS}/([a-fA-F0-9]{8,8})/publickey$} do |uuid, hashid|
       @current_client.publickey(hashid) do |response|
         logs "returning public key for hash #{hashid} to client #{uuid}"
-	status 200
+        status 200
         content_type "text/plain"
         body { { :pubkey => response[:content]}.to_json}
       end

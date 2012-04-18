@@ -204,10 +204,6 @@ module Hoccer
         status action.response[0]
         body   { action.response[1].to_json }
       end
-      @current_client.timeout do |action|
-        headers "Access-Control-Allow-Origin" => "*"
-        status 204
-      end
     end
 
     aget %r{#{CLIENTS}/action/peek.js$} do |uuid|

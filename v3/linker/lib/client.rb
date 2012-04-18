@@ -264,6 +264,14 @@ module Hoccer
       @success = block
     end
 
+    def timeout &block
+      @timeout = block
+      EM::Timer.new(60) do
+        @timeout.call()
+        @timeout = nil
+      end
+    end
+
     # terminate the client's current action
     # called when the action's response is set
 

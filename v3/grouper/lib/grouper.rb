@@ -40,6 +40,7 @@ module Hoccer
         environment_data["selected_clients"] = environment_data["selected_clients"].map do |hash|
           Lookup.reverse_lookup(hash)
         end
+        environment_data["selected_clients"].delete("") # XXX remove invalid UUIDs
       end
 
       # delete environment entry for this uuid if existing and create new one using environment data

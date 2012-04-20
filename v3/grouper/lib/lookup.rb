@@ -21,8 +21,12 @@ module Hoccer
     # find uuid for hash
   
     def self.reverse_lookup hash
-      lookup = Lookup.where(:hash => hash).first
-      lookup[:uuid]
+      results = Lookup.where(:hash => hash)
+      if results.empty?
+        ""
+      else
+        results.first[:uuid]
+      end
     end
   end
 end

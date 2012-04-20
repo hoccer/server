@@ -1,3 +1,6 @@
 [submodule "v3/filecache"]
 	path = v3/filecache
 	url = git@github.com:hoccer/filecache_node
+[submodule "v3/worldmap"]
+	path = v3/worldmap
+	url = git@github.com:hoccer/worldmap.git

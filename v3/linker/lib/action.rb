@@ -69,7 +69,10 @@ module Hoccer
 
       # if there is no other client in group, terminate with timeout or success (if content has already been sent to waiting clients)
 
+      puts "verifying transaction of type #{name}"
+
       if (group.size_without_waiters < 2)
+        puts "group to small!"
         invalidate
       end
 
@@ -77,37 +80,51 @@ module Hoccer
 
       clients   = group.clients_with_action( name )
 
+      client_uuids = clients.map { |c| c.uuid }
+      client_roles = clients.map { |c| c.action[:role] }
+
+      puts "transaction clients: #{client_uuids.inspect}"
+      puts "transaction roles: #{client_roles.inspect}"
+
       sender    = clients.select { |c| c.action[:role] == :sender }
       receiver  = clients.select { |c| c.action[:role] == :receiver && !c.action[:waiting] }
 
       receiver_uuids = receiver.map { |r| r.uuid }
       sender_uuids = sender.map { |s| s.uuid }
 
-      puts "verifying transaction of type #{name}. senders: #{sender_uuids.inspect}, receivers: #{receiver_uuids.inspect}"
+      puts "transaction senders: #{sender_uuids.inspect}, receivers: #{receiver_uuids.inspect}"
 
       # return if no others are found
-
-      return if clients.size < 2
+      if clients.size < 2
+        puts "not enough clients"
+        return
+      end
 
       # check for conflict (numbers of senders and receivers incompatible with action type)
 
       if conflict? sender, receiver
+        puts "transaction conflict"
         conflict clients
 
       # if the clients that participate in the action have been successfully identified
       # (compatible number of senders and receivers, if reevaluate=false all clients in group participating)
 
-      elsif success? sender, receiver, group, reevaluate
+      else
+        if success? sender, receiver, group, reevaluate
+          puts "success!"
 
-        # send payload to all clients and terminate actions
+          # send payload to all clients and terminate actions
 
-        data = sender.map { |s| s.action[:payload] }
+          data = sender.map { |s| s.action[:payload] }
 
-        puts "payload sent from client #{sender[0].uuid} to clients #{receiver_uuids.inspect}: #{data.inspect}"
+          puts "payload sent from client #{sender[0].uuid} to clients #{receiver_uuids.inspect}: #{data.inspect}"
 
-        clients.each { |x| x.action.response = [200, data] }
+          clients.each { |x| x.action.response = [200, data] }
 
-        on_success( data, sender, receiver )
+          on_success( data, sender, receiver )
+        else
+          puts "failure!"
+        end
       end
     end
 

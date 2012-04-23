@@ -86,15 +86,18 @@ def worldmap_request method, path, content, &block
   end
 
   # compose request
+  rmethod = method ||= "PUT"
+  rpath = path ||= "/"
+
   http = EM::Protocols::HttpClient.request(
     :host => host,
     :port => port,
-    :verb => method ||= "PUT",
-    :request => path ||= "/",
+    :verb => rmethod,
+    :request => rpath,
     :content => content
   )
 
-  puts "request to worldmap server: #{http.method} #{http.request} #{http.content}"
+  puts "request to worldmap: #{rmethod} #{rpath}: #{content}"
 
   # when done...
   http.callback do |response|

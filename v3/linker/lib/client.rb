@@ -309,7 +309,11 @@ module Hoccer
 
       # if group has changed or the method is called with the forced parameter
 
-      puts "forced group update for client #{uuid} after 60s" if forced
+      if forced
+        puts "forced group update for client #{uuid} after 60s"
+      else
+        puts "normal group update for client #{uuid}"
+      end
 
       if (@current_group_hash != md5 && group.size > 0) || forced
 

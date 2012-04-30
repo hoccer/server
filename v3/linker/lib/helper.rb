@@ -104,7 +104,7 @@ def worldmap_request method, path, content, &block
     # log the response
     code = response[:code]
     content = response[:content]
-    puts "response from worldmap server: #{code} #{content}"
+    puts "response from worldmap: #{code} #{content}"
 
     # call back if provided
     unless block.nil?

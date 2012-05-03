@@ -95,7 +95,7 @@ module Hoccer
     def has_mdns
       return false unless self.mdns
       m = self.mdns.with_indifferent_access
-      m[:own_id] && m[:seen_ids] && m[seen_ids].count > 0
+      m[:own_id] && m[:seen_ids] && m[:seen_ids].count > 0
     end
 
     def has_network

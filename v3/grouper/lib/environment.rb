@@ -12,6 +12,7 @@ module Hoccer
 
     field :gps,         :type => Hash
     field :wifi,        :type => Hash
+    field :mdns,        :type => Hash
     field :network,     :type => Hash
     field :group_id
     field :api_key
@@ -91,6 +92,12 @@ module Hoccer
       g[:latitude] && g[:longitude] && g[:accuracy]
     end
 
+    def has_mdns
+      return false unless self.mdns
+      m = self.mdns.with_indifferent_access
+      m[:own_id] && m[:seen_ids] && m[seen_ids].count > 0
+    end
+
     def has_network
       return false unless self.network
       n = self.network.with_indifferent_access
@@ -123,6 +130,43 @@ module Hoccer
       ).any_of(
         *(bssids.map { |bssid| {"wifi.bssids" => bssid} })
       ).to_a
+    end
+
+    # all clients that have seen our mdns ID within the last 30s
+
+    def nearby_mdns
+      return [] unless has_mdns
+
+      own_id = self.mdns.with_indifferent_access[:own_id]
+      seen_ids = self.mdns.with_indifferent_access[:seen_ids]
+
+      # if api key hoccer compatible: only clients with hoccer compatible api keys
+      # if not: only clients with same api key
+
+      if hoccer_compatible?
+        query = { "api_key" => { "$in" => hoccer_compatible_api_keys } }
+      else
+        query = { "api_key" => api_key }
+      end
+
+      # environment update in last 30s and sharing a bssid
+
+      return [] unless own_id
+
+      puts "client has mdns.own_id #{own_id}"
+      puts "client has mdns.seen_ids #{seen_ids}"
+
+      r = Environment.where(
+        { "created_at" => {"$gt" => Time.now.to_f - 30}}
+      ).where(
+        query
+      ).where(
+        { "mdns.seen_ids" => own_id }
+      ).to_a
+
+      puts "query returned clients #{r}"
+
+      r
     end
 
     # all clients in geographic proximity (according to gps data) with environment update in the last 30s
@@ -183,10 +227,10 @@ module Hoccer
       end
     end
 
-    # nearby clients (determined by gps or wifi bssid)
+    # nearby clients (determined by gps, wifi and mdns)
 
     def nearby
-      nearby_gps | nearby_bssids
+      nearby_gps | nearby_bssids | nearby_mdns
     end
 
     # whether the client's api key is hoccer compatible

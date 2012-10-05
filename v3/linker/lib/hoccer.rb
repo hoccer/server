@@ -36,7 +36,7 @@ module Hoccer
     before %r{#{CLIENTS}/.*$} do |uuid|
       @current_client = Hoccer::Client.find_or_create( uuid )
       @current_client.update_connection self
-      logs "before request= #{request.request_method} #{request.path_info}"
+      logs "request #{@current_client.uuid} #{request.request_method} #{request.path_info}"
     end
 
     # GET request to receive client info

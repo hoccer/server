@@ -45,10 +45,21 @@ module Hoccer
       clients   = group.clients_with_action( name )
       waiters    = clients.select { |c| c.action[:role] == :receiver && c.action[:waiting] }
 
-      # set responses (terminates the waiting clients' actions)
+      # if there are no waiters then return
+
+      if waiters.size == 0
+        return
+      end
+
+      # get uuids for waiters
 
       waiter_uuids = waiters.map { |w| w.uuid }
-      puts "payload sent from client #{uuid} to waiting clients #{waiter_uuids.inspect}: #{self[:payload].inspect}" unless waiters.size == 0
+
+      # log about it
+
+      logs "client #{uuid} action wakes #{waiter_uuids.inspect}"
+
+      # set responses (terminates the waiting clients' actions)
 
       waiters.each do |w|
         w.action.response = [200, [ self[:payload] ] ]
@@ -69,10 +80,8 @@ module Hoccer
 
       # if there is no other client in group, terminate with timeout or success (if content has already been sent to waiting clients)
 
-      puts "verifying transaction of type #{name}"
-
       if (group.size_without_waiters < 2)
-        puts "group to small!"
+        logs "transaction waitersonly"
         invalidate
       end
 
@@ -83,27 +92,26 @@ module Hoccer
       client_uuids = clients.map { |c| c.uuid }
       client_roles = clients.map { |c| c.action[:role] }
 
-      puts "transaction clients: #{client_uuids.inspect}"
-      puts "transaction roles: #{client_roles.inspect}"
-
       sender    = clients.select { |c| c.action[:role] == :sender }
       receiver  = clients.select { |c| c.action[:role] == :receiver && !c.action[:waiting] }
+      waiter    = clients.select { |c| c.action[:role] == :receiver && c.action[:waiting] }
 
       receiver_uuids = receiver.map { |r| r.uuid }
       sender_uuids = sender.map { |s| s.uuid }
+      waiter_uuids = waiter.map { |s| s.uuid }
 
-      puts "transaction senders: #{sender_uuids.inspect}, receivers: #{receiver_uuids.inspect}"
+      logs "transaction verify senders #{sender_uuids.inspect} receivers #{sender_uuids.inspect} waiters #{waiter_uuids.inspect}"
 
       # return if no others are found
       if clients.size < 2
-        puts "not enough clients"
+        logs "transaction lonely"
         return
       end
 
       # check for conflict (numbers of senders and receivers incompatible with action type)
 
       if conflict? sender, receiver
-        puts "transaction conflict"
+        logs "transaction conflict"
         conflict clients
 
       # if the clients that participate in the action have been successfully identified
@@ -111,19 +119,17 @@ module Hoccer
 
       else
         if success? sender, receiver, group, reevaluate
-          puts "success!"
-
           # send payload to all clients and terminate actions
 
           data = sender.map { |s| s.action[:payload] }
 
-          puts "payload sent from client #{sender[0].uuid} to clients #{receiver_uuids.inspect}: #{data.inspect}"
+          logs "transaction success type #{@name} from #{sender_uuids.inspect} to #{receiver_uuids.inspect} data #{data.inspect}"
 
           clients.each { |x| x.action.response = [200, data] }
 
           on_success( data, sender, receiver )
         else
-          puts "failure!"
+          puts "transaction failure type #{@name} from #{sender_uuids.inspect} to #{receiver_uuids.inspect}"
         end
       end
     end
@@ -134,7 +140,6 @@ module Hoccer
       if @content_sent
         self.response = [200, [ self[:payload] ] ]
       else
-        puts "timeout for client #{uuid}"
         self.response = [204, {"message" => "timeout"}]
       end
     end
@@ -143,7 +148,6 @@ module Hoccer
 
     def conflict clients
       client_uuids = clients.map { |c| c.uuid }
-      puts "conflict for clients #{client_uuids.inspect}"
 
       clients.each do |c|
         c.action.response = [409, {"message" => "conflict"}]

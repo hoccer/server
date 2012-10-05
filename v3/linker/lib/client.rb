@@ -95,7 +95,7 @@ module Hoccer
 
       @environment.merge!( parsed_environment )
 
-      puts "environment update for client #{uuid}: #{environment.inspect}"
+      logs "client #{uuid} environment #{environment.inspect}"
 
       # pass request to grouper
       
@@ -111,7 +111,7 @@ module Hoccer
 
         ids = content["group"].map { |info| info["client_uuid"] }
 
-        puts "updated clients after environment update for client #{uuid}: #{ids.inspect}"
+        logs "client #{uuid} updates #{ids.inspect}"
 
         Client.find_all_by_uuids( ids ).each do |client|
           group = Group.new(content['group'])
@@ -148,6 +148,8 @@ module Hoccer
     # sign off client
 
     def delete &block
+
+      logs "client #{uuid} delete"
 
       # get current group from grouper, then pass on delete request
 
@@ -202,15 +204,24 @@ module Hoccer
     # role: sender or receiver
 
     def add_action name, role, waiting = false
+      parsed_body = parse_body
       @waiting = waiting
       @action  = Action.create(
         :name     => name,
         :role     => role,
-        :payload  => parse_body,
+        :payload  => parsed_body,
         :waiting  => waiting?,
         :uuid     => uuid,
         :api_key  => environment[:api_key]
       )
+
+      if waiting?
+        mode = "waiting"
+      else
+        mode = "immediate"
+      end
+
+      logs "client #{uuid} action request #{mode} #{name} #{role}"
 
       # get the client's current selected group from the grouper
 
@@ -227,8 +238,10 @@ module Hoccer
 
         if waiting?
           EM::Timer.new(60) do
-            @action.response = [504, {"message" => "request_timeout"}.to_json] unless @action.nil?
-            puts "timeout for waiting client #{uuid}" unless @action.nil?
+            logs "client #{uuid} action timeout #{mode} #{name} #{role}"
+            if @action
+              @action.response = [504, {"message" => "request_timeout"}.to_json]
+            end
           end
         else
 
@@ -245,6 +258,7 @@ module Hoccer
 
           if @action
             EM::Timer.new(group.latency + self.action.timeout) do
+              logs "client #{uuid} action timeout #{mode} #{name} #{role}"
 
               # find compatible senders/receivers
               # if successful, send content and terminate
@@ -282,6 +296,8 @@ module Hoccer
       @grouped              = block
       @current_group_hash   = hash
 
+      logs "client #{uuid} peek request"
+
       # get current group from grouper and set response (unless the group hash is unchanged)
 
       async_group { |group| update_grouped( group ) }
@@ -301,7 +317,7 @@ module Hoccer
     def update_grouped group, forced = false
 
       # get sorted list of clients in group and calculate hash
-      
+
       group_array = group.client_infos( uuid )
       sorted_group = group_array.sort { |m,n| m[:id] <=> n[:id] }
 
@@ -309,13 +325,13 @@ module Hoccer
 
       # if group has changed or the method is called with the forced parameter
 
-      if forced
-        puts "forced group update for client #{uuid} after 60s"
-      else
-        puts "normal group update for client #{uuid}"
-      end
-
       if (@current_group_hash != md5 && group.size > 0) || forced
+
+        if forced
+          logs "client #{uuid} peek timeout"
+        else
+          logs "client #{uuid} peek update"
+        end
 
         # set response for peek request
 
@@ -323,6 +339,8 @@ module Hoccer
           :group_id => md5,
           :group => sorted_group
         }
+
+        # call peek response block
 
         @grouped.call( response ) if @grouped
 

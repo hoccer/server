@@ -14,6 +14,7 @@ module Hoccer
     field :wifi,        :type => Hash
     field :mdns,        :type => Hash
     field :network,     :type => Hash
+    field :channel,     :type => Hash
     field :group_id
     field :api_key
     field :pubkey_id
@@ -102,6 +103,12 @@ module Hoccer
       return false unless self.network
       n = self.network.with_indifferent_access
       n && n[:latitude] && n[:longitude] && n[:accuracy]
+    end
+
+    def has_channel
+      return false unless self.channel
+      n = self.channel.with_indifferent_access
+      n && n[:name]
     end
 
     # all clients sharing a wifi bssid with environment update in the last 30s
@@ -227,6 +234,31 @@ module Hoccer
       end
     end
 
+    def nearby_channel
+      return [] unless has_channel
+
+      name = self.channel.with_indifferent_access[:name]
+
+      # if api key hoccer compatible: only clients with hoccer compatible api keys
+      # if not: only clients with same api key
+
+      if hoccer_compatible?
+        query = { "api_key" => { "$in" => hoccer_compatible_api_keys } }
+      else
+        query = { "api_key" => api_key }
+      end
+
+      r = Environment.where(
+        { "created_at" => {"$gt" => Time.now.to_f - 30}}
+      ).where(
+        query
+      ).where(
+        { "channel.name" => name }
+      ).to_a
+
+      r
+    end
+
     # nearby clients (determined by gps, wifi and mdns)
 
     def nearby
@@ -263,19 +295,25 @@ module Hoccer
 
     def update_groups
 
-      # get nearby clients
+      if has_channel
+        @grouped_envs = self.nearby_channel
+      else
+        # get nearby clients
 
-      relevant_envs = self.nearby
+        relevant_envs = self.nearby
 
-      # all clients in the same group as a nearby client
+        # all clients in the same group as a nearby client
 
-      @grouped_envs = relevant_envs.inject([]) do |result, element|
-        element.all_in_group.each do |group_env|
-          unless result.include?( group_env )
-            result << group_env
+        @grouped_envs = relevant_envs.inject([]) do |result, element|
+          element.all_in_group.each do |group_env|
+            unless result.include?( group_env )
+		unless element.has_channel
+              result << group_env
+		end
+            end
           end
+          result
         end
-        result
       end
 
       # create new group id and assign to all clients in the new group
@@ -285,7 +323,7 @@ module Hoccer
       group_uuids = @grouped_envs.map { |e| e.client_uuid }
       puts "creating new group with id #{new_group_id} and clients #{group_uuids.inspect}"
 
-      ( @grouped_envs | relevant_envs ).each do |foobar|
+      @grouped_envs.each do |foobar|
         foobar[:group_id] = new_group_id
         foobar.save
       end

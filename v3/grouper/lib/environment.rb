@@ -7,6 +7,9 @@ module Hoccer
     MAX_SEARCH_DISTANCE = 5050.0
     EARTH_RADIUS        = 1000 * 6371
 
+    CHANNEL_MINLENGTH   = 8
+    CHANNEL_MAXLENGTH   = 32
+
     include Mongoid::Document
     store_in :environments
 
@@ -108,7 +111,7 @@ module Hoccer
     def has_channel
       return false unless self.channel
       n = self.channel.with_indifferent_access
-      n && n[:name]
+      n && n[:name] && (n[:name].size >= CHANNEL_MINLENGTH) && (n[:name].size <= CHANNEL_MAXLENGTH)
     end
 
     # all clients sharing a wifi bssid with environment update in the last 30s

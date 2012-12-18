@@ -306,10 +306,10 @@ module Hoccer
 
         @grouped_envs = relevant_envs.inject([]) do |result, element|
           element.all_in_group.each do |group_env|
-            unless result.include?( group_env )
-		unless element.has_channel
-              result << group_env
-		end
+            unless element.has_channel
+              unless result.include?( group_env )
+                result << group_env
+              end
             end
           end
           result

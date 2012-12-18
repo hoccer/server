@@ -37,6 +37,7 @@ namespace :db do
       "wifi.bssids" => 1,
       "mdns.own_id" => 1,
       "mdns.seen_ids" => 1,
+      "channel.name" => 1,
       "client_uuid" => 1,
       "group_id"    => 1,
       "created_at"  => 1

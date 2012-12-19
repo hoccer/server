@@ -7,7 +7,7 @@ module Hoccer
     MAX_SEARCH_DISTANCE = 5050.0
     EARTH_RADIUS        = 1000 * 6371
 
-    CHANNEL_MINLENGTH   = 8
+    CHANNEL_MINLENGTH   = 6
     CHANNEL_MAXLENGTH   = 32
 
     include Mongoid::Document
